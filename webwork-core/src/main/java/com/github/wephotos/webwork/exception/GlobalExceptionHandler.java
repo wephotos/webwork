@@ -1,6 +1,6 @@
 package com.github.wephotos.webwork.exception;
 
-import com.github.wephotos.webwork.util.RestObject;
+import com.github.wephotos.webwork.utils.RestObject;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
