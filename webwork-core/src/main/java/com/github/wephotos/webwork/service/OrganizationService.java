@@ -1,6 +1,6 @@
 package com.github.wephotos.webwork.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.github.wephotos.webwork.entity.OrgState;
 import com.github.wephotos.webwork.entity.Organization;
@@ -8,9 +8,9 @@ import com.github.wephotos.webwork.mapper.OrganizationMapper;
 import com.github.wephotos.webwork.mapper.UserOrgMapper;
 import com.github.wephotos.webwork.utils.WebWorkUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Objects;
 
 /**
@@ -19,9 +19,9 @@ import java.util.Objects;
  */
 @Service
 public class OrganizationService {
-    @Autowired
+    @Resource
     private OrganizationMapper organizationMapper;
-    @Autowired
+    @Resource
     private UserOrgMapper userOrgMapper;
 
     public boolean create(Organization organization) {
@@ -54,8 +54,8 @@ public class OrganizationService {
     }
 
     public boolean checkOrgNameUnique(Organization org) {
-        QueryWrapper<Organization> wrapper = new QueryWrapper<>();
-        wrapper.select("id").lambda().eq(Organization::getName, org.getName());
+        LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(Organization::getId).eq(Organization::getName, org.getName());
         Organization result = organizationMapper.selectOne(wrapper);
         return Objects.isNull(result) || StringUtils.equals(result.getId(), org.getId());
     }

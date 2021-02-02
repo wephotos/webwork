@@ -1,8 +1,9 @@
 package com.github.wephotos.webwork.service;
 
 import com.github.wephotos.webwork.mapper.UserOrgMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * @author chengzi
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UserOrgService {
-    @Autowired
+    @Resource
     private UserOrgMapper userOrgMapper;
 
 }

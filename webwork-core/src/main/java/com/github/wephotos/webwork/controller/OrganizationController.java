@@ -4,8 +4,9 @@ package com.github.wephotos.webwork.controller;
 import com.github.wephotos.webwork.entity.Organization;
 import com.github.wephotos.webwork.service.OrganizationService;
 import com.github.wephotos.webwork.utils.RestObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
 
 /**
  * 组织
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/organization")
 public class OrganizationController {
-    @Autowired
+    @Resource
     private OrganizationService organizationService;
 
     @PostMapping("/create")

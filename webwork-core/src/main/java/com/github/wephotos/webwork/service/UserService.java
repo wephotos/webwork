@@ -1,5 +1,6 @@
 package com.github.wephotos.webwork.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
@@ -10,9 +11,9 @@ import com.github.wephotos.webwork.mapper.UserMapper;
 import com.github.wephotos.webwork.mapper.UserRoleMapper;
 import com.github.wephotos.webwork.utils.WebWorkUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.Objects;
 
@@ -22,9 +23,9 @@ import java.util.Objects;
  */
 @Service
 public class UserService extends ServiceImpl<UserMapper, User> {
-    @Autowired
+    @Resource
     private UserMapper userMapper;
-    @Autowired
+    @Resource
     private UserRoleMapper userRoleMapper;
 
 
@@ -76,21 +77,21 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
 
     public boolean checkLoginNameUnique(String loginName) {
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.select("id").lambda().eq(User::getLoginName, loginName.trim());
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(User::getId).eq(User::getLoginName, loginName);
         return SqlHelper.retBool(userMapper.selectCount(wrapper));
     }
 
     public boolean checkPhoneUnique(User user) {
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.select("id", "login_name", "phone").lambda().eq(User::getPhone, user.getPhone().trim());
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(User::getId, User::getLoginName, User::getPhone).eq(User::getPhone, user.getPhone());
         User result = userMapper.selectOne(wrapper);
         return Objects.isNull(result) || StringUtils.equals(result.getId(), user.getId());
     }
 
     public boolean checkEmailUnique(User user) {
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.select("id", "login_name", "email").lambda().eq(User::getEmail, user.getEmail().trim());
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(User::getId, User::getLoginName, User::getEmail).eq(User::getEmail, user.getEmail().trim());
         User result = userMapper.selectOne(wrapper);
         return Objects.isNull(result) || StringUtils.equals(result.getId(), user.getId());
     }

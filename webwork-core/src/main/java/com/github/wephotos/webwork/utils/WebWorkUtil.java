@@ -1,9 +1,9 @@
 package com.github.wephotos.webwork.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,7 +20,7 @@ public final class WebWorkUtil {
 
     private static ObjectMapper objectMapper;
 
-    @Autowired
+    @Resource
     public void setObjectMapper(ObjectMapper objectMapper) {
         WebWorkUtil.objectMapper = objectMapper;
     }

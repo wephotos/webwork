@@ -4,7 +4,6 @@ package com.github.wephotos.webwork.controller;
 import com.github.wephotos.webwork.entity.Resource;
 import com.github.wephotos.webwork.service.ResourceService;
 import com.github.wephotos.webwork.utils.RestObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/resource")
 public class ResourceController {
-    @Autowired
+    @javax.annotation.Resource
     private ResourceService resourceService;
 
     /**
@@ -42,18 +41,6 @@ public class ResourceController {
         boolean result = resourceService.update(resource);
         return RestObject.builder().data(result).build();
     }
-
-    /**
-     * 删除资源
-     *
-     * @param id 资源id
-     * @return RestObject
-     */
-//    @PostMapping("/delete/{id}")
-//    public RestObject delete(@PathVariable String id) {
-//        boolean result = resourceService.delete(id);
-//        return RestObject.builder().data(result).build();
-//    }
 
 
     /**

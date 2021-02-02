@@ -3,10 +3,10 @@ package com.github.wephotos.webwork.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.wephotos.webwork.entity.UserRole;
 import com.github.wephotos.webwork.mapper.UserRoleMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Service
 public class UserRoleService {
-    @Autowired
+    @Resource
     private UserRoleMapper userRoleMapper;
 
     @Transactional(rollbackFor = Exception.class)

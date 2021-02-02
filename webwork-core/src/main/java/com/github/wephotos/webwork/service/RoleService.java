@@ -1,15 +1,15 @@
 package com.github.wephotos.webwork.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.github.wephotos.webwork.entity.Role;
 import com.github.wephotos.webwork.entity.RoleState;
 import com.github.wephotos.webwork.mapper.RoleMapper;
 import com.github.wephotos.webwork.utils.WebWorkUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Objects;
 
 /**
@@ -18,7 +18,7 @@ import java.util.Objects;
  */
 @Service
 public class RoleService {
-    @Autowired
+    @Resource
     private RoleMapper roleMapper;
 
     public boolean create(Role role) {
@@ -47,16 +47,16 @@ public class RoleService {
 
     public boolean checkRoleNameUnique(Role role) {
         String roleId = role.getId();
-        QueryWrapper<Role> wrapper = new QueryWrapper<>();
-        wrapper.lambda().eq(Role::getName, role.getName());
+        LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(Role::getId).eq(Role::getName, role.getName());
         Role result = roleMapper.selectOne(wrapper);
         return Objects.isNull(result) || StringUtils.equals(result.getId(), roleId);
     }
 
     public boolean checkRoleCodeUnique(Role role) {
         String roleId = role.getId();
-        QueryWrapper<Role> wrapper = new QueryWrapper<>();
-        wrapper.lambda().eq(Role::getCode, role.getCode());
+        LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(Role::getId).eq(Role::getCode, role.getCode());
         Role result = roleMapper.selectOne(wrapper);
         return Objects.isNull(result) || StringUtils.equals(result.getId(), roleId);
     }
@@ -65,9 +65,4 @@ public class RoleService {
         return roleMapper.selectById(id);
     }
 
-    public Role query(String roleName) {
-        QueryWrapper<Role> wrapper = new QueryWrapper<>();
-        wrapper.lambda().eq(Role::getName, roleName);
-        return roleMapper.selectOne(wrapper);
-    }
 }

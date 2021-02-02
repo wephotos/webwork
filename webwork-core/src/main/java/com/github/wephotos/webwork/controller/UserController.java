@@ -7,8 +7,9 @@ import com.github.wephotos.webwork.service.UserService;
 import com.github.wephotos.webwork.utils.Errors;
 import com.github.wephotos.webwork.utils.RestObject;
 import com.github.wephotos.webwork.utils.ValidationUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
 
 /**
  * 用户管理
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    @Autowired
+    @Resource
     private UserService userService;
 
     /**
