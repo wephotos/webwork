@@ -11,7 +11,7 @@ public enum Errors {
     /**
      * USER相关
      */
-    USER_NAME_EXIST(100101, "用户名称重复"),
+    USER_NAME_EXIST(100101, "登录名重复"),
     USER_PHONE_EXIST(100102, "手机号重复"),
     USER_MAIL_EXIST(100103, "邮箱重复"),
 

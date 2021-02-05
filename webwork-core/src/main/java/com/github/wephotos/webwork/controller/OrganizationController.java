@@ -20,9 +20,9 @@ public class OrganizationController {
     @Resource
     private OrganizationService organizationService;
 
-    @PostMapping("/create")
+    @PostMapping("/save")
     public RestObject create(@RequestBody Organization organization) {
-        boolean result = organizationService.create(organization);
+        boolean result = organizationService.save(organization);
         return RestObject.builder().data(result).build();
     }
 

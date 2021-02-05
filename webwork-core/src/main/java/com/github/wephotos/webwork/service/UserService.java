@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.github.wephotos.webwork.entity.User;
 import com.github.wephotos.webwork.entity.UserRole;
 import com.github.wephotos.webwork.entity.UserState;
+import com.github.wephotos.webwork.entity.dto.UserDto;
 import com.github.wephotos.webwork.mapper.UserMapper;
 import com.github.wephotos.webwork.mapper.UserRoleMapper;
 import com.github.wephotos.webwork.utils.WebWorkUtil;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -33,7 +35,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return userMapper.selectById(id);
     }
 
-    public boolean create(User user) {
+    public boolean create(UserDto user) {
         user.setId(WebWorkUtil.uuid());
         user.setStatus(UserState.ENABLED.getValue());
         user.setCreateTime(new Date());
@@ -45,13 +47,14 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     }
 
 
-    public boolean update(User user) {
+    public boolean update(UserDto user) {
         user.setPassword(null);
+        // 修改用户
         userMapper.updateById(user);
-        // 更新用户
-        saveUserRole(user);
         // 删除用户与角色关联
         userRoleMapper.delete(new QueryWrapper<UserRole>().lambda().eq(UserRole::getUserId, user.getId()));
+        // 新增用户角色关联
+        saveUserRole(user);
         return true;
     }
 
@@ -69,17 +72,11 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return userMapper.updateById(user);
     }
 
-    public User query(String loginName) {
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.lambda().eq(User::getLoginName, loginName);
-        return userMapper.selectOne(wrapper);
-    }
-
 
     public boolean checkLoginNameUnique(String loginName) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.select(User::getId).eq(User::getLoginName, loginName);
-        return SqlHelper.retBool(userMapper.selectCount(wrapper));
+        return userMapper.selectCount(wrapper) == 0;
     }
 
     public boolean checkPhoneUnique(User user) {
@@ -106,8 +103,15 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return SqlHelper.retBool(userMapper.updateById(newUser));
     }
 
-    public void saveUserRole(User user) {
-//        List<UserRole> roles = user.getRoles();
-//        roles.stream().peek(userRole -> userRole.setId(WebWorkUtil.uuid())).forEach(userRoleMapper::insert);
+    public void saveUserRole(UserDto userDto) {
+        String userId = userDto.getId();
+        List<String> roles = userDto.getRoles();
+        roles.stream().map(roleId -> {
+            UserRole ur = new UserRole();
+            ur.setId(WebWorkUtil.uuid());
+            ur.setUserId(userId);
+            ur.setRoleId(roleId);
+            return ur;
+        }).forEach(userRoleMapper::insert);
     }
 }

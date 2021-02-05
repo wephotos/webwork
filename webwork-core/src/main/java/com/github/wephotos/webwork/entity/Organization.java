@@ -21,5 +21,6 @@ public class Organization {
     private String parentId;
     private Integer type;
     private Integer status;
+    private Integer sort;
     private String code;
 }

@@ -24,11 +24,17 @@ public class OrganizationService {
     @Resource
     private UserOrgMapper userOrgMapper;
 
-    public boolean create(Organization organization) {
+    public boolean save(Organization organization) {
+        String maxCode = organizationMapper.findMaxCode(organization.getParentId());
         organization.setId(WebWorkUtil.uuid());
         organization.setStatus(1);
+        if (StringUtils.isNotBlank(organization.getParentId())) {
+            Organization parent = organizationMapper.selectById(organization.getParentId());
+            organization.setCode(parent.getCode().concat(maxCode));
+        } else {
+            organization.setCode(maxCode);
+        }
         return SqlHelper.retBool(organizationMapper.insert(organization));
-
     }
 
     public boolean update(Organization organization) {
