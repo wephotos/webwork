@@ -11,5 +11,11 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface ResourceMapper extends BaseMapper<Resource> {
-
+    /**
+     * get maxCode
+     *
+     * @param parentId parentId
+     * @return code
+     */
+    String findMaxCode(String parentId);
 }

@@ -4,15 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
-import com.github.wephotos.webwork.entity.User;
-import com.github.wephotos.webwork.entity.UserRole;
-import com.github.wephotos.webwork.entity.UserState;
+import com.github.wephotos.webwork.entity.*;
 import com.github.wephotos.webwork.entity.dto.UserDto;
+import com.github.wephotos.webwork.mapper.OrganizationMapper;
 import com.github.wephotos.webwork.mapper.UserMapper;
+import com.github.wephotos.webwork.mapper.UserOrgMapper;
 import com.github.wephotos.webwork.mapper.UserRoleMapper;
 import com.github.wephotos.webwork.utils.WebWorkUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -29,12 +30,17 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     private UserMapper userMapper;
     @Resource
     private UserRoleMapper userRoleMapper;
+    @Resource
+    private OrganizationMapper organizationMapper;
+    @Resource
+    private UserOrgMapper userOrgMapper;
 
 
     public User get(String id) {
         return userMapper.selectById(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public boolean create(UserDto user) {
         user.setId(WebWorkUtil.uuid());
         user.setStatus(UserState.ENABLED.getValue());
@@ -43,10 +49,12 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         userMapper.insert(user);
         // 新增用户角色关联
         saveUserRole(user);
+        // 新增用户部门
+        saveUserDept(user);
         return true;
     }
 
-
+    @Transactional(rollbackFor = Exception.class)
     public boolean update(UserDto user) {
         user.setPassword(null);
         // 修改用户
@@ -55,6 +63,10 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         userRoleMapper.delete(new QueryWrapper<UserRole>().lambda().eq(UserRole::getUserId, user.getId()));
         // 新增用户角色关联
         saveUserRole(user);
+        // 删除用户与部门关联
+        userOrgMapper.delete(new QueryWrapper<UserOrg>().lambda().eq(UserOrg::getUserId, user.getId()));
+        // 新增用户部门关联
+        saveUserDept(user);
         return true;
     }
 
@@ -95,8 +107,6 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
 
     public boolean resetUserPwd(User user) {
-        // TODO 处理密码
-        //user.setPassword("");
         User newUser = new User();
         newUser.setId(user.getId());
         newUser.setPassword(user.getPassword());
@@ -113,5 +123,29 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             ur.setRoleId(roleId);
             return ur;
         }).forEach(userRoleMapper::insert);
+    }
+
+    private void saveUserDept(UserDto user) {
+        String depId = user.getDepId();
+        // 根据部门id查找单位
+        Organization org = getOrg(depId);
+        UserOrg userOrg = new UserOrg();
+        userOrg.setId(WebWorkUtil.uuid());
+        userOrg.setUserId(user.getId());
+        userOrg.setDeptId(depId);
+        userOrg.setOrgId(org.getId());
+        userOrgMapper.insert(userOrg);
+    }
+
+    private Organization getOrg(String orgId) {
+        Organization org = organizationMapper.selectById(orgId);
+        if (org != null && org.getType() != 1) {
+            Organization parent = getOrg(org.getParentId());
+            // 找到单位
+            if (parent.getStatus() == 1) {
+                return parent;
+            }
+        }
+        return org;
     }
 }

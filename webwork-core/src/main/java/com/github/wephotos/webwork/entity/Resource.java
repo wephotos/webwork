@@ -19,6 +19,7 @@ public class Resource {
     private String id;
     private String name;
     private Integer type;
+    private String permission;
     private String code;
     private String parentId;
     private Integer status;

@@ -4,9 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.github.wephotos.webwork.entity.Resource;
 import com.github.wephotos.webwork.mapper.ResourceMapper;
-import com.github.wephotos.webwork.mapper.RoleResourceMapper;
-import com.github.wephotos.webwork.utils.Errors;
-import com.github.wephotos.webwork.utils.ValidationUtil;
 import com.github.wephotos.webwork.utils.WebWorkUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -22,20 +19,20 @@ public class ResourceService {
     @javax.annotation.Resource
     private ResourceMapper resourceMapper;
 
-    @javax.annotation.Resource
-    private RoleResourceMapper roleResourceMapper;
-
-    public boolean create(Resource resource) {
-        ValidationUtil.isTrue(Errors.RESOURCE_NAME_EXIST, checkResourceNameUnique(resource));
-        ValidationUtil.isTrue(Errors.RESOURCE_CODE_EXIST, checkResourceCodeUnique(resource));
+    public boolean save(Resource resource) {
+        String maxCode = resourceMapper.findMaxCode(resource.getParentId());
         resource.setId(WebWorkUtil.uuid());
         resource.setStatus(1);
+        if (StringUtils.isNotBlank(resource.getParentId())) {
+            Resource parent = resourceMapper.selectById(resource.getParentId());
+            resource.setCode(parent.getCode().concat(maxCode));
+        } else {
+            resource.setCode(maxCode);
+        }
         return SqlHelper.retBool(resourceMapper.insert(resource));
     }
 
     public boolean update(Resource resource) {
-        ValidationUtil.isTrue(Errors.RESOURCE_NAME_EXIST, checkResourceNameUnique(resource));
-        ValidationUtil.isTrue(Errors.RESOURCE_CODE_EXIST, checkResourceCodeUnique(resource));
         return SqlHelper.retBool(resourceMapper.updateById(resource));
     }
 

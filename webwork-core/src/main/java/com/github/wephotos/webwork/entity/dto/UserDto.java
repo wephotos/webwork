@@ -17,5 +17,12 @@ import java.util.List;
 @NoArgsConstructor
 @ToString(callSuper = true)
 public class UserDto extends User {
-    List<String> roles;
+    /**
+     * 角色id集合
+     */
+    private List<String> roles;
+    /**
+     * 部门id
+     */
+    private String depId;
 }

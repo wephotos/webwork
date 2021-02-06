@@ -31,9 +31,9 @@ public class UserController {
      */
     @PostMapping("/save")
     public RestObject save(@RequestBody UserDto user) {
-//        ValidationUtil.isTrue(Errors.USER_NAME_EXIST, userService.checkLoginNameUnique(user.getLoginName()));
-//        ValidationUtil.isTrue(Errors.USER_PHONE_EXIST, userService.checkPhoneUnique(user));
-//        ValidationUtil.isTrue(Errors.USER_MAIL_EXIST, userService.checkEmailUnique(user));
+        ValidationUtil.isTrue(Errors.USER_NAME_EXIST, userService.checkLoginNameUnique(user.getLoginName()));
+        ValidationUtil.isTrue(Errors.USER_PHONE_EXIST, userService.checkPhoneUnique(user));
+        ValidationUtil.isTrue(Errors.USER_MAIL_EXIST, userService.checkEmailUnique(user));
         boolean bool = userService.create(user);
         return RestObject.builder().data(bool).build();
     }

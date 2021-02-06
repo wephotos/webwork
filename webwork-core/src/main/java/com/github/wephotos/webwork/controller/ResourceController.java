@@ -3,7 +3,9 @@ package com.github.wephotos.webwork.controller;
 
 import com.github.wephotos.webwork.entity.Resource;
 import com.github.wephotos.webwork.service.ResourceService;
+import com.github.wephotos.webwork.utils.Errors;
 import com.github.wephotos.webwork.utils.RestObject;
+import com.github.wephotos.webwork.utils.ValidationUtil;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -24,9 +26,11 @@ public class ResourceController {
      * @param resource resource
      * @return RestObject
      */
-    @PostMapping("/create")
-    public RestObject create(@RequestBody Resource resource) {
-        boolean result = resourceService.create(resource);
+    @PostMapping("/save")
+    public RestObject save(@RequestBody Resource resource) {
+        ValidationUtil.isTrue(Errors.RESOURCE_NAME_EXIST, resourceService.checkResourceNameUnique(resource));
+        ValidationUtil.isTrue(Errors.RESOURCE_CODE_EXIST, resourceService.checkResourceCodeUnique(resource));
+        boolean result = resourceService.save(resource);
         return RestObject.builder().data(result).build();
     }
 
@@ -38,6 +42,8 @@ public class ResourceController {
      */
     @PostMapping("/update")
     public RestObject update(@RequestBody Resource resource) {
+        ValidationUtil.isTrue(Errors.RESOURCE_NAME_EXIST, resourceService.checkResourceNameUnique(resource));
+        ValidationUtil.isTrue(Errors.RESOURCE_CODE_EXIST, resourceService.checkResourceCodeUnique(resource));
         boolean result = resourceService.update(resource);
         return RestObject.builder().data(result).build();
     }
@@ -63,10 +69,10 @@ public class ResourceController {
         return RestObject.builder().data(bool).build();
     }
 
-    @GetMapping("/checkResourceCodeUnique")
-    public RestObject checkResourceCodeUnique(@RequestParam String code) {
+    @GetMapping("/checkResourcePermissionUnique")
+    public RestObject checkResourcePermissionUnique(@RequestParam String permission) {
         Resource resource = new Resource();
-        resource.setCode(code);
+        resource.setPermission(permission);
         boolean bool = resourceService.checkResourceCodeUnique(resource);
         return RestObject.builder().data(bool).build();
     }

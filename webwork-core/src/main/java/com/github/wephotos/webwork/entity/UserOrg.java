@@ -17,6 +17,7 @@ import lombok.*;
 @TableName(value = "sys_user_org")
 public class UserOrg {
     private String id;
-    private String resourceId;
+    private String userId;
     private String orgId;
+    private String deptId;
 }

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.github.wephotos.webwork.entity.OrgState;
 import com.github.wephotos.webwork.entity.Organization;
 import com.github.wephotos.webwork.mapper.OrganizationMapper;
-import com.github.wephotos.webwork.mapper.UserOrgMapper;
 import com.github.wephotos.webwork.utils.WebWorkUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -21,8 +20,6 @@ import java.util.Objects;
 public class OrganizationService {
     @Resource
     private OrganizationMapper organizationMapper;
-    @Resource
-    private UserOrgMapper userOrgMapper;
 
     public boolean save(Organization organization) {
         String maxCode = organizationMapper.findMaxCode(organization.getParentId());

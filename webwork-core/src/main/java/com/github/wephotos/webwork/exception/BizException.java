@@ -23,12 +23,14 @@ public class BizException extends RuntimeException {
 
     public BizException(String msg) {
         super(msg);
+        this.code = 500;
         this.msg = msg;
     }
 
     public BizException(String msg, Throwable e) {
         super(msg, e);
         this.msg = msg;
+        this.code = 500;
     }
 
     public BizException(String msg, int code) {
