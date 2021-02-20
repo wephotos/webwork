@@ -19,12 +19,12 @@ public enum Errors {
      * ROLE相关
      */
     ROLE_NAME_EXIST(100201, "角色名称重复"),
-    ROLE_CODE_EXIST(100202, "角色Code重复"),
+    ROLE_CODE_EXIST(100202, "角色code重复"),
     /**
      * RESOURCE相关
      */
     RESOURCE_NAME_EXIST(100301, "资源名称重复"),
-    RESOURCE_CODE_EXIST(100301, "资源Code重复");
+    RESOURCE_CODE_EXIST(100301, "资源code重复");
 
     private final Integer code;
     private final String message;

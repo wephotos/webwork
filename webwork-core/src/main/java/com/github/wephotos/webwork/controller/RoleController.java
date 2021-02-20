@@ -1,6 +1,7 @@
 package com.github.wephotos.webwork.controller;
 
 import com.github.wephotos.webwork.entity.Role;
+import com.github.wephotos.webwork.entity.dto.RoleDto;
 import com.github.wephotos.webwork.service.RoleService;
 import com.github.wephotos.webwork.utils.Errors;
 import com.github.wephotos.webwork.utils.RestObject;
@@ -27,11 +28,11 @@ public class RoleController {
      * @param role role
      * @return RestObject
      */
-    @PostMapping("/create")
-    public RestObject create(@RequestBody Role role) {
+    @PostMapping("/save")
+    public RestObject save(@RequestBody RoleDto role) {
         ValidationUtil.isTrue(Errors.ROLE_NAME_EXIST, roleService.checkRoleNameUnique(role));
         ValidationUtil.isTrue(Errors.ROLE_CODE_EXIST, roleService.checkRoleCodeUnique(role));
-        boolean result = roleService.create(role);
+        boolean result = roleService.save(role);
         return RestObject.builder().data(result).build();
     }
 
@@ -42,7 +43,7 @@ public class RoleController {
      * @return RestObject
      */
     @PostMapping("/update")
-    public RestObject update(@RequestBody Role role) {
+    public RestObject update(@RequestBody RoleDto role) {
         ValidationUtil.isTrue(Errors.ROLE_NAME_EXIST, roleService.checkRoleNameUnique(role));
         ValidationUtil.isTrue(Errors.ROLE_CODE_EXIST, roleService.checkRoleCodeUnique(role));
         boolean result = roleService.update(role);
@@ -86,7 +87,7 @@ public class RoleController {
     }
 
     /**
-     * 校验角色名称
+     * 校验角色名称是否唯一
      *
      * @param roleName 角色名称
      * @return RestObject
@@ -100,7 +101,7 @@ public class RoleController {
     }
 
     /**
-     * 校验角色Code
+     * 校验角色code是否唯一
      *
      * @param code 角色code
      * @return RestObject
