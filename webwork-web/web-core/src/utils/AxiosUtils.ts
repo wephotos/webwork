@@ -1,9 +1,8 @@
-import { ResponseEntity } from "@/types/ResponseEntity";
-import axios, { AxiosRequestConfig } from "axios";
+import { ResponseEntity } from '@/types/ResponseEntity'
+import axios, { AxiosRequestConfig } from 'axios'
 
 /** AxiosUtils */
 class AxiosUtils {
-
     /** axios instance */
     private instance = axios.create({
         baseURL: process.env.BASE_URL,
@@ -13,21 +12,20 @@ class AxiosUtils {
     /** 初始化 */
     constructor() {
         this.instance.interceptors.request.use(config => {
-            return config;
+            return config
         }, error => {
-            return Promise.reject(error);
+            return Promise.reject(error)
         })
 
         this.instance.interceptors.response.use(response => {
-            return response;
+            return response
         }, error => {
-            return Promise.reject(error);
+            return Promise.reject(error)
         })
     }
 
-
     /** GET请求 */
-    get<T>(url: string, config?: AxiosRequestConfig) {
+    get<T = any>(url: string, config?: AxiosRequestConfig) {
         return new Promise<ResponseEntity<T>>((resolve, reject) => {
             this.instance.get(url, config).then((res) => {
                 resolve(res.data)
@@ -38,7 +36,7 @@ class AxiosUtils {
     }
 
     /** POST请求 */
-    post<T>(url: string, data?: any, config?: AxiosRequestConfig) {
+    post<T = any>(url: string, data?: any, config?: AxiosRequestConfig) {
         return new Promise<ResponseEntity<T>>((resolve, reject) => {
             this.instance.post(url, data, config).then((res) => {
                 resolve(res.data)
@@ -47,9 +45,7 @@ class AxiosUtils {
             })
         })
     }
-
 }
 /** 导出AxiosUtils实例 */
-const axiosUtils = new AxiosUtils();
-export default axiosUtils;
-
+const axiosUtils = new AxiosUtils()
+export default axiosUtils
