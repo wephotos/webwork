@@ -3,7 +3,7 @@ package com.github.wephotos.webwork.core.controller;
 
 import com.github.wephotos.webwork.core.entity.Organization;
 import com.github.wephotos.webwork.core.service.OrganizationService;
-import com.github.wephotos.webwork.core.utils.RestObject;
+import com.github.wephotos.webwork.http.RestObject;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

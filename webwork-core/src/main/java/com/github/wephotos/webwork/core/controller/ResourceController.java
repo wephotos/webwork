@@ -3,9 +3,9 @@ package com.github.wephotos.webwork.core.controller;
 
 import com.github.wephotos.webwork.core.entity.Resource;
 import com.github.wephotos.webwork.core.service.ResourceService;
-import com.github.wephotos.webwork.core.utils.Errors;
-import com.github.wephotos.webwork.core.utils.RestObject;
 import com.github.wephotos.webwork.core.utils.ValidationUtil;
+import com.github.wephotos.webwork.error.Errors;
+import com.github.wephotos.webwork.http.RestObject;
 import org.springframework.web.bind.annotation.*;
 
 /**

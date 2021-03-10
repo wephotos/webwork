@@ -1,5 +1,6 @@
-package com.github.wephotos.webwork.core.utils;
+package com.github.wephotos.webwork.http;
 
+import com.github.wephotos.webwork.error.Errors;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,6 +1,8 @@
 package com.github.wephotos.webwork.core.exception;
 
-import com.github.wephotos.webwork.core.utils.RestObject;
+
+import com.github.wephotos.webwork.error.WebworkException;
+import com.github.wephotos.webwork.http.RestObject;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,8 +22,8 @@ public class GlobalExceptionHandler {
     /**
      * 处理自定义异常
      */
-    @ExceptionHandler(BizException.class)
-    public RestObject handleBizException(BizException e) {
+    @ExceptionHandler(WebworkException.class)
+    public RestObject handleWebworkException(WebworkException e) {
         log.error(e.getMessage());
         return RestObject.builder().code(e.getCode()).msg(e.getMsg()).build();
     }

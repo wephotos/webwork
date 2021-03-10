@@ -1,6 +1,7 @@
 package com.github.wephotos.webwork.core.utils;
 
-import com.github.wephotos.webwork.core.exception.BizException;
+import com.github.wephotos.webwork.error.Errors;
+import com.github.wephotos.webwork.error.WebworkException;
 
 /**
  * @author chengzi
@@ -20,6 +21,6 @@ public class ValidationUtil {
     }
 
     public static void failure(Errors errors) {
-        throw new BizException(errors.getCode(), errors.getMessage());
+        throw new WebworkException(errors.getCode(), errors.getMessage());
     }
 }
