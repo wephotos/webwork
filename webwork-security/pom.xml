@@ -7,17 +7,11 @@
         <version>0.0.1-SNAPSHOT</version>
         <relativePath/>
     </parent>
-    <groupId>com.github.wephotos</groupId>
+
     <artifactId>webwork-security</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>webwork security</name>
     <description>webwork security</description>
-
-    <properties>
-        <java.version>1.8</java.version>
-        <spring-boot-version>2.4.3</spring-boot-version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -41,15 +35,7 @@
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
-
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>aliyunmaven</id>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-        </repository>
-    </repositories>
 
     <build>
         <plugins>
@@ -57,9 +43,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <encoding>UTF-8</encoding>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${encoding}</encoding>
                     <showWarnings>true</showWarnings>
                 </configuration>
             </plugin>
