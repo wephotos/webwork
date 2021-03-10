@@ -1,9 +1,5 @@
 package com.github.wephotos.webwork.security.service;
 
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Service;
-
 import com.github.wephotos.webwork.security.auth.SecurityAuth;
 import com.github.wephotos.webwork.security.entity.User;
 import com.github.wephotos.webwork.security.entity.UserAuth;
@@ -13,14 +9,20 @@ import com.github.wephotos.webwork.security.entity.UserAuth;
  * @author TQ
  *
  */
-@Service("securityService")
 public class SecurityService {
 	
 	/**
 	 * 认证接口
 	 */
-	@Resource
 	private SecurityAuth securityAuth;
+	
+	/**
+	 * 设置认证接口
+	 * @param securityAuth
+	 */
+	public void setSecurityAuth(SecurityAuth securityAuth) {
+		this.securityAuth = securityAuth;
+	}
 	
 	/**
 	 * 用户认证
