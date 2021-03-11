@@ -6,7 +6,7 @@
         <groupId>com.github.wephotos</groupId>
         <artifactId>webwork-schema</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath/>
+        <relativePath>../webwork-schema/pom.xml</relativePath>
     </parent>
 
     <artifactId>webwork-core</artifactId>
