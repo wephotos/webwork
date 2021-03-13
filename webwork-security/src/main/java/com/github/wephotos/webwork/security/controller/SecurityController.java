@@ -3,10 +3,12 @@ package com.github.wephotos.webwork.security.controller;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.wephotos.webwork.security.entity.RestObject;
+import com.github.wephotos.webwork.http.RestObject;
 import com.github.wephotos.webwork.security.entity.User;
 import com.github.wephotos.webwork.security.entity.UserAuth;
 import com.github.wephotos.webwork.security.service.SecurityService;
@@ -19,6 +21,7 @@ import com.github.wephotos.webwork.security.storage.SessionUserStorage;
  */
 @RestController
 @RequestMapping("/security")
+@ConditionalOnBean(value = SecurityService.class)
 public class SecurityController {
 	
 	/**
@@ -33,6 +36,7 @@ public class SecurityController {
 	 * @param auth 认证信息
 	 * @return {@link User}
 	 */
+	@PostMapping("/auth")
 	public RestObject auth(UserAuth auth, HttpSession session) {
 		User user = securityService.auth(auth);
 		SessionUserStorage.put(user, session);
