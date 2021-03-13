@@ -5,7 +5,12 @@ package com.github.wephotos.webwork.error;
  * @date 2021-03-10 22:09
  */
 public class WebworkRuntimeException extends RuntimeException {
-    public WebworkRuntimeException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public WebworkRuntimeException() {
         super();
     }
 
