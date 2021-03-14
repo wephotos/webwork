@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.github.wephotos</groupId>
-        <artifactId>webwork-schema</artifactId>
+        <artifactId>webwork-pom</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../webwork-schema/pom.xml</relativePath>
+        <relativePath>../webwork-pom/pom.xml</relativePath>
     </parent>
 
     <artifactId>webwork-security</artifactId>
@@ -35,9 +35,14 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-        	<groupId>org.springframework.boot</groupId>
-        	<artifactId>spring-boot-configuration-processor</artifactId>
-        	<optional>true</optional>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.github.wephotos</groupId>
+            <artifactId>webwork-schema</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

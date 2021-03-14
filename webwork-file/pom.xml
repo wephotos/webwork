@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.github.wephotos</groupId>
-        <artifactId>webwork-schema</artifactId>
+        <artifactId>webwork-pom</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../webwork-schema/pom.xml</relativePath>
+        <relativePath>../webwork-pom/pom.xml</relativePath>
     </parent>
 
     <artifactId>webwork-file-spring-boot-starter</artifactId>

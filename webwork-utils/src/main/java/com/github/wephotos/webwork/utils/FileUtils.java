@@ -1,9 +1,9 @@
-package com.github.wephotos.utils;
+package com.github.wephotos.webwork.utils;
 
 /**
  * 文件工具类
- * @author TQ
  *
+ * @author TQ
  */
 public class FileUtils extends org.apache.commons.io.FileUtils {
 
