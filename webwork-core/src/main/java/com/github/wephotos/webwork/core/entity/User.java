@@ -19,7 +19,12 @@ import java.util.Date;
 @NoArgsConstructor
 @TableName(value = "sys_user")
 public class User implements Serializable {
-    private String id;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private String id;
     private String loginName;
     private String password;
     private Integer sort;

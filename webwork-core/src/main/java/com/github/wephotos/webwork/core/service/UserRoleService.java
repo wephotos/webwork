@@ -23,7 +23,7 @@ public class UserRoleService {
 
     }
 
-    private int delete(String userId) {
+    public int delete(String userId) {
         QueryWrapper<UserRole> wrapper = new QueryWrapper<>();
         wrapper.lambda().eq(UserRole::getUserId, userId);
         return userRoleMapper.delete(wrapper);

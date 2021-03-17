@@ -18,6 +18,10 @@ import java.util.List;
 @ToString(callSuper = true)
 public class UserDto extends User {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
      * 角色id集合
      */
     private List<String> roles;
