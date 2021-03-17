@@ -13,6 +13,10 @@ public class WebworkRuntimeException extends RuntimeException {
 	public WebworkRuntimeException() {
         super();
     }
+	
+	public WebworkRuntimeException(String message) {
+        super(message);
+    }
 
     public WebworkRuntimeException(String message, Throwable cause) {
         super(message, cause);

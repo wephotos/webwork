@@ -8,7 +8,8 @@
         <relativePath>../webwork-pom/pom.xml</relativePath>
     </parent>
 
-    <artifactId>webwork-security</artifactId>
+    <artifactId>webwork-security-spring-boot-starter</artifactId>
+    <packaging>jar</packaging>
     <name>webwork security</name>
     <description>webwork security</description>
 
@@ -39,11 +40,11 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>com.github.wephotos</groupId>
             <artifactId>webwork-schema</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-        </dependency>
+        </dependency> -->
     </dependencies>
 
     <build>

@@ -39,7 +39,6 @@ public class SecurityAuthFilter implements Filter {
 		if(redirect != null) {
 			this.redirect = redirect;
 		}
-		ignoreList.add(this.redirect);
 		if(ignorePaths != null) {
 			ignoreList.addAll(Arrays.asList(ignorePaths.split(",")));
 		}
@@ -63,6 +62,12 @@ public class SecurityAuthFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) sRequest;
 		HttpServletResponse response = (HttpServletResponse) sResponse;
 		String URI = request.getRequestURI();
+		// 认证页面
+		if(redirect.equals(URI)) {
+			chain.doFilter(request, response);
+			return;
+		}
+		// 忽略路径
 		for(String path : ignoreList) {
 			if(URI.contains(path)) {
 				chain.doFilter(request, response);
