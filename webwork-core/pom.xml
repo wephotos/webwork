@@ -11,7 +11,7 @@
 
     <artifactId>webwork-core</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>webwork core</name>
+    <name>webwork-core</name>
     <description>webwork core</description>
 
     <dependencies>
