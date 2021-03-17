@@ -10,7 +10,7 @@
 
     <artifactId>webwork-security-spring-boot-starter</artifactId>
     <packaging>jar</packaging>
-    <name>webwork security</name>
+    <name>webwork-security</name>
     <description>webwork security</description>
 
     <dependencies>

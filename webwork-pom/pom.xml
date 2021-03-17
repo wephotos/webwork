@@ -15,7 +15,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>webwork pom</name>
+    <name>webwork-pom</name>
     <description>webwork pom</description>
 
     <properties>
@@ -23,6 +23,15 @@
         <java.version>1.8</java.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
     </properties>
+
+    <modules>
+        <module>../webwork-core</module>
+        <module>../webwork-schema</module>
+        <module>../webwork-logging</module>
+        <module>../webwork-file</module>
+        <module>../webwork-security</module>
+        <module>../webwork-utils</module>
+    </modules>
 
     <repositories>
         <repository>
@@ -35,11 +44,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-        </dependency>
-		<dependency>
-            <groupId>com.github.wephotos</groupId>
-            <artifactId>webwork-schema</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

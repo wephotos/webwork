@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>webwork-utils</artifactId>
-    <name>webwork utils</name>
+    <name>webwork-utils</name>
     <packaging>jar</packaging>
     <description>webwork utils</description>
 

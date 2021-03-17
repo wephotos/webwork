@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>webwork-logging</artifactId>
-    <name>webwork logging</name>
+    <name>webwork-logging</name>
     <packaging>jar</packaging>
     <description>webwork logging</description>
 

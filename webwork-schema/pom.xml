@@ -11,7 +11,7 @@
 
     <artifactId>webwork-schema</artifactId>
     <packaging>jar</packaging>
-    <name>webwork schema</name>
+    <name>webwork-schema</name>
     <description>webwork schema</description>
 
     <build>
