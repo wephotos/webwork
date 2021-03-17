@@ -10,6 +10,8 @@
 	</parent>
 
 	<artifactId>webwork-core</artifactId>
+	<packaging>jar</packaging>
+	
 	<name>webwork-core</name>
 	<description>webwork core</description>
 
