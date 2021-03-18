@@ -15,14 +15,9 @@
       </a-menu>
     </a-layout-header>
     <a-layout>
-      <a-layout-sider width="200" style="background: #fff"
-        >Sider</a-layout-sider
-      >
+      <a-layout-sider width="200" style="background: #fff">Sider</a-layout-sider>
       <a-layout-content>Content</a-layout-content>
     </a-layout>
-    <a-layout-footer style="padding: 10px 25px; text-align: center"
-      >Webwork Core ©2020 Created by Ant UED</a-layout-footer
-    >
   </a-layout>
 </template>
 <script lang="ts">
