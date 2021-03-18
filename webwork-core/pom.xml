@@ -56,6 +56,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.github.wephotos</groupId>
+			<artifactId>webwork-security-spring-boot-starter</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.wephotos</groupId>
 			<artifactId>webwork-file-spring-boot-starter</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
