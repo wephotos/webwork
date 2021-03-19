@@ -1,7 +1,7 @@
 # webwork
 企业应用系统的快速开发框架
 
-## webwork-pom 公共POM文件
+## webwork-pom 公共POM
 
 ## webwork-schema 公共定义
 
