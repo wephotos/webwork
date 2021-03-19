@@ -1,18 +1,18 @@
 # webwork
 企业应用系统的快速开发框架
 
-## webwork-pom 公共POM
+## [webwork-pom](https://github.com/wephotos/webwork/webwork-pom)
 
-## webwork-schema 公共定义
+## [webwork-schema](https://github.com/wephotos/webwork/webwork-schema)
 
-## webwork-core - 用户权限
+## [webwork-core](https://github.com/wephotos/webwork/webwork-core)
 
-## webwork-file - 文件管理
+## [webwork-file](https://github.com/wephotos/webwork/webwork-file)
 
-## webwork-security - 安全认证
+## [webwork-security](https://github.com/wephotos/webwork/webwork-security)
 
-## webwork-logging - 日志记录
+## [webwork-logging](https://github.com/wephotos/webwork/webwork-logging)
 
-## webwork-utils - 工具包
+## [webwork-utils](https://github.com/wephotos/webwork/webwork-utils)
 
-## webwork-web - 基于Vue3.0 + TS 的前端工程
+## [webwork-web](https://github.com/wephotos/webwork/webwork-web)
