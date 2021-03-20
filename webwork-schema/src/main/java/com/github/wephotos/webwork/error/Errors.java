@@ -29,10 +29,9 @@ public enum Errors {
     /**
      * 登录相关
      */
-    USERNAME_NOT_FOUND(1004001, "用户不存在"),
-    USER_DISABLED(1004002, "用户被禁用"),
-    USER_DELETED(1004003, "用户被删除"),
-    USER_PASSWORD_ERROR(1004004, "密码错误");
+    USER_DISABLED(1004001, "用户被禁用"),
+    USER_DELETED(1004002, "用户被删除"),
+    USERNAME_PASSWORD_ERROR(1004003, "用户名或密码错误");
 
     private final Integer code;
     private final String message;

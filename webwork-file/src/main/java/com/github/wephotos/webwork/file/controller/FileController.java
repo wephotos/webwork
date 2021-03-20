@@ -99,8 +99,20 @@ public class FileController {
      */
     @GetMapping("/delete/{id}")
     public RestObject delete(@PathVariable("id") String id) throws IOException {
-        fileService.deleteByPrimaryKey(id);
-        return RestObject.builder().build();
+        int i = fileService.deleteByPrimaryKey(id);
+        return RestObject.builder().data(i).build();
+    }
+
+    /**
+     * 逻辑删除
+     *
+     * @param id 附件id
+     * @return {@link RestObject}
+     */
+    @GetMapping("/logic-delete/{id}")
+    public RestObject logicDelete(@PathVariable("id") String id) {
+        int i = fileService.logicDelete(id);
+        return RestObject.builder().data(i).build();
     }
 
     /**

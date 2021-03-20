@@ -26,12 +26,14 @@ public class WebworkUserAuth implements SecurityAuth {
     public User auth(UserAuth auth) {
         com.github.wephotos.webwork.core.entity.User user = userService.getByAccount(auth.getUsername());
         if (user == null) {
-            throw new WebworkException(Errors.USERNAME_NOT_FOUND.getMessage(), Errors.USERNAME_NOT_FOUND.getCode());
+            throw new WebworkException(Errors.USERNAME_PASSWORD_ERROR.getMessage(), Errors.USERNAME_PASSWORD_ERROR.getCode());
         }
         Integer status = user.getStatus();
+        // 账号禁用
         if (status.intValue() == EntityState.DISABLED.getValue().intValue()) {
             throw new WebworkException(Errors.USER_DISABLED.getMessage(), Errors.USER_DISABLED.getCode());
         }
+        // 账号删除
         if (status.intValue() == EntityState.DELETED.getValue().intValue()) {
             throw new WebworkException(Errors.USER_DELETED.getMessage(), Errors.USER_DELETED.getCode());
         }
@@ -50,7 +52,7 @@ public class WebworkUserAuth implements SecurityAuth {
             result.setGroupName(userOrgDto.getGroupName());
             return result;
         } else {
-            throw new WebworkException(Errors.USER_PASSWORD_ERROR.getMessage(), Errors.USER_PASSWORD_ERROR.getCode());
+            throw new WebworkException(Errors.USERNAME_PASSWORD_ERROR.getMessage(), Errors.USERNAME_PASSWORD_ERROR.getCode());
         }
     }
 }

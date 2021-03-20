@@ -46,6 +46,9 @@
             <if test="createTime != null">
                 createTime = #{createTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="status != null">
+                `status` = #{status,jdbcType=CHAR},
+            </if>
         </set>
         where id = #{id,jdbcType=CHAR}
     </update>
@@ -61,6 +64,7 @@
         <include refid="Base_Column_List"/>
         from webwork_file
         where owner = #{owner,jdbcType=CHAR}
+        and status = 1
     </select>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">

@@ -15,29 +15,29 @@ import java.util.Date;
 @Setter
 @ToString
 public class WebworkFile {
-	/**
-	 * 主键
-	 */
+    /**
+     * 主键
+     */
     private String id;
     /**
-	 * 附件主体
-	 */
+     * 附件主体
+     */
     private String owner;
     /**
-	 * 文件名
-	 */
+     * 文件名
+     */
     private String name;
     /**
-	 * 文件大小
-	 */
+     * 文件大小
+     */
     private long size;
     /**
-	 * 文件存储对象名
-	 */
+     * 文件存储对象名
+     */
     private String objectName;
     /**
-	 * 文件内容类型
-	 */
+     * 文件内容类型
+     */
     private String contentType;
     /**
      * 上传人标识
@@ -48,9 +48,13 @@ public class WebworkFile {
      */
     private String userName;
     /**
-	 * 上传时间
-	 */
+     * 上传时间
+     */
     private Date createTime;
+    /**
+     * 状态
+     */
+    private Integer status;
 
     /**
      * 文件流

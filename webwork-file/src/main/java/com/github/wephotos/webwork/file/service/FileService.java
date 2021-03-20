@@ -5,6 +5,7 @@ import com.github.wephotos.webwork.file.entity.UploadResult;
 import com.github.wephotos.webwork.file.entity.WebworkFile;
 import com.github.wephotos.webwork.file.mapper.FileMapper;
 import com.github.wephotos.webwork.file.stor.FileStor;
+import com.github.wephotos.webwork.http.EntityState;
 import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 import lombok.Getter;
@@ -99,4 +100,15 @@ public class FileService {
         return fileMapper.list(owner);
     }
 
+    /**
+     * 逻辑删除
+     *
+     * @param id id
+     */
+    public int logicDelete(String id) {
+        WebworkFile file = new WebworkFile();
+        file.setId(id);
+        file.setStatus(EntityState.DISABLED.getValue());
+        return fileMapper.updateByPrimaryKeySelective(file);
+    }
 }
