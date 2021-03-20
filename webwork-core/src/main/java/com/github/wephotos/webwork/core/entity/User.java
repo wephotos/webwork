@@ -20,18 +20,48 @@ import java.util.Date;
 @TableName(value = "sys_user")
 public class User implements Serializable {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private String id;
-    private String loginName;
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * 主键
+     */
+    private String id;
+    /**
+     * 登录名
+     */
+    private String account;
+    /**
+     * 密码
+     */
     private String password;
+    /**
+     * 排序
+     */
     private Integer sort;
+    /**
+     * 中文名
+     */
     private String name;
+    /**
+     * 邮箱
+     */
     private String email;
+    /**
+     * 联系方式
+     */
     private String phone;
+    /**
+     * 状态 启用：1，0：禁用，2：删除
+     */
     private Integer status;
+    /**
+     * 创建时间
+     */
     private Date createTime;
+    /**
+     * 修改时间
+     */
     private Date updateTime;
 }

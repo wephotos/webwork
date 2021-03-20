@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.wephotos.webwork.core.mapper.UserMapper">
+
+    <select id="getByAccount" resultType="com.github.wephotos.webwork.core.entity.User">
+        select id, account, name, password, email, phone, status
+        from sys_user
+        where account = #{account}
+    </select>
+</mapper>

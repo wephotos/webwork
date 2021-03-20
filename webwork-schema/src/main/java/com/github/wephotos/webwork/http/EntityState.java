@@ -1,13 +1,13 @@
-package com.github.wephotos.webwork.core.entity;
+package com.github.wephotos.webwork.http;
 
 import lombok.Getter;
 
 /**
- * @author chengzi
- * @date 2021-01-26 09:22
+ * @author xc
+ * @date 2021-03-20 11:34
  */
 @Getter
-public enum OrgState {
+public enum EntityState {
     /**
      * 启用
      */
@@ -15,23 +15,29 @@ public enum OrgState {
     /**
      * 禁用
      */
-    DISABLED("禁用", 0);
+    DISABLED("禁用", 0),
+
+    /**
+     * 删除
+     */
+    DELETED("删除", 2);
+
     /**
      * 状态名
      */
     private final String name;
     /**
-     * 状态值
+     * 状态 启用：1，0：禁用，2：删除
      */
     private final Integer value;
 
-    OrgState(String name, Integer value) {
+    EntityState(String name, Integer value) {
         this.name = name;
         this.value = value;
     }
 
-    public static OrgState resolve(int value) {
-        for (OrgState state : OrgState.values()) {
+    public static EntityState resolve(int value) {
+        for (EntityState state : EntityState.values()) {
             if (state.value == value) {
                 return state;
             }

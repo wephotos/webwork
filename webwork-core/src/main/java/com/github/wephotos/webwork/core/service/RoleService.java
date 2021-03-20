@@ -5,10 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.github.wephotos.webwork.core.entity.Role;
 import com.github.wephotos.webwork.core.entity.RoleResource;
-import com.github.wephotos.webwork.core.entity.RoleState;
 import com.github.wephotos.webwork.core.entity.dto.RoleDto;
 import com.github.wephotos.webwork.core.mapper.RoleMapper;
 import com.github.wephotos.webwork.core.mapper.RoleResourceMapper;
+import com.github.wephotos.webwork.http.EntityState;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -53,14 +53,14 @@ public class RoleService {
 
     public boolean disable(String id) {
         Role role = new Role();
-        role.setStatus(RoleState.DISABLED.getValue());
+        role.setStatus(EntityState.DISABLED.getValue());
         role.setId(id);
         return SqlHelper.retBool(roleMapper.updateById(role));
     }
 
     public boolean enable(String id) {
         Role role = new Role();
-        role.setStatus(RoleState.ENABLED.getValue());
+        role.setStatus(EntityState.ENABLED.getValue());
         role.setId(id);
         return SqlHelper.retBool(roleMapper.updateById(role));
     }

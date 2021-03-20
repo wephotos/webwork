@@ -2,10 +2,10 @@ package com.github.wephotos.webwork.core.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
-import com.github.wephotos.webwork.core.entity.OrgState;
 import com.github.wephotos.webwork.core.entity.Organization;
 import com.github.wephotos.webwork.core.mapper.OrganizationMapper;
 import com.github.wephotos.webwork.core.utils.WebWorkUtil;
+import com.github.wephotos.webwork.http.EntityState;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -40,14 +40,14 @@ public class OrganizationService {
 
     public boolean disable(String id) {
         Organization org = new Organization();
-        org.setStatus(OrgState.DISABLED.getValue());
+        org.setStatus(EntityState.DISABLED.getValue());
         org.setId(id);
         return SqlHelper.retBool(organizationMapper.updateById(org));
     }
 
     public boolean enable(String id) {
         Organization org = new Organization();
-        org.setStatus(OrgState.ENABLED.getValue());
+        org.setStatus(EntityState.ENABLED.getValue());
         org.setId(id);
         return SqlHelper.retBool(organizationMapper.updateById(org));
     }

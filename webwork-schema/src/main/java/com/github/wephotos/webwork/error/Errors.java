@@ -25,7 +25,14 @@ public enum Errors {
      * RESOURCE相关
      */
     RESOURCE_NAME_EXIST(100301, "资源名称重复"),
-    RESOURCE_CODE_EXIST(100301, "资源code重复");
+    RESOURCE_CODE_EXIST(100301, "资源code重复"),
+    /**
+     * 登录相关
+     */
+    USERNAME_NOT_FOUND(1004001, "用户不存在"),
+    USER_DISABLED(1004002, "用户被禁用"),
+    USER_DELETED(1004003, "用户被删除"),
+    USER_PASSWORD_ERROR(1004004, "密码错误");
 
     private final Integer code;
     private final String message;

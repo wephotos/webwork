@@ -13,7 +13,7 @@ import javax.annotation.Resource;
  * @date 2021-01-25 16:55
  */
 @RestController
-@RequestMapping("/roleResource")
+@RequestMapping("/role-resource")
 public class RoleResourceController {
     @Resource
     private RoleResourceService roleResourceService;

@@ -16,8 +16,20 @@ import lombok.*;
 @NoArgsConstructor
 @TableName(value = "sys_user_org")
 public class UserOrg {
+    /**
+     * 主键
+     */
     private String id;
+    /**
+     * 用户id
+     */
     private String userId;
+    /**
+     * 组织id
+     */
     private String orgId;
+    /**
+     * 部门id
+     */
     private String deptId;
 }

@@ -31,7 +31,7 @@ public class UserController {
      */
     @PostMapping("/save")
     public RestObject save(@RequestBody UserDto user) {
-        ValidationUtil.isTrue(Errors.USER_NAME_EXIST, userService.checkLoginNameUnique(user.getLoginName()));
+        ValidationUtil.isTrue(Errors.USER_NAME_EXIST, userService.checkAccountUnique(user.getAccount()));
         ValidationUtil.isTrue(Errors.USER_PHONE_EXIST, userService.checkPhoneUnique(user));
         ValidationUtil.isTrue(Errors.USER_MAIL_EXIST, userService.checkEmailUnique(user));
         boolean bool = userService.create(user);
@@ -93,9 +93,9 @@ public class UserController {
     /**
      * 校验用户名
      */
-    @GetMapping("/checkLoginNameUnique")
-    public RestObject checkLoginNameUnique(String loginName) {
-        boolean bool = userService.checkLoginNameUnique(loginName);
+    @GetMapping("/checkAccountUnique")
+    public RestObject checkAccountUnique(String account) {
+        boolean bool = userService.checkAccountUnique(account);
         return RestObject.builder().data(bool).build();
     }
 

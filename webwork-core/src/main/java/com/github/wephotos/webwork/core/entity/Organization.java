@@ -16,11 +16,32 @@ import lombok.*;
 @NoArgsConstructor
 @TableName(value = "sys_organization")
 public class Organization {
+    /**
+     * 主键
+     */
     private String id;
+    /**
+     * 名称
+     */
     private String name;
+    /**
+     * 上级id
+     */
     private String parentId;
+    /**
+     * 1:组织，2:部门
+     */
     private Integer type;
+    /**
+     * 1:启用，0:禁用
+     */
     private Integer status;
+    /**
+     * 排序
+     */
     private Integer sort;
+    /**
+     * 编码
+     */
     private String code;
 }

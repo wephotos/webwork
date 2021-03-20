@@ -16,10 +16,28 @@ import lombok.*;
 @NoArgsConstructor
 @TableName(value = "sys_role")
 public class Role {
+    /**
+     * 主键
+     */
     private String id;
+    /**
+     * name
+     */
     private String name;
+    /**
+     * status
+     */
     private String code;
+    /**
+     * remark
+     */
     private Integer status;
+    /**
+     * sort
+     */
     private Integer sort;
+    /**
+     *
+     */
     private String remark;
 }

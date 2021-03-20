@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.wephotos.webwork.core.mapper.UserOrgMapper">
+
+    <select id="getByUserId" resultType="com.github.wephotos.webwork.core.entity.dto.UserOrgDto">
+        SELECT a.org_id,
+               a.dept_id,
+               (SELECT so.name FROM sys_organization so WHERE a.org_id = so.id)  groupName,
+               (SELECT so.name FROM sys_organization so WHERE a.dept_id = so.id) depName
+        FROM sys_user_org a
+        WHERE a.user_id = #{userId}
+    </select>
+</mapper>

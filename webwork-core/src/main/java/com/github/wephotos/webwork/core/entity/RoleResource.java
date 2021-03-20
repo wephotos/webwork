@@ -16,7 +16,16 @@ import lombok.*;
 @NoArgsConstructor
 @TableName(value = "sys_role_resource")
 public class RoleResource {
+    /**
+     * 主键
+     */
     private String id;
+    /**
+     * 菜单id
+     */
     private String resourceId;
+    /**
+     * 角色id
+     */
     private String roleId;
 }

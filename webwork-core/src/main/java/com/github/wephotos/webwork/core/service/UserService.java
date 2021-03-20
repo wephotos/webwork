@@ -4,13 +4,17 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
-import com.github.wephotos.webwork.core.entity.*;
+import com.github.wephotos.webwork.core.entity.Organization;
+import com.github.wephotos.webwork.core.entity.User;
+import com.github.wephotos.webwork.core.entity.UserOrg;
+import com.github.wephotos.webwork.core.entity.UserRole;
 import com.github.wephotos.webwork.core.entity.dto.UserDto;
 import com.github.wephotos.webwork.core.mapper.OrganizationMapper;
 import com.github.wephotos.webwork.core.mapper.UserMapper;
 import com.github.wephotos.webwork.core.mapper.UserOrgMapper;
 import com.github.wephotos.webwork.core.mapper.UserRoleMapper;
 import com.github.wephotos.webwork.core.utils.WebWorkUtil;
+import com.github.wephotos.webwork.http.EntityState;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +47,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     @Transactional(rollbackFor = Exception.class)
     public boolean create(UserDto user) {
         user.setId(WebWorkUtil.uuid());
-        user.setStatus(UserState.ENABLED.getValue());
+        user.setStatus(EntityState.ENABLED.getValue());
         user.setCreateTime(new Date());
         // 新增用户
         userMapper.insert(user);
@@ -72,35 +76,35 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
     public int disable(String id) {
         User user = new User();
-        user.setStatus(UserState.DISABLED.getValue());
+        user.setStatus(EntityState.DISABLED.getValue());
         user.setId(id);
         return userMapper.updateById(user);
     }
 
     public int enable(String id) {
         User user = new User();
-        user.setStatus(UserState.ENABLED.getValue());
+        user.setStatus(EntityState.ENABLED.getValue());
         user.setId(id);
         return userMapper.updateById(user);
     }
 
 
-    public boolean checkLoginNameUnique(String loginName) {
+    public boolean checkAccountUnique(String account) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(User::getId).eq(User::getLoginName, loginName);
+        wrapper.select(User::getId).eq(User::getAccount, account);
         return userMapper.selectCount(wrapper) == 0;
     }
 
     public boolean checkPhoneUnique(User user) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(User::getId, User::getLoginName, User::getPhone).eq(User::getPhone, user.getPhone());
+        wrapper.select(User::getId, User::getAccount, User::getPhone).eq(User::getPhone, user.getPhone());
         User result = userMapper.selectOne(wrapper);
         return Objects.isNull(result) || StringUtils.equals(result.getId(), user.getId());
     }
 
     public boolean checkEmailUnique(User user) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(User::getId, User::getLoginName, User::getEmail).eq(User::getEmail, user.getEmail().trim());
+        wrapper.select(User::getId, User::getAccount, User::getEmail).eq(User::getEmail, user.getEmail().trim());
         User result = userMapper.selectOne(wrapper);
         return Objects.isNull(result) || StringUtils.equals(result.getId(), user.getId());
     }
@@ -127,14 +131,16 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
     private void saveUserDept(UserDto user) {
         String depId = user.getDepId();
-        // 根据部门id查找单位
-        Organization org = getOrg(depId);
-        UserOrg userOrg = new UserOrg();
-        userOrg.setId(WebWorkUtil.uuid());
-        userOrg.setUserId(user.getId());
-        userOrg.setDeptId(depId);
-        userOrg.setOrgId(org.getId());
-        userOrgMapper.insert(userOrg);
+        if (StringUtils.isNotBlank(depId)) {
+            // 根据部门id查找单位
+            Organization org = getOrg(depId);
+            UserOrg userOrg = new UserOrg();
+            userOrg.setId(WebWorkUtil.uuid());
+            userOrg.setUserId(user.getId());
+            userOrg.setDeptId(depId);
+            userOrg.setOrgId(org.getId());
+            userOrgMapper.insert(userOrg);
+        }
     }
 
     private Organization getOrg(String orgId) {
@@ -147,5 +153,9 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             }
         }
         return org;
+    }
+
+    public User getByAccount(String account) {
+        return userMapper.getByAccount(account);
     }
 }

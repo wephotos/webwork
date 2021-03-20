@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.wephotos.webwork.file.mapper.FileMapper">
+    <sql id="Base_Column_List">
+        id
+        ,owner, name, size, object_name, content_type, user_id, user_name, create_time
+    </sql>
+
+    <resultMap id="BaseResultMap" type="com.github.wephotos.webwork.file.entity.WebworkFile">
+        <id column="id" property="id" jdbcType="CHAR"/>
+        <result column="owner" property="owner" jdbcType="CHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="size" property="size" jdbcType="INTEGER"/>
+        <result column="object_name" property="objectName" jdbcType="VARCHAR"/>
+        <result column="content_type" property="contentType" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="CHAR"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert">
+        insert into webwork_file(id, owner, name, size, object_name, content_type, user_id, user_name, create_time)
+        values (#{id,jdbcType=CHAR}, #{owner,jdbcType=CHAR}, #{name,jdbcType=VARCHAR}, #{size,jdbcType=INTEGER},
+                #{objectName,jdbcType=VARCHAR}, #{contentType,jdbcType=VARCHAR}, #{userId,jdbcType=CHAR},
+                #{userName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        update webwork_file
+        <set>
+            <if test="owner != null">
+                owner = #{owner,jdbcType=CHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="size != null">
+                size = #{size,jdbcType=INTEGER},
+            </if>
+            <if test="objectName != null">
+                objectName = #{objectName,jdbcType=VARCHAR},
+            </if>
+            <if test="contentType != null">
+                contentType = #{contentType,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                createTime = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=CHAR}
+    </update>
+
+    <delete id="deleteByPrimaryKey">
+        delete
+        from webwork_file
+        where id = #{id,jdbcType=CHAR}
+    </delete>
+
+    <select id="list" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from webwork_file
+        where owner = #{owner,jdbcType=CHAR}
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from webwork_file
+        where id = #{id,jdbcType=CHAR}
+    </select>
+</mapper>
