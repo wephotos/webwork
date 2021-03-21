@@ -6,25 +6,30 @@
         mode="horizontal"
         :style="{ lineHeight: '64px' }"
         v-model:selectedKeys="current"
+        @click="handleClick"
       >
-        <a-menu-item key="user">组织人员</a-menu-item>
-        <a-menu-item key="menu">功能模块</a-menu-item>
-        <a-menu-item key="role">角色权限</a-menu-item>
-        <a-menu-item key="dict">数据字典</a-menu-item>
-        <a-menu-item key="conf">系统设置</a-menu-item>
+        <a-menu-item key="organization">组织人员</a-menu-item>
+        <a-menu-item key="role">用户角色</a-menu-item>
+        <a-menu-item key="resource">功能模块</a-menu-item>
+        <a-menu-item key="dictionary">数据字典</a-menu-item>
+        <a-menu-item key="config">配置中心</a-menu-item>
       </a-menu>
     </a-layout-header>
-    <a-layout>
-      <a-layout-sider width="200" style="background: #fff">Sider</a-layout-sider>
-      <a-layout-content>Content</a-layout-content>
-    </a-layout>
+    <a-layout-content>
+      <router-view />
+    </a-layout-content>
   </a-layout>
 </template>
 <script lang="ts">
 import { Vue } from 'vue-class-component'
 
 export default class Home extends Vue {
-  current: string[] = ['user']
+  // 当前选中
+  current: string[] = ['organization']
+  // 菜单点击
+  handleClick(e: {key: string; [key: string]: unknown}) {
+    this.$router.push(e.key)
+  }
 }
 </script>
 <style lang="scss">
