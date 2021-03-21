@@ -17,7 +17,7 @@ public class SecurityProperties {
     /**
      * 登录页面
      */
-    private String loginUrl = "/";
+    private String loginUrl = "/login";
     
     /**
      * 拦截规则
@@ -26,6 +26,6 @@ public class SecurityProperties {
     /**
      * 忽略路径
      */
-    private String ignorePaths = "";
+    private String ignorePatterns = "";
     
 }

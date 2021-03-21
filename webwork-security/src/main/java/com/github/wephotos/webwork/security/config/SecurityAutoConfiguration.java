@@ -53,7 +53,7 @@ public class SecurityAutoConfiguration {
 		FilterRegistrationBean<SecurityAuthFilter> registration = new FilterRegistrationBean<>();
 		registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
 		registration.addUrlPatterns(props.getUrlPatterns());
-		registration.setFilter(new SecurityAuthFilter(props.getLoginUrl(), props.getIgnorePaths()));
+		registration.setFilter(new SecurityAuthFilter(props.getLoginUrl(), props.getIgnorePatterns()));
 		return registration;
 	}
 }
