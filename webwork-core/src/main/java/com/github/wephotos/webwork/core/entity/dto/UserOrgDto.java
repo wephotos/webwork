@@ -16,10 +16,6 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class UserOrgDto extends UserOrg {
     /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    /**
      * 部门名称
      */
     private String depName;
