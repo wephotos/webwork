@@ -53,10 +53,12 @@ public class FileController {
         try (InputStream input = file.getInputStream()) {
             workFile.setName(file.getOriginalFilename());
             workFile.setInputStream(input);
-            workFile.setUserName(user.getName());
-            workFile.setUserId(user.getId());
             workFile.setContentType(file.getContentType());
             workFile.setSize(file.getSize());
+            if(user != null) {
+            	workFile.setUserId(user.getId());
+            	workFile.setUserName(user.getName());
+            }
             UploadResult upload = fileService.upload(workFile);
             return RestObject.builder().data(upload).build();
         }
