@@ -1,7 +1,7 @@
 /**
  * 接口响应数据定义
  */
-export declare class ResponseEntity<T> {
+export declare class R<T> {
     /** 错误代码 */
     code: number;
     /** 错误消息 */

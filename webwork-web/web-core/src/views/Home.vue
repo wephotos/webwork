@@ -8,7 +8,7 @@
         v-model:selectedKeys="current"
         @click="handleClick"
       >
-        <a-menu-item key="organization">组织人员</a-menu-item>
+        <a-menu-item key="user">组织人员</a-menu-item>
         <a-menu-item key="role">用户角色</a-menu-item>
         <a-menu-item key="resource">功能模块</a-menu-item>
         <a-menu-item key="dictionary">数据字典</a-menu-item>
@@ -25,7 +25,7 @@ import { Vue } from 'vue-class-component'
 
 export default class Home extends Vue {
   // 当前选中
-  current: string[] = ['organization']
+  current: string[] = ['user']
   // 菜单点击
   handleClick(e: {key: string; [key: string]: unknown}) {
     this.$router.push(e.key)

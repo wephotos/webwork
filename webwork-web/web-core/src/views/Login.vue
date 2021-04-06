@@ -38,7 +38,7 @@ import { Options, Vue } from 'vue-class-component'
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import axiosUtils from '@/utils/AxiosUtils'
-import { ResponseEntity } from '@/types/ResponseEntity'
+import { R } from '@/types/R'
 interface UserAuth {
     username: string;
     password: string;
@@ -68,7 +68,7 @@ export default class Login extends Vue {
     async handleFinish(values: UserAuth) {
       console.log(values, this.formData)
       const params = `username=${this.formData.username}&password=${this.formData.password}`
-      const result = await axiosUtils.post<ResponseEntity<LoginUser>>('/security/auth', params, {
+      const result = await axiosUtils.post<R<LoginUser>>('/security/auth', params, {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           }

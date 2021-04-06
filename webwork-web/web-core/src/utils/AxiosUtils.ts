@@ -1,4 +1,4 @@
-import { ResponseEntity } from '@/types/ResponseEntity'
+import { R } from '@/types/R'
 import axios, { AxiosRequestConfig } from 'axios'
 
 /** AxiosUtils */
@@ -26,7 +26,7 @@ class AxiosUtils {
 
     /** GET请求 */
     get<T = any>(url: string, config?: AxiosRequestConfig) {
-        return new Promise<ResponseEntity<T>>((resolve, reject) => {
+        return new Promise<R<T>>((resolve, reject) => {
             this.instance.get(url, config).then((res) => {
                 resolve(res.data)
             }).catch((reason) => {
@@ -37,7 +37,7 @@ class AxiosUtils {
 
     /** POST请求 */
     post<T = any>(url: string, data?: any, config?: AxiosRequestConfig) {
-        return new Promise<ResponseEntity<T>>((resolve, reject) => {
+        return new Promise<R<T>>((resolve, reject) => {
             this.instance.post(url, data, config).then((res) => {
                 resolve(res.data)
             }).catch((reason) => {
