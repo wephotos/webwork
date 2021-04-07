@@ -120,6 +120,9 @@ import { Options, Vue } from 'vue-class-component'
 import { SearchOutlined } from '@ant-design/icons-vue'
 import { TableState, TableStateFilters } from 'ant-design-vue/es/table/interface'
 import { ref, unref } from 'vue'
+import userRequest from '@/request/UserRequest'
+import Pageable from '@/types/Pageable'
+import UserForm from './UserForm.vue'
 const treeDataConst = [
   {
     title: '诗和远方',
@@ -148,7 +151,11 @@ const treeDataConst = [
 ]
 // 分页数据类型
 type Pagination = TableState['pagination'];
-
+// 排序映射
+const orderMap: {[key: string]: string} = {
+  ascend: 'ASC',
+  descend: 'DESC'
+}
 @Options({
   components: {
     SearchOutlined
@@ -162,6 +169,11 @@ type Pagination = TableState['pagination'];
 export default class VueUser extends Vue {
   // 用户列定义
   columns = [
+    {
+      title: '序号',
+      dataIndex: 'number',
+      width: 100
+    },
     {
       title: '姓名',
       dataIndex: 'name',
@@ -215,32 +227,71 @@ export default class VueUser extends Vue {
     pageSize: 10
   }
 
-  mounted() {
-    // console.log('mounted', this.$refs.searchInput)
+  // 分页条件
+  pageable: Pageable = {
+    curr: this.pagination.current,
+    size: this.pagination.pageSize
   }
 
-  updated() {
-    // console.log('updated', this.$refs.searchInput)
+  mounted() {
+    this.pageQueryUser()
+  }
+
+  // 分页查询用户
+  async pageQueryUser() {
+    const result = await userRequest.pageList(this.pageable)
+    if (result.code === 0) {
+      this.users = result.data.data
+      this.pagination.total = result.data.count
+      // 处理序号
+      for (let i = 0; i < this.users.length; i++) {
+        this.users[i].number = (this.pageable.curr - 1) * this.pageable.size + i + 1
+      }
+    } else {
+      this.$toast(result.msg)
+    }
   }
 
   // 表格变动监听
   handleTableChange(pag: Pagination, filters: TableStateFilters, sorter: {field: string; order: string}) {
-      console.log(pag, filters, sorter)
       this.pagination.current = pag?.current || 1
+      this.pageable.sortField = sorter.field || ''
+      this.pageable.sortOrder = orderMap[sorter.order] || ''
+      this.pageable.condition = { name: (filters.name instanceof Array ? filters.name[0] : '') }
+      console.log(this.pageable)
+      this.pageQueryUser()
   }
 
   /** 列表搜索 */
   handleSearch(selectedKeys: string[], confirm: Function, dataIndex: string) {
     confirm()
-    this.searchText = selectedKeys[0]
+    this.searchText = selectedKeys[0] || ''
     this.searchedColumn = dataIndex
-    console.log(this.searchText, this.searchedColumn)
   }
 
   /** 查询条件重置 */
   handleReset(clearFilters: Function) {
     clearFilters()
     this.searchText = ''
+  }
+
+  // 编辑人员
+  onUserEdit(user: User) {
+    this.$dialog({
+      title: '编辑用户',
+      width: 550,
+      height: 650,
+      content: {
+        handle: true,
+        component: UserForm,
+        props: { id: user.id }
+      }
+    })
+  }
+
+  // 人员排序
+  onUserSort(user: User) {
+    console.log(user.sort)
   }
 
   // 组织树数据源

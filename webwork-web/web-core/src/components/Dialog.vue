@@ -143,14 +143,14 @@ export default class Dialog extends Vue {
   }
 
   // 确认回调
-  _ok(...args: any[]) {
+  _ok(...args: unknown[]) {
     if (!this.ok || this.ok(args)) {
       this._destroy()
     }
   }
 
   // 关闭回调
-  _close(...args: any[]) {
+  _close(...args: unknown[]) {
     if (!this.close || this.close(args)) {
       this._destroy()
     }
@@ -324,7 +324,7 @@ export default class Dialog extends Vue {
   left: 0;
   width: 100%;
   background-image: none;
-  background: #3080f8;
+  background: #001529;
 }
 .title span {
   color: #fff;

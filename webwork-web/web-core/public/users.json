@@ -1,0 +1,25 @@
+{
+    "code": 0,
+    "msg": "OK",
+    "data": {
+        "count": 100,
+        "data": [
+            {
+                "id": "tianqi",
+                "name": "田奇",
+                "account": "tianq",
+                "phone": "18709827703",
+                "email": "tq_email@qq.com",
+                "updateTime": "2021-04-03 17:23:36"
+            },
+            {
+                "id": "liyc",
+                "name": "李谊成",
+                "account": "liyc",
+                "phone": "15295581648",
+                "email": "lyc_email@qq.com",
+                "updateTime": "2021-04-03 17:23:36"
+            }
+        ]
+    }
+}

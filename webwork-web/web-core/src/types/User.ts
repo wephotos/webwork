@@ -20,4 +20,6 @@ export declare class User {
     createTime?: string;
     /** 更新时间 */
     updateTime?: string;
+    // 其它属性
+    [key: string]: any;
 }
