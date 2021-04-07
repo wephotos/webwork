@@ -8,6 +8,10 @@ import lombok.Getter;
  */
 @Getter
 public enum EntityState {
+	/**
+	 * 删除
+	 */
+	DELETED("删除", -1),
     /**
      * 启用
      */
@@ -15,12 +19,8 @@ public enum EntityState {
     /**
      * 禁用
      */
-    DISABLED("禁用", 0),
+    DISABLED("禁用", 0);
 
-    /**
-     * 删除
-     */
-    DELETED("删除", 2);
 
     /**
      * 状态名

@@ -41,5 +41,5 @@ public class Pageable {
 	/**
 	 * ASC DESC
 	 */
-	private String sortDirection;
+	private String sortOrder;
 }
