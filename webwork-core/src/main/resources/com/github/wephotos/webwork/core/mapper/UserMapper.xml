@@ -7,4 +7,9 @@
         from sys_user
         where account = #{account}
     </select>
+
+    <select id="page" resultType="com.github.wephotos.webwork.core.entity.User">
+        SELECT *
+        FROM sys_user ${ew.customSqlSegment}
+    </select>
 </mapper>

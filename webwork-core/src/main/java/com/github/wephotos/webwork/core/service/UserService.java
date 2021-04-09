@@ -2,6 +2,8 @@ package com.github.wephotos.webwork.core.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.github.wephotos.webwork.core.entity.Organization;
@@ -15,7 +17,8 @@ import com.github.wephotos.webwork.core.mapper.UserOrgMapper;
 import com.github.wephotos.webwork.core.mapper.UserRoleMapper;
 import com.github.wephotos.webwork.core.utils.WebWorkUtil;
 import com.github.wephotos.webwork.http.EntityState;
-import org.apache.commons.lang3.StringUtils;
+import com.github.wephotos.webwork.http.Pageable;
+import com.github.wephotos.webwork.utils.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,21 +91,44 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return userMapper.updateById(user);
     }
 
+    public com.github.wephotos.webwork.http.Page<User> page(Pageable<User> pageable) {
+        User condition = pageable.getCondition();
+        Page<User> page = new Page<>(pageable.getCurr(), pageable.getSize());
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        // 查询条件
+        if (condition != null) {
+            wrapper.like(StringUtils.isNotEmpty(condition.getAccount()), "account", condition.getAccount());
+            wrapper.like(StringUtils.isNotEmpty(condition.getName()), "name", condition.getName());
+            wrapper.like(StringUtils.isNotEmpty(condition.getEmail()), "email", condition.getEmail());
+            wrapper.like(StringUtils.isNotEmpty(condition.getPhone()), "phone", condition.getPhone());
+            wrapper.eq(condition.getStatus() != null, "status", condition.getStatus());
+        }
+        // 传入排序字段
+        if (StringUtils.isNotBlank(pageable.getSortField())) {
+            String order = pageable.getSortOrder();
+            wrapper.orderBy(true, "asc".equals(order), pageable.getSortField());
+        }
+        IPage<User> res = userMapper.page(page, wrapper);
+        com.github.wephotos.webwork.http.Page<User> result = new com.github.wephotos.webwork.http.Page<>();
+        result.setCount(res.getTotal());
+        result.setData(res.getRecords());
+        return result;
+    }
 
-    public boolean checkAccountUnique(String account) {
+    public boolean checkExistsAccount(String account) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(User::getId).eq(User::getAccount, account);
+        wrapper.select(User::getId).eq(User::getAccount, account.trim());
         return userMapper.selectCount(wrapper) == 0;
     }
 
-    public boolean checkPhoneUnique(User user) {
+    public boolean checkExistsPhone(User user) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(User::getId, User::getAccount, User::getPhone).eq(User::getPhone, user.getPhone());
+        wrapper.select(User::getId, User::getAccount, User::getPhone).eq(User::getPhone, user.getPhone().trim());
         User result = userMapper.selectOne(wrapper);
         return Objects.isNull(result) || StringUtils.equals(result.getId(), user.getId());
     }
 
-    public boolean checkEmailUnique(User user) {
+    public boolean checkExistsEmail(User user) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.select(User::getId, User::getAccount, User::getEmail).eq(User::getEmail, user.getEmail().trim());
         User result = userMapper.selectOne(wrapper);

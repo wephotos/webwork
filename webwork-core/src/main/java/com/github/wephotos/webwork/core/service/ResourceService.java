@@ -42,14 +42,14 @@ public class ResourceService {
         return resourceMapper.selectOne(wrapper);
     }
 
-    public boolean checkResourceNameUnique(Resource resource) {
+    public boolean checkExistsName(Resource resource) {
         LambdaQueryWrapper<Resource> wrapper = new LambdaQueryWrapper<>();
         wrapper.select(Resource::getId).eq(Resource::getName, resource.getName());
         com.github.wephotos.webwork.core.entity.Resource result = resourceMapper.selectOne(wrapper);
         return Objects.isNull(result) || StringUtils.equals(result.getId(), resource.getId());
     }
 
-    public boolean checkResourceCodeUnique(Resource resource) {
+    public boolean checkExistsPermission(Resource resource) {
         LambdaQueryWrapper<Resource> wrapper = new LambdaQueryWrapper<>();
         wrapper.select(Resource::getId).eq(Resource::getCode, resource.getCode());
         com.github.wephotos.webwork.core.entity.Resource result = resourceMapper.selectOne(wrapper);

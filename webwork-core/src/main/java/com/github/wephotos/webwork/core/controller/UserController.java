@@ -6,6 +6,8 @@ import com.github.wephotos.webwork.core.entity.dto.UserDto;
 import com.github.wephotos.webwork.core.service.UserService;
 import com.github.wephotos.webwork.core.utils.ValidationUtil;
 import com.github.wephotos.webwork.error.Errors;
+import com.github.wephotos.webwork.http.Page;
+import com.github.wephotos.webwork.http.Pageable;
 import com.github.wephotos.webwork.http.RestObject;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,19 +33,24 @@ public class UserController {
      */
     @PostMapping("/save")
     public RestObject save(@RequestBody UserDto user) {
-        ValidationUtil.isTrue(Errors.USER_NAME_EXIST, userService.checkAccountUnique(user.getAccount()));
-        ValidationUtil.isTrue(Errors.USER_PHONE_EXIST, userService.checkPhoneUnique(user));
-        ValidationUtil.isTrue(Errors.USER_MAIL_EXIST, userService.checkEmailUnique(user));
+        ValidationUtil.isTrue(Errors.USER_NAME_EXIST, userService.checkExistsAccount(user.getAccount()));
+        ValidationUtil.isTrue(Errors.USER_PHONE_EXIST, userService.checkExistsPhone(user));
+        ValidationUtil.isTrue(Errors.USER_MAIL_EXIST, userService.checkExistsEmail(user));
         boolean bool = userService.create(user);
         return RestObject.builder().data(bool).build();
     }
 
     @PostMapping("/update")
     public RestObject update(@RequestBody UserDto user) {
-        ValidationUtil.isTrue(Errors.USER_PHONE_EXIST, userService.checkPhoneUnique(user));
-        ValidationUtil.isTrue(Errors.USER_MAIL_EXIST, userService.checkEmailUnique(user));
+        ValidationUtil.isTrue(Errors.USER_PHONE_EXIST, userService.checkExistsPhone(user));
+        ValidationUtil.isTrue(Errors.USER_MAIL_EXIST, userService.checkExistsEmail(user));
         boolean update = userService.update(user);
         return RestObject.builder().data(update).build();
+    }
+
+    @PostMapping("/page")
+    public Page<User> page(@RequestBody Pageable<User> pageable) {
+        return userService.page(pageable);
     }
 
     /**
@@ -70,7 +77,7 @@ public class UserController {
         return RestObject.builder().data(result).build();
     }
 
-    @PostMapping("/resetPwd")
+    @PostMapping("/reset-password")
     public RestObject resetPwd(@RequestBody User user) {
         if (userService.resetUserPwd(user)) {
             // 重新登录,清除缓存...
@@ -93,27 +100,27 @@ public class UserController {
     /**
      * 校验用户名
      */
-    @GetMapping("/checkAccountUnique")
-    public RestObject checkAccountUnique(String account) {
-        boolean bool = userService.checkAccountUnique(account);
+    @GetMapping("/check-exists-account")
+    public RestObject checkExistsAccount(String account) {
+        boolean bool = userService.checkExistsAccount(account);
         return RestObject.builder().data(bool).build();
     }
 
     /**
      * 校验手机号码
      */
-    @GetMapping("/checkPhoneUnique")
-    public RestObject checkPhoneUnique(User user) {
-        boolean bool = userService.checkPhoneUnique(user);
+    @GetMapping("/check-exists-phone")
+    public RestObject checkExistsPhone(User user) {
+        boolean bool = userService.checkExistsPhone(user);
         return RestObject.builder().data(bool).build();
     }
 
     /**
      * 校验email邮箱
      */
-    @GetMapping("/checkEmailUnique")
-    public RestObject checkEmailUnique(User user) {
-        boolean bool = userService.checkEmailUnique(user);
+    @GetMapping("/check-exists-email")
+    public RestObject checkExistsEmail(User user) {
+        boolean bool = userService.checkExistsEmail(user);
         return RestObject.builder().data(bool).build();
     }
 }

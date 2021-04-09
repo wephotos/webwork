@@ -30,8 +30,8 @@ public class RoleController {
      */
     @PostMapping("/save")
     public RestObject save(@RequestBody RoleDto role) {
-        ValidationUtil.isTrue(Errors.ROLE_NAME_EXIST, roleService.checkRoleNameUnique(role));
-        ValidationUtil.isTrue(Errors.ROLE_CODE_EXIST, roleService.checkRoleCodeUnique(role));
+        ValidationUtil.isTrue(Errors.ROLE_NAME_EXIST, roleService.checkExistsName(role));
+        ValidationUtil.isTrue(Errors.ROLE_CODE_EXIST, roleService.checkExistsCode(role));
         boolean result = roleService.save(role);
         return RestObject.builder().data(result).build();
     }
@@ -44,8 +44,8 @@ public class RoleController {
      */
     @PostMapping("/update")
     public RestObject update(@RequestBody RoleDto role) {
-        ValidationUtil.isTrue(Errors.ROLE_NAME_EXIST, roleService.checkRoleNameUnique(role));
-        ValidationUtil.isTrue(Errors.ROLE_CODE_EXIST, roleService.checkRoleCodeUnique(role));
+        ValidationUtil.isTrue(Errors.ROLE_NAME_EXIST, roleService.checkExistsName(role));
+        ValidationUtil.isTrue(Errors.ROLE_CODE_EXIST, roleService.checkExistsCode(role));
         boolean result = roleService.update(role);
         return RestObject.builder().data(result).build();
     }
@@ -92,11 +92,11 @@ public class RoleController {
      * @param roleName 角色名称
      * @return RestObject
      */
-    @GetMapping("/checkRoleNameUnique")
-    public RestObject checkRoleNameUnique(@RequestParam String roleName) {
+    @GetMapping("/check-exists-name")
+    public RestObject checkExistsName(@RequestParam String roleName) {
         Role role = new Role();
         role.setName(roleName);
-        boolean bool = roleService.checkRoleNameUnique(role);
+        boolean bool = roleService.checkExistsName(role);
         return RestObject.builder().data(bool).build();
     }
 
@@ -106,11 +106,11 @@ public class RoleController {
      * @param code 角色code
      * @return RestObject
      */
-    @GetMapping("/checkRoleCodeUnique")
-    public RestObject checkRoleCodeUnique(@RequestParam String code) {
+    @GetMapping("/check-exists-code")
+    public RestObject checkExistsCode(@RequestParam String code) {
         Role role = new Role();
         role.setCode(code);
-        boolean bool = roleService.checkRoleCodeUnique(role);
+        boolean bool = roleService.checkExistsCode(role);
         return RestObject.builder().data(bool).build();
     }
 }

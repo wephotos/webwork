@@ -65,7 +65,7 @@ public class RoleService {
         return SqlHelper.retBool(roleMapper.updateById(role));
     }
 
-    public boolean checkRoleNameUnique(Role role) {
+    public boolean checkExistsName(Role role) {
         String roleId = role.getId();
         LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
         wrapper.select(Role::getId).eq(Role::getName, role.getName());
@@ -73,7 +73,7 @@ public class RoleService {
         return Objects.isNull(result) || StringUtils.equals(result.getId(), roleId);
     }
 
-    public boolean checkRoleCodeUnique(Role role) {
+    public boolean checkExistsCode(Role role) {
         String roleId = role.getId();
         LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
         wrapper.select(Role::getId).eq(Role::getCode, role.getCode());

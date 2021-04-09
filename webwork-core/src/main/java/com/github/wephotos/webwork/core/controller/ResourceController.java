@@ -28,8 +28,8 @@ public class ResourceController {
      */
     @PostMapping("/save")
     public RestObject save(@RequestBody Resource resource) {
-        ValidationUtil.isTrue(Errors.RESOURCE_NAME_EXIST, resourceService.checkResourceNameUnique(resource));
-        ValidationUtil.isTrue(Errors.RESOURCE_CODE_EXIST, resourceService.checkResourceCodeUnique(resource));
+        ValidationUtil.isTrue(Errors.RESOURCE_NAME_EXIST, resourceService.checkExistsName(resource));
+        ValidationUtil.isTrue(Errors.RESOURCE_CODE_EXIST, resourceService.checkExistsPermission(resource));
         boolean result = resourceService.save(resource);
         return RestObject.builder().data(result).build();
     }
@@ -42,8 +42,8 @@ public class ResourceController {
      */
     @PostMapping("/update")
     public RestObject update(@RequestBody Resource resource) {
-        ValidationUtil.isTrue(Errors.RESOURCE_NAME_EXIST, resourceService.checkResourceNameUnique(resource));
-        ValidationUtil.isTrue(Errors.RESOURCE_CODE_EXIST, resourceService.checkResourceCodeUnique(resource));
+        ValidationUtil.isTrue(Errors.RESOURCE_NAME_EXIST, resourceService.checkExistsName(resource));
+        ValidationUtil.isTrue(Errors.RESOURCE_CODE_EXIST, resourceService.checkExistsPermission(resource));
         boolean result = resourceService.update(resource);
         return RestObject.builder().data(result).build();
     }
@@ -61,19 +61,19 @@ public class ResourceController {
         return RestObject.builder().data(resource).build();
     }
 
-    @GetMapping("/checkResourceNameUnique")
-    public RestObject checkResourceNameUnique(@RequestParam String name) {
+    @GetMapping("/check-exists-name")
+    public RestObject checkExistsName(@RequestParam String name) {
         Resource resource = new Resource();
         resource.setName(name);
-        boolean bool = resourceService.checkResourceNameUnique(resource);
+        boolean bool = resourceService.checkExistsName(resource);
         return RestObject.builder().data(bool).build();
     }
 
-    @GetMapping("/checkResourcePermissionUnique")
-    public RestObject checkResourcePermissionUnique(@RequestParam String permission) {
+    @GetMapping("/check-exists-permission")
+    public RestObject checkExistsPermission(@RequestParam String permission) {
         Resource resource = new Resource();
         resource.setPermission(permission);
-        boolean bool = resourceService.checkResourceCodeUnique(resource);
+        boolean bool = resourceService.checkExistsPermission(resource);
         return RestObject.builder().data(bool).build();
     }
 }

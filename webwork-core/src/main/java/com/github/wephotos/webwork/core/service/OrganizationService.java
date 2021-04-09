@@ -6,10 +6,12 @@ import com.github.wephotos.webwork.core.entity.Organization;
 import com.github.wephotos.webwork.core.mapper.OrganizationMapper;
 import com.github.wephotos.webwork.core.utils.WebWorkUtil;
 import com.github.wephotos.webwork.http.EntityState;
-import org.apache.commons.lang3.StringUtils;
+import com.github.wephotos.webwork.security.entity.User;
+import com.github.wephotos.webwork.utils.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -56,7 +58,24 @@ public class OrganizationService {
         return organizationMapper.selectById(id);
     }
 
-    public boolean checkOrgNameUnique(Organization org) {
+    public List<Organization> children(String parentId, Integer type, User sessionUser) {
+        LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(Organization::getId, Organization::getName,
+                Organization::getCode, Organization::getStatus,
+                Organization::getType, Organization::getParentId);
+        String deptId = sessionUser.getDeptId();
+        // 没有传parentId获取当前登录用户的部门id
+        if (StringUtils.isBlank(parentId)) {
+            parentId = deptId;
+        }
+        wrapper.eq(Organization::getParentId, parentId);
+        if (null != type) {
+            wrapper.eq(Organization::getType, type);
+        }
+        return organizationMapper.selectList(wrapper);
+    }
+
+    public boolean checkExistsName(Organization org) {
         LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
         wrapper.select(Organization::getId).eq(Organization::getName, org.getName());
         Organization result = organizationMapper.selectOne(wrapper);

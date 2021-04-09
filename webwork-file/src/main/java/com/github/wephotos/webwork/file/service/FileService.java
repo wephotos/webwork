@@ -6,6 +6,7 @@ import com.github.wephotos.webwork.file.entity.WebworkFile;
 import com.github.wephotos.webwork.file.mapper.FileMapper;
 import com.github.wephotos.webwork.file.stor.FileStor;
 import com.github.wephotos.webwork.http.EntityState;
+import com.github.wephotos.webwork.utils.FilenameUtils;
 import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 import lombok.Getter;
@@ -52,10 +53,16 @@ public class FileService {
         if (StringUtils.isBlank(file.getOwner())) {
             throw new IllegalArgumentException("附件关联外键不能为空");
         }
-        String objectName = fileStor.getNewObjectName(file.getName());
+        String objectNameParam = file.getName();
+        if (StringUtils.isNotBlank(file.getObjectName())) {
+            String extension = FilenameUtils.getExtension(file.getName());
+            objectNameParam = file.getObjectName() + "." + extension;
+        }
+        String objectName = fileStor.getNewObjectName(objectNameParam);
         file.setObjectName(objectName);
         fileStor.storage(file);
         file.setId(WebworkUtils.uuid());
+        file.setStatus(EntityState.ENABLED.getValue());
         file.setCreateTime(WebworkUtils.timestamp());
         fileMapper.insert(file);
         return UploadResult.builder()
