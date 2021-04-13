@@ -38,9 +38,9 @@ public class WebworkUserAuth implements SecurityAuth {
             throw new WebworkException(Errors.USER_DELETED.getMessage(), Errors.USER_DELETED.getCode());
         }
         // TODO 密码加密处理
-        String password_ = user.getPassword();
-        String password = auth.getPassword();
-        if (password_.equals(password)) {
+        String passwordDb = user.getPassword();
+        String passwordParam = auth.getPassword();
+        if (passwordDb.equals(passwordParam)) {
             // 获取部门与组织信息
             UserOrgDto userOrgDto = userOrgService.getByUserId(user.getId());
             User result = new User();

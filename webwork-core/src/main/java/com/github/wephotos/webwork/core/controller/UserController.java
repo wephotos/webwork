@@ -2,6 +2,7 @@ package com.github.wephotos.webwork.core.controller;
 
 
 import com.github.wephotos.webwork.core.entity.User;
+import com.github.wephotos.webwork.core.entity.UserVo;
 import com.github.wephotos.webwork.core.entity.dto.UserDto;
 import com.github.wephotos.webwork.core.service.UserService;
 import com.github.wephotos.webwork.core.utils.ValidationUtil;
@@ -49,7 +50,7 @@ public class UserController {
     }
 
     @PostMapping("/page")
-    public Page<User> page(@RequestBody Pageable<User> pageable) {
+    public Page<UserVo> page(@RequestBody Pageable<UserVo> pageable) {
         return userService.page(pageable);
     }
 
@@ -77,8 +78,8 @@ public class UserController {
         return RestObject.builder().data(result).build();
     }
 
-    @PostMapping("/reset-password")
-    public RestObject resetPwd(@RequestBody User user) {
+    @PostMapping("/password")
+    public RestObject password(@RequestBody User user) {
         if (userService.resetUserPwd(user)) {
             // 重新登录,清除缓存...
         }
@@ -95,6 +96,18 @@ public class UserController {
     public RestObject get(@PathVariable String id) {
         User user = userService.get(id);
         return RestObject.builder().data(user).build();
+    }
+
+    /**
+     * 置顶用户
+     *
+     * @param id 用户id
+     * @return RestObject
+     */
+    @PostMapping("/top/{id}")
+    public RestObject top(@PathVariable String id) {
+        userService.top(id);
+        return RestObject.builder().data(id).build();
     }
 
     /**

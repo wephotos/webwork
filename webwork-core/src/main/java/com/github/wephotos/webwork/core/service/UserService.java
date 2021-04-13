@@ -2,14 +2,9 @@ package com.github.wephotos.webwork.core.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
-import com.github.wephotos.webwork.core.entity.Organization;
-import com.github.wephotos.webwork.core.entity.User;
-import com.github.wephotos.webwork.core.entity.UserOrg;
-import com.github.wephotos.webwork.core.entity.UserRole;
+import com.github.wephotos.webwork.core.entity.*;
 import com.github.wephotos.webwork.core.entity.dto.UserDto;
 import com.github.wephotos.webwork.core.mapper.OrganizationMapper;
 import com.github.wephotos.webwork.core.mapper.UserMapper;
@@ -17,6 +12,7 @@ import com.github.wephotos.webwork.core.mapper.UserOrgMapper;
 import com.github.wephotos.webwork.core.mapper.UserRoleMapper;
 import com.github.wephotos.webwork.core.utils.WebWorkUtil;
 import com.github.wephotos.webwork.http.EntityState;
+import com.github.wephotos.webwork.http.Page;
 import com.github.wephotos.webwork.http.Pageable;
 import com.github.wephotos.webwork.utils.StringUtils;
 import org.springframework.stereotype.Service;
@@ -91,28 +87,12 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return userMapper.updateById(user);
     }
 
-    public com.github.wephotos.webwork.http.Page<User> page(Pageable<User> pageable) {
-        User condition = pageable.getCondition();
-        Page<User> page = new Page<>(pageable.getCurr(), pageable.getSize());
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-        // 查询条件
-        if (condition != null) {
-            wrapper.like(StringUtils.isNotEmpty(condition.getAccount()), "account", condition.getAccount());
-            wrapper.like(StringUtils.isNotEmpty(condition.getName()), "name", condition.getName());
-            wrapper.like(StringUtils.isNotEmpty(condition.getEmail()), "email", condition.getEmail());
-            wrapper.like(StringUtils.isNotEmpty(condition.getPhone()), "phone", condition.getPhone());
-            wrapper.eq(condition.getStatus() != null, "status", condition.getStatus());
-        }
-        // 传入排序字段
-        if (StringUtils.isNotBlank(pageable.getSortField())) {
-            String order = pageable.getSortOrder();
-            wrapper.orderBy(true, "asc".equals(order), pageable.getSortField());
-        }
-        IPage<User> res = userMapper.page(page, wrapper);
-        com.github.wephotos.webwork.http.Page<User> result = new com.github.wephotos.webwork.http.Page<>();
-        result.setCount(res.getTotal());
-        result.setData(res.getRecords());
-        return result;
+    public Page<UserVo> page(Pageable<UserVo> pageable) {
+        pageable.setStart((pageable.getCurr() - 1) * pageable.getSize());
+        Page<UserVo> page = new Page<>();
+        page.setData(userMapper.page(pageable));
+        page.setCount(userMapper.pageCount(pageable));
+        return page;
     }
 
     public boolean checkExistsAccount(String account) {
@@ -137,9 +117,10 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
 
     public boolean resetUserPwd(User user) {
+        String oldPass = user.getPassword();
         User newUser = new User();
         newUser.setId(user.getId());
-        newUser.setPassword(user.getPassword());
+        newUser.setPassword(oldPass);
         return SqlHelper.retBool(userMapper.updateById(newUser));
     }
 
@@ -183,5 +164,13 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
     public User getByAccount(String account) {
         return userMapper.getByAccount(account);
+    }
+
+    public int top(String id) {
+        User user = new User();
+        user.setId(id);
+        user.setTopTime(WebWorkUtil.timestamp());
+        user.setSort(1);
+        return userMapper.updateById(user);
     }
 }

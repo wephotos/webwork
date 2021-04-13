@@ -16,6 +16,6 @@ public class UserOrgService {
     private UserOrgMapper userOrgMapper;
 
     public UserOrgDto getByUserId(String userId) {
-        return userOrgMapper.getByUserId(userId);
+        return userOrgMapper.find(userId);
     }
 }

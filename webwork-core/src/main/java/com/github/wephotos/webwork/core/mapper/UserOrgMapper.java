@@ -12,6 +12,11 @@ import org.apache.ibatis.annotations.Param;
  */
 @Mapper
 public interface UserOrgMapper extends BaseMapper<UserOrg> {
-
-    UserOrgDto getByUserId(@Param("userId") String userId);
+    /**
+     * 根据userId查找
+     *
+     * @param userId userId
+     * @return UserOrgDto
+     */
+    UserOrgDto find(@Param("userId") String userId);
 }

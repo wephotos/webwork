@@ -37,7 +37,7 @@ public final class WebWorkUtil {
         return new Timestamp(System.currentTimeMillis());
     }
 
-    public static boolean isXMLHttpRequest(HttpServletRequest request) {
+    public static boolean isXmlHttpRequest(HttpServletRequest request) {
         String xRequestedWith = request.getHeader("X-Requested-With");
         return xRequestedWith != null && xRequestedWith.contains("XMLHttpRequest");
     }
@@ -45,9 +45,9 @@ public final class WebWorkUtil {
     /**
      * 写出JSON数据到响应流中
      *
-     * @param value
-     * @param response
-     * @throws IOException
+     * @param value    value
+     * @param response response
+     * @throws IOException IOException
      */
     public static void responseJson(Object value, HttpServletResponse response) throws IOException {
         response.setCharacterEncoding("UTF-8");

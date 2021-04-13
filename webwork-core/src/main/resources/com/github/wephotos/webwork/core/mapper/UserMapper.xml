@@ -2,14 +2,106 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.wephotos.webwork.core.mapper.UserMapper">
 
+    <resultMap id="BaseResultMap" type="com.github.wephotos.webwork.core.entity.UserVo">
+        <result column="id" property="id" jdbcType="CHAR"/>
+        <result column="account" property="account" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="CHAR"/>
+        <result column="depName" property="depName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, account, name, password, email, phone, status,create_time,top_time
+    </sql>
+
+    <!--根据账号获取用户-->
     <select id="getByAccount" resultType="com.github.wephotos.webwork.core.entity.User">
         select id, account, name, password, email, phone, status
         from sys_user
         where account = #{account}
     </select>
 
-    <select id="page" resultType="com.github.wephotos.webwork.core.entity.User">
-        SELECT *
-        FROM sys_user ${ew.customSqlSegment}
+    <!--分页-->
+    <select id="page" resultMap="BaseResultMap">
+        SELECT
+        a.id,
+        a.account,
+        a.name,
+        a.email,
+        a.phone,
+        a.sort,
+        a.status,
+        a.create_time,
+        a.top_time,
+        c.name depName
+        FROM
+        sys_user a,
+        sys_user_org b,
+        sys_organization c
+        <where>
+            <include refid="pageCond"/>
+        </where>
+        <include refid="orderBy"/>
+        LIMIT #{start}, #{size}
     </select>
+
+    <!--分页总数-->
+    <select id="pageCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM
+        sys_user a,
+        sys_user_org b,
+        sys_organization c
+        <where>
+            <include refid="pageCond"/>
+        </where>
+    </select>
+
+    <!--查询条件-->
+    <sql id="pageCond">
+        a.id = b.user_id AND b.dept_id = c.id
+        <if test="condition != null">
+            <if test="condition.account != null and condition.account != ''">
+                AND a.account LIKE CONCAT('%',#{condition.account,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="condition.name != null and condition.name != ''">
+                AND a.name LIKE CONCAT('%',#{condition.name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="condition.email != null and condition.email != ''">
+                AND a.email LIKE CONCAT('%',#{condition.email,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="condition.phone != null and condition.phone != ''">
+                AND a.phone LIKE CONCAT('%',#{condition.phone,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="condition.status != null">
+                AND a.status = #{condition.status,jdbcType=INTEGER}
+            </if>
+            <if test="condition.depName != null">
+                AND c.name = #{condition.name,jdbcType=INTEGER}
+            </if>
+            <if test="condition.depId != null">
+                AND b.dept_id = #{condition.depId,jdbcType=INTEGER}z
+            </if>
+        </if>
+    </sql>
+
+    <!-- 排序 -->
+    <sql id="orderBy">
+        ORDER BY
+        <choose>
+            <when test="sortField != null and sortField !=''">
+                ${sortField}
+                <if test="sortOrder != null  and sortOrder !=''">
+                    ${sortOrder}
+                </if>
+            </when>
+            <otherwise>
+                a.sort ASC, a.top_time DESC
+            </otherwise>
+        </choose>
+    </sql>
+
 </mapper>
