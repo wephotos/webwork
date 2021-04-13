@@ -51,4 +51,11 @@ public interface FileMapper {
      * @return 附件集合
      */
     List<WebworkFile> list(String owner);
+
+    /**
+     * 根据文件存储对象名获取存储记录
+     * @param objectName 文件对象名
+     * @return the {@link WebworkFile}
+     */
+	WebworkFile selectByObjectName(String objectName);
 }

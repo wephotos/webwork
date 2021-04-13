@@ -1,21 +1,23 @@
 package com.github.wephotos.webwork.file.service;
 
 
+import java.io.IOException;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
 import com.github.wephotos.webwork.file.entity.UploadResult;
 import com.github.wephotos.webwork.file.entity.WebworkFile;
 import com.github.wephotos.webwork.file.mapper.FileMapper;
 import com.github.wephotos.webwork.file.stor.FileStor;
 import com.github.wephotos.webwork.http.EntityState;
-import com.github.wephotos.webwork.utils.FilenameUtils;
 import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
+
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * @author chengzi
@@ -53,18 +55,29 @@ public class FileService {
         if (StringUtils.isBlank(file.getOwner())) {
             throw new IllegalArgumentException("附件关联外键不能为空");
         }
-        String objectNameParam = file.getName();
-        if (StringUtils.isNotBlank(file.getObjectName())) {
-            String extension = FilenameUtils.getExtension(file.getName());
-            objectNameParam = file.getObjectName() + "." + extension;
+        // 是否覆盖原文件
+        boolean isOverwrite = false;
+        String objectName = file.getObjectName();
+        if(StringUtils.isBlank(objectName)) {
+        	objectName = fileStor.getNewObjectName(file.getName());
+        	file.setObjectName(objectName);
+        }else {
+        	WebworkFile ofile = fileMapper.selectByObjectName(objectName);
+        	if(ofile != null) {
+        		isOverwrite = true;
+        		file.setId(ofile.getId());
+        		fileMapper.updateByPrimaryKeySelective(file);
+        	}
         }
-        String objectName = fileStor.getNewObjectName(objectNameParam);
-        file.setObjectName(objectName);
+        if(!isOverwrite) {
+        	file.setId(WebworkUtils.uuid());
+        	file.setStatus(EntityState.ENABLED.getValue());
+        	file.setCreateTime(WebworkUtils.timestamp());
+        	fileMapper.insert(file);
+        }
+        //存储文件
         fileStor.storage(file);
-        file.setId(WebworkUtils.uuid());
-        file.setStatus(EntityState.ENABLED.getValue());
-        file.setCreateTime(WebworkUtils.timestamp());
-        fileMapper.insert(file);
+        // 返回主键 文件名 存储对象名
         return UploadResult.builder()
                            .id(file.getId())
                            .name(file.getName())

@@ -38,13 +38,13 @@
                 size = #{size,jdbcType=INTEGER},
             </if>
             <if test="objectName != null">
-                objectName = #{objectName,jdbcType=VARCHAR},
+                object_name = #{objectName,jdbcType=VARCHAR},
             </if>
             <if test="contentType != null">
-                contentType = #{contentType,jdbcType=VARCHAR},
+                content_type = #{contentType,jdbcType=VARCHAR},
             </if>
             <if test="createTime != null">
-                createTime = #{createTime,jdbcType=TIMESTAMP},
+                create_time = #{createTime,jdbcType=TIMESTAMP},
             </if>
             <if test="status != null">
                 `status` = #{status,jdbcType=CHAR},
@@ -72,5 +72,14 @@
         <include refid="Base_Column_List"/>
         from webwork_file
         where id = #{id,jdbcType=CHAR}
+    </select>
+    
+    <select id="selectByObjectName" resultMap="BaseResultMap">
+    	select
+          <include refid="Base_Column_List"/>
+        from 
+          webwork_file
+        where 
+          object_name = #{objectName,jdbcType=VARCHAR}
     </select>
 </mapper>
