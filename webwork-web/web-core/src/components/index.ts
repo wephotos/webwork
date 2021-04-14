@@ -5,7 +5,6 @@ import Alert from '@/components/Alert.vue'
 import Dialog from '@/components/Dialog.vue'
 import Loading from '@/components/Loading.vue'
 import components from '@/components'
-import { Options } from '@/types/Options'
 
 /** 插件安装 */
 export default function install(app: App, ...$options: any[]) {

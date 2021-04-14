@@ -24,10 +24,11 @@ export class UserRequest extends BaseRequest {
     update(user: User) {
         return super.post('/user/update', user)
     }
+
     /** 分页查询 */
     pageList(pageable: Pageable) {
         return super.get<Page<User>>('/users.json')
     }
 }
-const userRequest = new UserRequest();
+const userRequest = new UserRequest()
 export default userRequest

@@ -1,18 +1,17 @@
-import { Component } from '@vue/runtime-core'
-
 /**
- * 组件选项类型
+ * 组件参数类型定义
  */
 declare namespace Options {
-    // Toast
-    interface Toast {
+    import { Component } from '@vue/runtime-core'
+    // 吐司
+    export type Toast = {
         // 消息
         msg: string;
         // 显示时长
         seconds?: number;
     }
     // 提示框
-    interface Alert {
+    export type Alert = {
         // 标题
         title?: string;
         // 内容
@@ -25,7 +24,7 @@ declare namespace Options {
         close?: () => void;
     }
     // 对话框
-    interface Dialog {
+    export type Dialog = {
         // 标题
         title?: string;
         // 内容

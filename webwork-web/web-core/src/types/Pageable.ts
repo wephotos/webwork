@@ -1,9 +1,9 @@
 /** 分页条件类型定义 */
 export default class Pageable {
     // 当前页码
-    curr: number = 1;
+    curr = 1;
     // 每页条数
-    size: number = 10;
+    size = 10;
     // 用户ID
     userId?: string;
     // 排序字段

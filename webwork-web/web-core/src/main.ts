@@ -4,7 +4,6 @@ import router from './router'
 import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
 import components from './components'
-import { Options } from './types/Options'
 
 /** 声明组件全局属性 */
 declare module '@vue/runtime-core' {
