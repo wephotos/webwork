@@ -39,7 +39,7 @@
         <!-- 操作列模板 -->
         <template #operation="{ record }">
           <a-space>
-            <a href="javascript:void(0);" @click="onUserSort(record)">排序</a>
+            <a href="javascript:void(0);" @click="onUserTop(record)">置顶</a>
             <a href="javascript:void(0);" @click="onUserEdit(record)">编辑</a>
           </a-space>
         </template>
@@ -278,9 +278,9 @@ export default class VueUser extends Vue {
   // 编辑人员
   onUserEdit(user: User) {
     this.$dialog({
-      title: '编辑用户',
+      title: '用户信息',
       width: 550,
-      height: 650,
+      height: 700,
       content: {
         handle: true,
         component: UserForm,
@@ -289,8 +289,8 @@ export default class VueUser extends Vue {
     })
   }
 
-  // 人员排序
-  onUserSort(user: User) {
+  // 人员置顶
+  onUserTop(user: User) {
     console.log(user.sort)
   }
 
