@@ -1,7 +1,7 @@
 # webwork
 企业应用系统的快速开发框架
 
-## [webwork-pom](/tree/main/webwork-pom)
+## [webwork-pom](../../tree/main/webwork-pom)
 公共POM文件定义
 ## [webwork-schema](https://github.com/wephotos/webwork/tree/main/webwork-schema)
 公共接口、数据类型定义
