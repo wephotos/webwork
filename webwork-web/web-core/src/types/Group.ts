@@ -1,5 +1,5 @@
 /** 组织节点类型定义 */
-export declare class Organization {
+export declare class Group {
     /** ID */
     id: string;
     /** 名称 */

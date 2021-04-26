@@ -1,28 +1,7 @@
 <template>
   <a-layout class="a-layout">
     <a-layout-sider class="a-layout-sider">
-      <a-tree :tree-data="treeData" v-model:expandedKeys="expandedKeys">
-        <template #title="{ key: treeKey, title }">
-          <a-dropdown :trigger="['contextmenu']">
-            <span>{{ title }}</span>
-            <template #overlay>
-              <a-menu
-                @click="
-                  ({ key: menuKey }) => onContextMenuClick(treeKey, menuKey)
-                "
-              >
-                <a-menu-item key="1">新增单位</a-menu-item>
-                <a-menu-item key="2">新增部门</a-menu-item>
-                <a-menu-item key="3">更新单位</a-menu-item>
-                <a-menu-item key="4">更新部门</a-menu-item>
-                <a-menu-item key="5">删除单位</a-menu-item>
-                <a-menu-item key="6">删除部门</a-menu-item>
-                <a-menu-item key="7">新增人员</a-menu-item>
-              </a-menu>
-            </template>
-          </a-dropdown>
-        </template>
-      </a-tree>
+      <Group />
     </a-layout-sider>
     <a-layout-content class="a-layout-content">
       <a-table
@@ -123,32 +102,7 @@ import { ref, unref } from 'vue'
 import userRequest from '@/request/UserRequest'
 import Pageable from '@/types/Pageable'
 import UserForm from './UserForm.vue'
-const treeDataConst = [
-  {
-    title: '诗和远方',
-    key: '0-0',
-    children: [
-      {
-        title: '安徽',
-        key: '0-0-0',
-        children: [
-          { title: '黄山', key: '0-0-0-0' },
-          { title: '九华山', key: '0-0-0-1' },
-          { title: '天柱山', key: '0-0-0-2' }
-        ]
-      },
-      {
-        title: '江苏',
-        key: '0-0-1',
-        children: [
-          { title: '太湖', key: '0-0-1-0' },
-          { title: '洪泽湖', key: '0-0-1-1' },
-          { title: '微山湖', key: '0-0-1-2' }
-        ]
-      }
-    ]
-  }
-]
+import Group from './Group.vue'
 // 分页数据类型
 type Pagination = TableState['pagination'];
 // 排序映射
@@ -158,6 +112,7 @@ const orderMap: {[key: string]: string} = {
 }
 @Options({
   components: {
+    Group,
     SearchOutlined
   },
   watch: {
@@ -280,7 +235,7 @@ export default class VueUser extends Vue {
     this.$dialog({
       title: '用户信息',
       width: 550,
-      height: 700,
+      height: 750,
       content: {
         handle: true,
         component: UserForm,
@@ -292,20 +247,6 @@ export default class VueUser extends Vue {
   // 人员置顶
   onUserTop(user: User) {
     console.log(user.sort)
-  }
-
-  // 组织树数据源
-  treeData = treeDataConst
-  // 展开的KEY
-  expandedKeys: string[] = ['0-0-0', '0-0-1']
-  // 右键菜单
-  onContextMenuClick(treeKey: string, menuKey: string) {
-    console.log(`treeKey: ${treeKey}, menuKey: ${menuKey}`)
-  }
-
-  // 属性监听
-  watchExpandedKeys(value: string[], oldValue: string[]) {
-    console.log('expandedKeys', value, oldValue)
   }
 }
 </script>

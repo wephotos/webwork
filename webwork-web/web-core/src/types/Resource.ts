@@ -1,4 +1,4 @@
-/** 角色数据类型 */
+/** 资源数据类型 */
 export declare class Resource {
     /** ID */
     id: string;

@@ -30,5 +30,5 @@ export class UserRequest extends BaseRequest {
         return super.get<Page<User>>('/users.json')
     }
 }
-const userRequest = new UserRequest()
-export default userRequest
+const request = new UserRequest()
+export default request

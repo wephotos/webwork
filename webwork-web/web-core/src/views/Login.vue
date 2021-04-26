@@ -1,7 +1,7 @@
 <template>
     <a-row align="middle" style="height:100%;">
         <a-col :span="6" :offset="9" class="login-box">
-            <h1 style="color:#1890ff;">webwork login</h1>
+            <h1 style="color:#1890ff;font-family:fantasy;">webworks</h1>
             <a-form
                 layout="horizontal"
                 :model="formData"
@@ -75,7 +75,7 @@ export default class Login extends Vue {
       })
       if (result.code === 0) {
           this.$toast('登录成功')
-          this.$router.push('/client')
+          this.$router.push('/user')
       } else {
           this.$toast(result.msg)
       }
@@ -88,6 +88,7 @@ export default class Login extends Vue {
 </script>
 <style scoped>
 .login-box {
+    height: 300px;
     padding-top: 20px;
     text-align: center;
     background:rgba(0,0,0,0.3);
