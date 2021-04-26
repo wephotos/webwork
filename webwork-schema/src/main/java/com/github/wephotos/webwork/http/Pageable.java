@@ -18,18 +18,9 @@ public class Pageable<T> {
      */
     private int curr = 1;
     /**
-     * 起始下标
-     */
-    private int start = 0;
-    /**
      * 每页条数
      */
     private int size = 15;
-
-    /**
-     * 用户ID
-     */
-    private String userId;
     /**
      * 查询条件
      */
@@ -42,4 +33,12 @@ public class Pageable<T> {
      * ASC DESC
      */
     private String sortOrder;
+    
+    /**
+     * 获取当前起始下标
+     * @return 分页开始下标
+     */
+    public int getStart() {
+    	return (this.curr - 1) * this.size;
+    }
 }

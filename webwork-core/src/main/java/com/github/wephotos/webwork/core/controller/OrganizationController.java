@@ -1,16 +1,24 @@
 package com.github.wephotos.webwork.core.controller;
 
 
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.github.wephotos.webwork.core.entity.Organization;
 import com.github.wephotos.webwork.core.service.OrganizationService;
 import com.github.wephotos.webwork.http.RestObject;
 import com.github.wephotos.webwork.security.entity.User;
 import com.github.wephotos.webwork.security.storage.SessionUserStorage;
-import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-import java.util.List;
 
 /**
  * 组织
@@ -63,14 +71,13 @@ public class OrganizationController {
     /**
      * 查询组织下组织或部门
      *
-     * @param parentId 组织/部门id
-     * @param type     类型：1：组织，2：部门
-     * @return RestObject
+     * @param parentId 父节点ID
+     * @return {@link RestObject}
      */
-    @PostMapping("/children")
-    public RestObject children(String parentId, Integer type, HttpSession session) {
-        User sessionUser = SessionUserStorage.get(session);
-        List<Organization> organizationList = organizationService.children(parentId, type, sessionUser);
+    @GetMapping("/children")
+    public RestObject children(String parentId, HttpSession session) {
+        User user = SessionUserStorage.get(session);
+        List<Organization> organizationList = organizationService.children(parentId, user);
         return RestObject.builder().data(organizationList).build();
     }
 

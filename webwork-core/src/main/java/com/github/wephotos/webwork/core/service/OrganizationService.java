@@ -1,5 +1,13 @@
 package com.github.wephotos.webwork.core.service;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.github.wephotos.webwork.core.entity.Organization;
@@ -8,11 +16,6 @@ import com.github.wephotos.webwork.core.utils.WebWorkUtil;
 import com.github.wephotos.webwork.http.EntityState;
 import com.github.wephotos.webwork.security.entity.User;
 import com.github.wephotos.webwork.utils.StringUtils;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * @author chengzi
@@ -58,20 +61,23 @@ public class OrganizationService {
         return organizationMapper.selectById(id);
     }
 
-    public List<Organization> children(String parentId, Integer type, User sessionUser) {
+    /**
+     * 查询下级组织机构
+     * @param parentId 父ID
+     * @param user 当前用户
+     * @return {@link Organization}
+     */
+    public List<Organization> children(String parentId, User user) {
+    	// 父节点为空，返回当前单位节点
+    	if(StringUtils.isBlank(parentId)) {
+    		Organization root = get(user.getGroupId());
+    		return Arrays.asList(root);
+    	}
         LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
         wrapper.select(Organization::getId, Organization::getName,
                 Organization::getCode, Organization::getStatus,
                 Organization::getType, Organization::getParentId);
-        String deptId = sessionUser.getDeptId();
-        // 没有传parentId获取当前登录用户的部门id
-        if (StringUtils.isBlank(parentId)) {
-            parentId = deptId;
-        }
         wrapper.eq(Organization::getParentId, parentId);
-        if (null != type) {
-            wrapper.eq(Organization::getType, type);
-        }
         return organizationMapper.selectList(wrapper);
     }
 

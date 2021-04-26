@@ -15,6 +15,10 @@ import lombok.ToString;
 @ToString
 public class UserVo extends User {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
      * 部门名称
      */
     private String depName;

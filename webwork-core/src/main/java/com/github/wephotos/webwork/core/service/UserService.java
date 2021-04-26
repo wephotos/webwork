@@ -88,7 +88,6 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     }
 
     public Page<UserVo> page(Pageable<UserVo> pageable) {
-        pageable.setStart((pageable.getCurr() - 1) * pageable.getSize());
         Page<UserVo> page = new Page<>();
         page.setData(userMapper.page(pageable));
         page.setCount(userMapper.pageCount(pageable));
