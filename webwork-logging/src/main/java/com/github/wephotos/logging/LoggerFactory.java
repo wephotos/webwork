@@ -15,8 +15,7 @@ public final class LoggerFactory {
 	 * @return 日志对象
 	 */
 	public static Logger getLogger(Class<?> clazz) {
-		Logger logger = org.slf4j.LoggerFactory.getLogger(clazz);
-		return new WebworkLogger(logger);
+		return getLogger(clazz.getName());
 	}
 	
 	/**
@@ -27,5 +26,12 @@ public final class LoggerFactory {
 	public static Logger getLogger(String name) {
 		Logger logger = org.slf4j.LoggerFactory.getLogger(name);
 		return new WebworkLogger(logger);
+	}
+	
+	public static void main(String[] args) {
+		getLogger(LoggerFactory.class).debug("disruptor:{}", 0);
+		getLogger(LoggerFactory.class).debug("disruptor:{}", 1);
+		getLogger(LoggerFactory.class).debug("disruptor:{}", 2);
+		
 	}
 }
