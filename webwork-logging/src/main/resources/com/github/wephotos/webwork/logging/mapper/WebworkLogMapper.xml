@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.wephotos.webwork.logging.mapper.WebworkLogMapper">
+    <sql id="Base_Column_List">
+        id,owner, name, size, object_name, content_type, user_id, user_name, create_time
+    </sql>
+
+    <resultMap id="BaseResultMap" type="com.github.wephotos.webwork.logging.entiyt.WebworkLog">
+        <id column="id" property="id" jdbcType="CHAR"/>
+        <result column="ip" property="ip" jdbcType="VARCHAR"/>
+        <result column="operator" property="operator" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="level" property="level" jdbcType="VARCHAR"/>
+        <result column="browser" property="browser" jdbcType="VARCHAR"/>
+        <result column="url" property="url" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+</mapper>

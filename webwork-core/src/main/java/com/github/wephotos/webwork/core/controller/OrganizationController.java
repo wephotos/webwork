@@ -1,24 +1,17 @@
 package com.github.wephotos.webwork.core.controller;
 
 
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.github.wephotos.webwork.core.entity.Organization;
+import com.github.wephotos.webwork.core.entity.dto.DropSort;
 import com.github.wephotos.webwork.core.service.OrganizationService;
 import com.github.wephotos.webwork.http.RestObject;
 import com.github.wephotos.webwork.security.entity.User;
 import com.github.wephotos.webwork.security.storage.SessionUserStorage;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import java.util.List;
 
 /**
  * 组织
@@ -80,6 +73,14 @@ public class OrganizationController {
         List<Organization> organizationList = organizationService.children(parentId, user);
         return RestObject.builder().data(organizationList).build();
     }
+
+    // TODO 未测试 到时候再修改
+    @PostMapping("/dropSort")
+    public RestObject dropSort(DropSort dropSort) {
+        organizationService.dropSort(dropSort);
+        return RestObject.builder().build();
+    }
+
 
     @GetMapping("/check-exists-name")
     public RestObject checkExistsName(@RequestParam String name) {

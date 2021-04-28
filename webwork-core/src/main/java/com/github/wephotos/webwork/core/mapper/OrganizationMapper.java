@@ -2,6 +2,7 @@ package com.github.wephotos.webwork.core.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.wephotos.webwork.core.entity.Organization;
+import com.github.wephotos.webwork.core.entity.dto.DropSort;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -17,4 +18,6 @@ public interface OrganizationMapper extends BaseMapper<Organization> {
      * @return code
      */
     String findMaxCode(String parentId);
+
+    int dropSort(DropSort dropSort);
 }

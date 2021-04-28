@@ -1,21 +1,20 @@
 package com.github.wephotos.webwork.core.service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Service;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.github.wephotos.webwork.core.entity.Organization;
+import com.github.wephotos.webwork.core.entity.dto.DropSort;
 import com.github.wephotos.webwork.core.mapper.OrganizationMapper;
 import com.github.wephotos.webwork.core.utils.WebWorkUtil;
 import com.github.wephotos.webwork.http.EntityState;
 import com.github.wephotos.webwork.security.entity.User;
 import com.github.wephotos.webwork.utils.StringUtils;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author chengzi
@@ -63,16 +62,17 @@ public class OrganizationService {
 
     /**
      * 查询下级组织机构
+     *
      * @param parentId 父ID
-     * @param user 当前用户
+     * @param user     当前用户
      * @return {@link Organization}
      */
     public List<Organization> children(String parentId, User user) {
-    	// 父节点为空，返回当前单位节点
-    	if(StringUtils.isBlank(parentId)) {
-    		Organization root = get(user.getGroupId());
-    		return Arrays.asList(root);
-    	}
+        // 父节点为空，返回当前单位节点
+        if (StringUtils.isBlank(parentId)) {
+            Organization root = get(user.getGroupId());
+            return Arrays.asList(root);
+        }
         LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
         wrapper.select(Organization::getId, Organization::getName,
                 Organization::getCode, Organization::getStatus,
@@ -86,5 +86,9 @@ public class OrganizationService {
         wrapper.select(Organization::getId).eq(Organization::getName, org.getName());
         Organization result = organizationMapper.selectOne(wrapper);
         return Objects.isNull(result) || StringUtils.equals(result.getId(), org.getId());
+    }
+
+    public int dropSort(DropSort dropSort) {
+        return organizationMapper.dropSort(dropSort);
     }
 }

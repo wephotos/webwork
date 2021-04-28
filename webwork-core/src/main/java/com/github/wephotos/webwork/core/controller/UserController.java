@@ -1,6 +1,7 @@
 package com.github.wephotos.webwork.core.controller;
 
 
+import com.github.wephotos.logging.LoggerFactory;
 import com.github.wephotos.webwork.core.entity.User;
 import com.github.wephotos.webwork.core.entity.UserVo;
 import com.github.wephotos.webwork.core.entity.dto.UserDto;
@@ -10,6 +11,7 @@ import com.github.wephotos.webwork.error.Errors;
 import com.github.wephotos.webwork.http.Page;
 import com.github.wephotos.webwork.http.Pageable;
 import com.github.wephotos.webwork.http.RestObject;
+import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -23,6 +25,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     @Resource
     private UserService userService;
 
@@ -95,6 +98,7 @@ public class UserController {
     @GetMapping("/get/{id}")
     public RestObject get(@PathVariable String id) {
         User user = userService.get(id);
+        log.debug("LOGGGGGGGGG");
         return RestObject.builder().data(user).build();
     }
 
