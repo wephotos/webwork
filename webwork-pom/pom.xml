@@ -55,6 +55,11 @@
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis.plus.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.wephotos</groupId>
+                <artifactId>webwork-utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

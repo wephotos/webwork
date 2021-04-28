@@ -1,4 +1,4 @@
-package com.github.wephotos.webwork.logging.entiyt;
+package com.github.wephotos.webwork.logging.entity;
 
 import lombok.Getter;
 import lombok.Setter;

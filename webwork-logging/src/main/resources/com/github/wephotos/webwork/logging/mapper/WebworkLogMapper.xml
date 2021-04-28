@@ -5,7 +5,12 @@
         id,owner, name, size, object_name, content_type, user_id, user_name, create_time
     </sql>
 
-    <resultMap id="BaseResultMap" type="com.github.wephotos.webwork.logging.entiyt.WebworkLog">
+    <insert id="insert">
+        insert into webwork_log(id, ip, operator, type, level, browser, url, create_time, content)
+        values (#{id}, #{ip}, #{operator}, #{type}, #{level}, #{browser}, #{url}, #{createTime}, #{content})
+    </insert>
+
+    <resultMap id="BaseResultMap" type="com.github.wephotos.webwork.logging.entity.WebworkLog">
         <id column="id" property="id" jdbcType="CHAR"/>
         <result column="ip" property="ip" jdbcType="VARCHAR"/>
         <result column="operator" property="operator" jdbcType="VARCHAR"/>

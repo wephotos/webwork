@@ -50,7 +50,6 @@
         <dependency>
             <groupId>com.github.wephotos</groupId>
             <artifactId>webwork-utils</artifactId>
-            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.wephotos</groupId>
@@ -62,7 +61,6 @@
             <artifactId>webwork-file-spring-boot-starter</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-
     </dependencies>
 
     <build>

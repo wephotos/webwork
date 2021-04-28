@@ -51,7 +51,6 @@
         <dependency>
             <groupId>com.github.wephotos</groupId>
             <artifactId>webwork-utils</artifactId>
-            <version>${project.parent.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.yunify/qingstor.sdk.java -->

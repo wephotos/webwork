@@ -48,7 +48,6 @@
         <dependency>
             <groupId>com.github.wephotos</groupId>
             <artifactId>webwork-utils</artifactId>
-            <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
 
