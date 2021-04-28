@@ -98,7 +98,7 @@ public class UserController {
     @GetMapping("/get/{id}")
     public RestObject get(@PathVariable String id) {
         User user = userService.get(id);
-        log.debug("LOGGGGGGGGG");
+        log.debug("查询用户");
         return RestObject.builder().data(user).build();
     }
 

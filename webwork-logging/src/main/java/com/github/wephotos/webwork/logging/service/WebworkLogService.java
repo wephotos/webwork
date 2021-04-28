@@ -1,33 +1,27 @@
 package com.github.wephotos.webwork.logging.service;
 
-import com.github.wephotos.webwork.logging.entity.WebworkLog;
-import com.github.wephotos.webwork.logging.mapper.WebworkLogMapper;
-import com.github.wephotos.webwork.utils.WebworkUtils;
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-import javax.annotation.Resource;
-import java.util.Date;
+import com.github.wephotos.webwork.logging.entity.WebworkLog;
 
 /**
- * @author xc
- * @date 2021-04-28 22:01
+ * 日志服务接口
+ * @author TQ
+ *
  */
-@Service
-public class WebworkLogService {
-    @Resource
-    private WebworkLogMapper webworkLogMapper;
+public interface WebworkLogService {
 
-    public int saveLog() {
-        WebworkLog log = new WebworkLog();
-        log.setId(WebworkUtils.uuid());
-        log.setIp("");
-        log.setOperator("");
-        log.setType("");
-        log.setLevel("");
-        log.setBrowser("");
-        log.setUrl("");
-        log.setCreateTime(new Date());
-        log.setContent("");
-        return webworkLogMapper.insert(log);
-    }
+	/**
+	 * 保存日志
+	 * @param log 日志对象
+	 * @return 影响行数
+	 */
+	int save(WebworkLog log);
+	
+	/**
+	 * 批量保存日志
+	 * @param logs 日志集合
+	 * @return 影响行数
+	 */
+	int saveBatch(List<WebworkLog> logs);
 }

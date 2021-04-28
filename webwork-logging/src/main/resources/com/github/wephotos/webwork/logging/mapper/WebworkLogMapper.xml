@@ -2,24 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.wephotos.webwork.logging.mapper.WebworkLogMapper">
     <sql id="Base_Column_List">
-        id,owner, name, size, object_name, content_type, user_id, user_name, create_time
+        id, name, ip, operator, level, browser, url, create_time, content, stack_trace
     </sql>
-
-    <insert id="insert">
-        insert into webwork_log(id, ip, operator, type, level, browser, url, create_time, content)
-        values (#{id}, #{ip}, #{operator}, #{type}, #{level}, #{browser}, #{url}, #{createTime}, #{content})
-    </insert>
 
     <resultMap id="BaseResultMap" type="com.github.wephotos.webwork.logging.entity.WebworkLog">
         <id column="id" property="id" jdbcType="CHAR"/>
         <result column="ip" property="ip" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="operator" property="operator" jdbcType="VARCHAR"/>
-        <result column="type" property="type" jdbcType="INTEGER"/>
         <result column="level" property="level" jdbcType="VARCHAR"/>
         <result column="browser" property="browser" jdbcType="VARCHAR"/>
         <result column="url" property="url" jdbcType="VARCHAR"/>
         <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="stack_trace" property="stackTrace" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+    <insert id="insert" parameterType="com.github.wephotos.webwork.logging.entity.WebworkLog">
+        insert into webwork_log(id, name, ip, operator, level, browser, url, create_time, content, stack_trace)
+        values (#{id}, #{name}, #{ip}, #{operator}, #{level}, #{browser}, #{url}, #{createTime}, #{content}, #{stackTrace})
+    </insert>
 </mapper>
