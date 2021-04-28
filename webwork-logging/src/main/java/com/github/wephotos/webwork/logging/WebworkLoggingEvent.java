@@ -1,4 +1,4 @@
-package com.github.wephotos.logging;
+package com.github.wephotos.webwork.logging;
 
 import org.slf4j.Marker;
 import org.slf4j.event.Level;
@@ -6,8 +6,8 @@ import org.slf4j.event.LoggingEvent;
 
 /**
  * 日志事件
- * @author TQ
  *
+ * @author TQ
  */
 public class WebworkLoggingEvent implements LoggingEvent {
 
@@ -21,6 +21,7 @@ public class WebworkLoggingEvent implements LoggingEvent {
     long timeStamp;
     Throwable throwable;
 
+    @Override
     public Level getLevel() {
         return level;
     }
@@ -29,6 +30,7 @@ public class WebworkLoggingEvent implements LoggingEvent {
         this.level = level;
     }
 
+    @Override
     public Marker getMarker() {
         return marker;
     }
@@ -37,6 +39,7 @@ public class WebworkLoggingEvent implements LoggingEvent {
         this.marker = marker;
     }
 
+    @Override
     public String getLoggerName() {
         return loggerName;
     }
@@ -53,6 +56,7 @@ public class WebworkLoggingEvent implements LoggingEvent {
         this.logger = logger;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }
@@ -61,6 +65,7 @@ public class WebworkLoggingEvent implements LoggingEvent {
         this.message = message;
     }
 
+    @Override
     public Object[] getArgumentArray() {
         return argArray;
     }
@@ -69,6 +74,7 @@ public class WebworkLoggingEvent implements LoggingEvent {
         this.argArray = argArray;
     }
 
+    @Override
     public long getTimeStamp() {
         return timeStamp;
     }
@@ -77,6 +83,7 @@ public class WebworkLoggingEvent implements LoggingEvent {
         this.timeStamp = timeStamp;
     }
 
+    @Override
     public String getThreadName() {
         return threadName;
     }
@@ -85,6 +92,7 @@ public class WebworkLoggingEvent implements LoggingEvent {
         this.threadName = threadName;
     }
 
+    @Override
     public Throwable getThrowable() {
         return throwable;
     }

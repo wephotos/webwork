@@ -1,43 +1,42 @@
-package com.github.wephotos.logging;
+package com.github.wephotos.webwork.logging;
 
+import com.github.wephotos.webwork.logging.disruptor.LoggingEventProducerWithTranslator;
 import org.slf4j.Marker;
 import org.slf4j.event.Level;
 import org.slf4j.helpers.MessageFormatter;
 
-import com.github.wephotos.logging.disruptor.LoggingEventProducerWithTranslator;
-
 /**
  * 日志发布
- * @author TQ
  *
+ * @author TQ
  */
 public class LoggerPublisher {
-	
-	String name;
-	WebworkLogger logger;
-    
-    LoggerPublisher(WebworkLogger logger){
-    	this.logger = logger;
-    	this.name = logger.getName();
+
+    String name;
+    WebworkLogger logger;
+
+    LoggerPublisher(WebworkLogger logger) {
+        this.logger = logger;
+        this.name = logger.getName();
     }
-    
-	public void recordEvent_0Args(Level level, Marker marker, String msg, Throwable t) {
+
+    public void recordEvent_0Args(Level level, Marker marker, String msg, Throwable t) {
         recordEvent(level, marker, msg, null, t);
     }
 
-	public void recordEvent_1Args(Level level, Marker marker, String msg, Object arg1) {
-        recordEvent(level, marker, msg, new Object[] { arg1 }, null);
+    public void recordEvent_1Args(Level level, Marker marker, String msg, Object arg1) {
+        recordEvent(level, marker, msg, new Object[]{arg1}, null);
     }
 
-	public void recordEvent2Args(Level level, Marker marker, String msg, Object arg1, Object arg2) {
+    public void recordEvent2Args(Level level, Marker marker, String msg, Object arg1, Object arg2) {
         if (arg2 instanceof Throwable) {
-            recordEvent(level, marker, msg, new Object[] { arg1 }, (Throwable) arg2);
+            recordEvent(level, marker, msg, new Object[]{arg1}, (Throwable) arg2);
         } else {
-            recordEvent(level, marker, msg, new Object[] { arg1, arg2 }, null);
+            recordEvent(level, marker, msg, new Object[]{arg1, arg2}, null);
         }
     }
 
-	public void recordEventArgArray(Level level, Marker marker, String msg, Object[] args) {
+    public void recordEventArgArray(Level level, Marker marker, String msg, Object[] args) {
         Throwable throwableCandidate = MessageFormatter.getThrowableCandidate(args);
         if (throwableCandidate != null) {
             Object[] trimmedCopy = MessageFormatter.trimmedCopy(args);
@@ -49,7 +48,7 @@ public class LoggerPublisher {
 
 
     // WARNING: this method assumes that any throwable is properly extracted
-	private void recordEvent(Level level, Marker marker, String msg, Object[] args, Throwable throwable) {
+    private void recordEvent(Level level, Marker marker, String msg, Object[] args, Throwable throwable) {
         WebworkLoggingEvent loggingEvent = new WebworkLoggingEvent();
         loggingEvent.setTimeStamp(System.currentTimeMillis());
         loggingEvent.setLevel(level);

@@ -1,7 +1,6 @@
 package com.github.wephotos.webwork.core.controller;
 
 
-import com.github.wephotos.logging.LoggerFactory;
 import com.github.wephotos.webwork.core.entity.User;
 import com.github.wephotos.webwork.core.entity.UserVo;
 import com.github.wephotos.webwork.core.entity.dto.UserDto;
@@ -11,6 +10,7 @@ import com.github.wephotos.webwork.error.Errors;
 import com.github.wephotos.webwork.http.Page;
 import com.github.wephotos.webwork.http.Pageable;
 import com.github.wephotos.webwork.http.RestObject;
+import com.github.wephotos.webwork.logging.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.*;
 

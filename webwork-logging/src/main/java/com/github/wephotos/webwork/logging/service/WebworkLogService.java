@@ -17,7 +17,7 @@ public class WebworkLogService {
     @Resource
     private WebworkLogMapper webworkLogMapper;
 
-    public boolean saveLog() {
+    public int saveLog() {
         WebworkLog log = new WebworkLog();
         log.setId(WebworkUtils.uuid());
         log.setIp("");
@@ -28,7 +28,6 @@ public class WebworkLogService {
         log.setUrl("");
         log.setCreateTime(new Date());
         log.setContent("");
-        webworkLogMapper.insert(log);
-        return true;
+        return webworkLogMapper.insert(log);
     }
 }
