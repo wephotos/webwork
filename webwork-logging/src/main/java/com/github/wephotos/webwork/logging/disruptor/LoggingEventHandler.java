@@ -5,9 +5,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.sql.Timestamp;
 
-import com.github.wephotos.webwork.logging.LoggerRequestHandler;
-import com.github.wephotos.webwork.logging.LoggerUtils;
 import com.github.wephotos.webwork.logging.WebworkLoggingEvent;
+import com.github.wephotos.webwork.logging.WebworkLoggingEvent.LoggerRequest;
 import com.github.wephotos.webwork.logging.entity.WebworkLog;
 import com.github.wephotos.webwork.logging.service.WebworkLogService;
 import com.github.wephotos.webwork.logging.service.WebworkLogServiceNop;
@@ -36,6 +35,7 @@ public class LoggingEventHandler implements EventHandler<WebworkLoggingEvent> {
 		}
 	}
 
+	//TODO: 后期可优化为批量入库
     @Override
     public void onEvent(WebworkLoggingEvent event, long sequence, boolean endOfBatch) throws Exception {
         logService.save(toWebworkLog(event));
@@ -49,10 +49,10 @@ public class LoggingEventHandler implements EventHandler<WebworkLoggingEvent> {
     WebworkLog toWebworkLog(WebworkLoggingEvent event) {
     	WebworkLog log = new WebworkLog();
     	log.setId(WebworkUtils.uuid());
-    	log.setName(event.getLoggerName());
-    	log.setCreateTime(new Timestamp(event.getTimeStamp()));
-    	log.setContent(event.getMessage());
     	log.setLevel(event.getLevel());
+    	log.setName(event.getLoggerName());
+    	log.setContent(event.getMessage());
+    	log.setCreateTime(new Timestamp(event.getTimeStamp()));
     	// 堆栈信息
     	Throwable throwable = event.getThrowable();
     	if(throwable != null) {
@@ -61,9 +61,12 @@ public class LoggingEventHandler implements EventHandler<WebworkLoggingEvent> {
     		throwable.printStackTrace(writer);
     		log.setStackTrace(out.toString());
     	}
-    	// 是否web环境
-    	if(LoggerUtils.isWebEnv()) {
-    		LoggerRequestHandler.extractRequest2Log(log);
+    	LoggerRequest request = event.getRequest();
+    	if(request != null) {
+    		log.setIp(request.getIp());
+    		log.setUrl(request.getRequestURL());
+    		log.setOperator(request.getOperator());
+    		log.setBrowser(request.getUserAgent());
     	}
     	return log;
     }

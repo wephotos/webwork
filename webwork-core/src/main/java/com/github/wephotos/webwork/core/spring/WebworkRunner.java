@@ -1,6 +1,7 @@
 package com.github.wephotos.webwork.core.spring;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
 import com.github.wephotos.webwork.logging.LoggerRequestHandler;
 import com.github.wephotos.webwork.security.entity.User;
@@ -11,6 +12,7 @@ import com.github.wephotos.webwork.security.storage.SessionUserStorage;
  * @author TQ
  *
  */
+@Component
 public class WebworkRunner implements CommandLineRunner {
 
 	@Override

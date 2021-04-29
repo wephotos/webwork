@@ -1,9 +1,10 @@
 package com.github.wephotos.webwork.logging;
 
-import com.github.wephotos.webwork.logging.disruptor.LoggingEventProducerWithTranslator;
 import org.slf4j.Marker;
 import org.slf4j.event.Level;
 import org.slf4j.helpers.MessageFormatter;
+
+import com.github.wephotos.webwork.logging.disruptor.LoggingEventProducerWithTranslator;
 
 /**
  * 日志发布
@@ -49,6 +50,9 @@ public class LoggerPublisher {
 
     // WARNING: this method assumes that any throwable is properly extracted
     private void recordEvent(Level level, Marker marker, String msg, Object[] args, Throwable throwable) {
+    	if(!isEnabled(level, marker)) {
+    		return;
+    	}
         WebworkLoggingEvent loggingEvent = new WebworkLoggingEvent();
         loggingEvent.setTimeStamp(System.currentTimeMillis());
         loggingEvent.setLevel(level);
@@ -62,8 +66,34 @@ public class LoggerPublisher {
 
         loggingEvent.setArgumentArray(args);
         loggingEvent.setThrowable(throwable);
-
+        // 获取当前请求信息
+    	if(LoggerUtils.isWebEnv()) {
+    		loggingEvent.setRequest(LoggerRequestHandler.getLoggerRequest());
+    	}
         //发布
         LoggingEventProducerWithTranslator.getProducer().onData(loggingEvent);
+    }
+    
+    /**
+     * 判断日志级别是否启用
+     * @param level {@link Level}
+     * @param marker {@link Marker}
+     * @return true/false
+     */
+    private boolean isEnabled(Level level, Marker marker) {
+    	switch (level) {
+		case TRACE:
+			return logger.isTraceEnabled(marker);
+		case DEBUG:
+			return logger.isDebugEnabled(marker);
+		case INFO:
+			return logger.isInfoEnabled(marker);
+		case WARN:
+			return logger.isWarnEnabled(marker);
+		case ERROR:
+			return logger.isErrorEnabled(marker);
+		default:
+			return false;
+		}
     }
 }

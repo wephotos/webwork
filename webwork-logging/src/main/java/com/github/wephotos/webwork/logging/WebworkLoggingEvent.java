@@ -4,100 +4,55 @@ import org.slf4j.Marker;
 import org.slf4j.event.Level;
 import org.slf4j.event.LoggingEvent;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 /**
  * 日志事件
  *
  * @author TQ
  */
+@Getter
+@Setter
+@ToString
 public class WebworkLoggingEvent implements LoggingEvent {
 
-    Level level;
-    Marker marker;
-    String loggerName;
-    WebworkLogger logger;
-    String threadName;
-    String message;
-    Object[] argArray;
-    long timeStamp;
-    Throwable throwable;
+    private Level level;
+    private Marker marker;
+    private String loggerName;
+    private WebworkLogger logger;
+    private String threadName;
+    private String message;
+    private Object[] argumentArray;
+    private long timeStamp;
+    private Throwable throwable;
+    private LoggerRequest request;
 
-    @Override
-    public Level getLevel() {
-        return level;
-    }
-
-    public void setLevel(Level level) {
-        this.level = level;
-    }
-
-    @Override
-    public Marker getMarker() {
-        return marker;
-    }
-
-    public void setMarker(Marker marker) {
-        this.marker = marker;
-    }
-
-    @Override
-    public String getLoggerName() {
-        return loggerName;
-    }
-
-    public void setLoggerName(String loggerName) {
-        this.loggerName = loggerName;
-    }
-
-    public WebworkLogger getLogger() {
-        return logger;
-    }
-
-    public void setLogger(WebworkLogger logger) {
-        this.logger = logger;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public Object[] getArgumentArray() {
-        return argArray;
-    }
-
-    public void setArgumentArray(Object[] argArray) {
-        this.argArray = argArray;
-    }
-
-    @Override
-    public long getTimeStamp() {
-        return timeStamp;
-    }
-
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
-    }
-
-    @Override
-    public String getThreadName() {
-        return threadName;
-    }
-
-    public void setThreadName(String threadName) {
-        this.threadName = threadName;
-    }
-
-    @Override
-    public Throwable getThrowable() {
-        return throwable;
-    }
-
-    public void setThrowable(Throwable throwable) {
-        this.throwable = throwable;
+    /**
+     * 当前请求相关信息
+     * @author TQ
+     *
+     */
+    @Getter
+    @Setter
+    @ToString
+    public static class LoggerRequest {
+        /**
+         * 请求者的ip
+         */
+        private String ip;
+        /**
+         * 操作者
+         */
+        private String operator;
+        /**
+         * 浏览器
+         */
+        private String userAgent;
+        /**
+         * 请求路径
+         */
+        private String requestURL;
     }
 }

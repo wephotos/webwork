@@ -22,4 +22,46 @@
         insert into webwork_log(id, name, ip, operator, level, browser, url, create_time, content, stack_trace)
         values (#{id}, #{name}, #{ip}, #{operator}, #{level}, #{browser}, #{url}, #{createTime}, #{content}, #{stackTrace})
     </insert>
+    
+    <select id="pageCount" resultType="int" parameterType="com.github.wephotos.webwork.http.Pageable">
+    	SELECT 
+    	  COUNT(1) 
+    	FROM 
+    	  webwork_log
+    	<where>
+    		<include refid="pageCond" />
+    	</where>
+    </select>
+    <select id="pageList" resultMap="BaseResultMap" parameterType="com.github.wephotos.webwork.http.Pageable">
+    	SELECT 
+    	  <include refid="Base_Column_List" />
+    	FROM 
+    	  webwork_log
+    	<where>
+    		<include refid="pageCond" />
+    	</where>
+    	ORDER BY 
+    	  create_time DESC
+    	LIMIT 
+    	  #{start, jdbcType=INTEGER}, #{size, jdbcType=INTEGER}
+    </select>
+    <sql id="pageCond">
+    	<if test="condition != null">
+    		<if test="condition.level != null">
+    			AND level = #{level, jdbcType=VARCHAR}
+    		</if>
+    		<if test="condition.ip != null and condition.ip != ''">
+    			AND ip = #{ip, jdbcType=VARCHAR}
+    		</if>
+    		<if test="condition.name != null and condition.name != ''">
+    			AND name LIKE CONCAT('%', #{name, jdbcType=VARCHAR}, '%')
+    		</if>
+    		<if test="condition.url != null and condition.url != ''">
+    			AND url LIKE CONCAT('%', #{url, jdbcType=VARCHAR}, '%')
+    		</if>
+    		<if test="condition.content != null and condition.content != ''">
+    			AND content LIKE CONCAT('%', #{content, jdbcType=VARCHAR}, '%')
+    		</if>
+    	</if>
+    </sql>
 </mapper>

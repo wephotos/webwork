@@ -36,6 +36,7 @@ public class LoggingEventProducerWithTranslator {
             event.setThreadName(source.getThreadName());
             event.setThrowable(source.getThrowable());
             event.setTimeStamp(source.getTimeStamp());
+            event.setRequest(source.getRequest());
         }
     };
 
