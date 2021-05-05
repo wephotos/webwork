@@ -15,7 +15,7 @@ export class GroupRequest extends BaseRequest {
 
     /** 添加组织机构 */
     add(data: Group) {
-        return super.post('/organization/save', data)
+        return super.post('/organization/add', data)
     }
 
     /** 更新组织机构 */
@@ -27,7 +27,6 @@ export class GroupRequest extends BaseRequest {
     children(parentId = '') {
         return super.get<Group[]>(`/organization/children?parentId=${parentId}`)
     }
-
 }
 
 const request = new GroupRequest()

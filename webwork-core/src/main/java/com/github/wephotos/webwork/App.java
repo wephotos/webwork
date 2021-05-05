@@ -17,11 +17,6 @@ public class App {
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);
         log.debug("===========webwork start success===========");
-        try {
-        	throw new Exception("异常测试");
-        }catch (Exception e) {
-			log.error("异常消息测试", e);
-		}
     }
 
 }

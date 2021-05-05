@@ -1,5 +1,13 @@
 package com.github.wephotos.webwork.core.service;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.github.wephotos.webwork.core.entity.Organization;
@@ -9,12 +17,6 @@ import com.github.wephotos.webwork.core.utils.WebWorkUtil;
 import com.github.wephotos.webwork.http.EntityState;
 import com.github.wephotos.webwork.security.entity.User;
 import com.github.wephotos.webwork.utils.StringUtils;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * @author chengzi
@@ -25,34 +27,43 @@ public class OrganizationService {
     @Resource
     private OrganizationMapper organizationMapper;
 
-    public boolean save(Organization organization) {
-        String maxCode = organizationMapper.findMaxCode(organization.getParentId());
-        organization.setId(WebWorkUtil.uuid());
-        organization.setStatus(1);
-        if (StringUtils.isNotBlank(organization.getParentId())) {
-            Organization parent = organizationMapper.selectById(organization.getParentId());
-            organization.setCode(parent.getCode().concat(maxCode));
-        } else {
-            organization.setCode(maxCode);
+    /**
+     * 保存节点
+     * @param data 节点数据
+     * @return 主键
+     */
+    public String add(Organization data) {
+        data.setId(WebWorkUtil.uuid());
+        String parentId = data.getParentId();
+        String maxCode = organizationMapper.findMaxCode(parentId);
+        Organization parent = organizationMapper.selectById(parentId);
+        if(parent == null) {
+        	data.setCode(maxCode);
+        }else {
+        	data.setCode(parent.getCode().concat(maxCode));
         }
-        return SqlHelper.retBool(organizationMapper.insert(organization));
+        organizationMapper.insert(data);
+        return data.getId();
     }
 
+    /**
+     * 更新
+     * @param organization
+     * @return
+     */
     public boolean update(Organization organization) {
         return SqlHelper.retBool(organizationMapper.updateById(organization));
     }
 
-    public boolean disable(String id) {
+    /**
+     * 删除 --逻辑删除
+     * @param id 节点ID
+     * @return 是否成功
+     */
+    public boolean delete(String id) {
         Organization org = new Organization();
-        org.setStatus(EntityState.DISABLED.getValue());
         org.setId(id);
-        return SqlHelper.retBool(organizationMapper.updateById(org));
-    }
-
-    public boolean enable(String id) {
-        Organization org = new Organization();
-        org.setStatus(EntityState.ENABLED.getValue());
-        org.setId(id);
+        org.setStatus(EntityState.DELETED.getValue());
         return SqlHelper.retBool(organizationMapper.updateById(org));
     }
 
@@ -77,7 +88,9 @@ public class OrganizationService {
         wrapper.select(Organization::getId, Organization::getName,
                 Organization::getCode, Organization::getStatus,
                 Organization::getType, Organization::getParentId);
-        wrapper.eq(Organization::getParentId, parentId);
+        wrapper
+        .eq(Organization::getParentId, parentId)
+        .ne(Organization::getStatus, EntityState.DELETED.getValue());
         return organizationMapper.selectList(wrapper);
     }
 

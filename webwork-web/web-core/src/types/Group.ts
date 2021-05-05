@@ -1,17 +1,17 @@
 /** 组织节点类型定义 */
 export declare class Group {
     /** ID */
-    id: string;
+    id?: string;
     /** 名称 */
-    name: string;
+    name?: string;
     /** 编码 */
-    code: string;
+    code?: string;
     /** 父ID */
-    parentId: string;
+    parentId?: string;
     /** 类型 */
-    type: number;
+    type?: number;
     /** 状态 */
-    status: number;
+    status?: number;
     /** 排序 */
-    sort: number;
+    sort?: number;
 }

@@ -1,6 +1,6 @@
 <template>
   <a-layout class="a-layout">
-    <a-layout-sider class="a-layout-sider">
+    <a-layout-sider class="a-layout-sider" @contextmenu.prevent>
       <Group />
     </a-layout-sider>
     <a-layout-content class="a-layout-content">

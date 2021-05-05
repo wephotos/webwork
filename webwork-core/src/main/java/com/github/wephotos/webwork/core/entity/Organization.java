@@ -1,7 +1,12 @@
 package com.github.wephotos.webwork.core.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 组织部门
@@ -25,11 +30,15 @@ public class Organization {
      */
     private String name;
     /**
+     * 编码
+     */
+    private String code;
+    /**
      * 上级id
      */
     private String parentId;
     /**
-     * 1:组织，2:部门
+     * 0:虚拟机构, 1:单位, 2:部门
      */
     private Integer type;
     /**
@@ -40,8 +49,4 @@ public class Organization {
      * 排序
      */
     private Integer sort;
-    /**
-     * 编码
-     */
-    private String code;
 }
