@@ -65,5 +65,8 @@ public class User implements Serializable {
      */
     private Date updateTime;
 
+    /**
+     * 置顶时间
+     */
     private Date topTime;
 }

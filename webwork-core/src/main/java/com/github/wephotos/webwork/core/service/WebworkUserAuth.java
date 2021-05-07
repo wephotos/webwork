@@ -1,15 +1,16 @@
 package com.github.wephotos.webwork.core.service;
 
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Component;
+
 import com.github.wephotos.webwork.core.entity.dto.UserOrgDto;
 import com.github.wephotos.webwork.error.Errors;
-import com.github.wephotos.webwork.error.WebworkException;
+import com.github.wephotos.webwork.error.WebworkRuntimeException;
 import com.github.wephotos.webwork.http.EntityState;
 import com.github.wephotos.webwork.security.auth.SecurityAuth;
 import com.github.wephotos.webwork.security.entity.User;
 import com.github.wephotos.webwork.security.entity.UserAuth;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 /**
  * @author xc
@@ -26,16 +27,16 @@ public class WebworkUserAuth implements SecurityAuth {
     public User auth(UserAuth auth) {
         com.github.wephotos.webwork.core.entity.User user = userService.getByAccount(auth.getUsername());
         if (user == null) {
-            throw new WebworkException(Errors.USERNAME_PASSWORD_ERROR.getMessage(), Errors.USERNAME_PASSWORD_ERROR.getCode());
+            throw new WebworkRuntimeException(Errors.USERNAME_PASSWORD_ERROR.getCode(), Errors.USERNAME_PASSWORD_ERROR.getMessage());
         }
         Integer status = user.getStatus();
         // 账号禁用
         if (status.intValue() == EntityState.DISABLED.getValue().intValue()) {
-            throw new WebworkException(Errors.USER_DISABLED.getMessage(), Errors.USER_DISABLED.getCode());
+            throw new WebworkRuntimeException(Errors.USER_DISABLED.getCode(), Errors.USER_DISABLED.getMessage());
         }
         // 账号删除
         if (status.intValue() == EntityState.DELETED.getValue().intValue()) {
-            throw new WebworkException(Errors.USER_DELETED.getMessage(), Errors.USER_DELETED.getCode());
+            throw new WebworkRuntimeException(Errors.USER_DELETED.getCode(), Errors.USER_DELETED.getMessage());
         }
         // TODO 密码加密处理
         String passwordDb = user.getPassword();
@@ -52,7 +53,7 @@ public class WebworkUserAuth implements SecurityAuth {
             result.setGroupName(userOrgDto.getGroupName());
             return result;
         } else {
-            throw new WebworkException(Errors.USERNAME_PASSWORD_ERROR.getMessage(), Errors.USERNAME_PASSWORD_ERROR.getCode());
+            throw new WebworkRuntimeException(Errors.USERNAME_PASSWORD_ERROR.getCode(), Errors.USERNAME_PASSWORD_ERROR.getMessage());
         }
     }
 }

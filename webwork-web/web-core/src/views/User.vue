@@ -1,7 +1,7 @@
 <template>
   <a-layout class="a-layout">
     <a-layout-sider class="a-layout-sider" @contextmenu.prevent>
-      <Group />
+      <Group @select="onSelectGroup" />
     </a-layout-sider>
     <a-layout-content class="a-layout-content">
       <a-table
@@ -103,6 +103,7 @@ import userRequest from '@/request/UserRequest'
 import Pageable from '@/types/Pageable'
 import UserForm from './UserForm.vue'
 import Group from './Group.vue'
+import { SelectEvent } from 'ant-design-vue/es/tree/Tree'
 // 分页数据类型
 type Pagination = TableState['pagination'];
 // 排序映射
@@ -149,7 +150,7 @@ export default class VueUser extends Vue {
     { title: '账号', dataIndex: 'account' },
     { title: '手机', dataIndex: 'phone', width: 200 },
     { title: '邮箱', dataIndex: 'email', width: 200 },
-    { title: '更新时间', dataIndex: 'updateTime', width: 200, sorter: true },
+    { title: '更新时间', dataIndex: 'updateTime', width: 200, sorter: true, sortField: 'update_time' },
     {
       title: '操作',
       dataIndex: 'operation',
@@ -185,7 +186,8 @@ export default class VueUser extends Vue {
   // 分页条件
   pageable: Pageable = {
     curr: this.pagination.current,
-    size: this.pagination.pageSize
+    size: this.pagination.pageSize,
+    condition: {}
   }
 
   mounted() {
@@ -208,12 +210,11 @@ export default class VueUser extends Vue {
   }
 
   // 表格变动监听
-  handleTableChange(pag: Pagination, filters: TableStateFilters, sorter: {field: string; order: string}) {
+  handleTableChange(pag: Pagination, filters: TableStateFilters, sorter: {field: string; order: string; column: {sortField: string}}) {
       this.pagination.current = pag?.current || 1
-      this.pageable.sortField = sorter.field || ''
+      this.pageable.sortField = (sorter.column && sorter.column.sortField) || ''
       this.pageable.sortOrder = orderMap[sorter.order] || ''
-      this.pageable.condition = { name: (filters.name instanceof Array ? filters.name[0] : '') }
-      console.log(this.pageable)
+      this.pageable.condition.name = (filters.name instanceof Array ? filters.name[0] : '')
       this.pageQueryUser()
   }
 
@@ -247,6 +248,13 @@ export default class VueUser extends Vue {
   // 人员置顶
   onUserTop(user: User) {
     console.log(user.sort)
+  }
+
+  // 节点选择
+  onSelectGroup(selectedKeys: string[], info: SelectEvent) {
+    console.log(selectedKeys, info)
+    this.pageable.condition.orgcode = info.node.dataRef.code
+    this.pageQueryUser()
   }
 }
 </script>

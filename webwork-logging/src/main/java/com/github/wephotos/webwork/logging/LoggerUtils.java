@@ -1,7 +1,5 @@
 package com.github.wephotos.webwork.logging;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.slf4j.helpers.Util;
 
 /**

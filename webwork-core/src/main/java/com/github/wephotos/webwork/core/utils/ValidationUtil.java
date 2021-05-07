@@ -1,7 +1,7 @@
 package com.github.wephotos.webwork.core.utils;
 
 import com.github.wephotos.webwork.error.Errors;
-import com.github.wephotos.webwork.error.WebworkException;
+import com.github.wephotos.webwork.error.WebworkRuntimeException;
 
 /**
  * @author chengzi
@@ -21,6 +21,6 @@ public class ValidationUtil {
     }
 
     public static void failure(Errors errors) {
-        throw new WebworkException(errors.getCode(), errors.getMessage());
+        throw new WebworkRuntimeException(errors.getCode(), errors.getMessage());
     }
 }

@@ -13,10 +13,10 @@ import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.github.wephotos.webwork.core.entity.Organization;
 import com.github.wephotos.webwork.core.entity.dto.DropSort;
 import com.github.wephotos.webwork.core.mapper.OrganizationMapper;
-import com.github.wephotos.webwork.core.utils.WebWorkUtil;
 import com.github.wephotos.webwork.http.EntityState;
 import com.github.wephotos.webwork.security.entity.User;
 import com.github.wephotos.webwork.utils.StringUtils;
+import com.github.wephotos.webwork.utils.WebworkUtils;
 
 /**
  * @author chengzi
@@ -33,7 +33,7 @@ public class OrganizationService {
      * @return 主键
      */
     public String add(Organization data) {
-        data.setId(WebWorkUtil.uuid());
+        data.setId(WebworkUtils.uuid());
         String parentId = data.getParentId();
         String maxCode = organizationMapper.findMaxCode(parentId);
         Organization parent = organizationMapper.selectById(parentId);

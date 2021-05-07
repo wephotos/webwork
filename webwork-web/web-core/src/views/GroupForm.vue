@@ -14,12 +14,14 @@
       <a-tree-select
         v-model:value="formData.parentId"
         :defaultValue="formData.parentName"
-        style="width: 100%"
         :disabled="!!id"
         :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
         :tree-data="treeData"
-        placeholder="请选择上级单位"
         :load-data="onLoadData"
+        @treeExpand="onSelectTreeExpand"
+        style="width: 100%"
+        placeholder="请选择上级单位"
+        tree-default-expand-all
       />
     </a-form-item>
     <a-form-item v-if="type == 1" label="虚拟节点" name="virtual">
@@ -153,6 +155,10 @@ export default class GroupForm extends Vue {
     })
   }
 
+  onSelectTreeExpand(expandedKeys: string[]) {
+      console.log(expandedKeys)
+  }
+
   // 保存
   onSubmit() {
     const formUnref = unref(this.formRef)
@@ -200,8 +206,10 @@ export default class GroupForm extends Vue {
         type: value.type, // 节点类型 0虚拟节点 1组织 2部门
         value: value.id,
         title: value.name,
+        code: value.code,
         isLeaf: value.type === 2,
-        disabled: value.type === 2
+        // disabled: value.type === 2
+        selectable: value.type === 1
       } as TreeDataItem
     })
   }

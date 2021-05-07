@@ -27,7 +27,7 @@ export class UserRequest extends BaseRequest {
 
     /** 分页查询 */
     pageList(pageable: Pageable) {
-        return super.get<Page<User>>('/users.json')
+        return super.post<Page<User>>('/user/page', pageable)
     }
 }
 const request = new UserRequest()

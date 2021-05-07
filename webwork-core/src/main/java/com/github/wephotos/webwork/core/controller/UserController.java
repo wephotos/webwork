@@ -1,9 +1,19 @@
 package com.github.wephotos.webwork.core.controller;
 
 
-import com.github.wephotos.webwork.core.entity.User;
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.github.wephotos.webwork.core.entity.UserVo;
 import com.github.wephotos.webwork.core.entity.dto.UserDto;
+import com.github.wephotos.webwork.core.entity.query.UserQuery;
 import com.github.wephotos.webwork.core.service.UserService;
 import com.github.wephotos.webwork.core.utils.ValidationUtil;
 import com.github.wephotos.webwork.error.Errors;
@@ -11,10 +21,6 @@ import com.github.wephotos.webwork.http.Page;
 import com.github.wephotos.webwork.http.Pageable;
 import com.github.wephotos.webwork.http.RestObject;
 import com.github.wephotos.webwork.logging.LoggerFactory;
-import org.slf4j.Logger;
-import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
 
 /**
  * 用户管理
@@ -25,68 +31,58 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+	
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
+    
     @Resource
     private UserService userService;
 
     /**
-     * 新增
-     *
-     * @param user user
-     * @return RestObject
+     * 新增用户
+     * @param user 用户对象
+     * @return {@link RestObject}
      */
-    @PostMapping("/save")
-    public RestObject save(@RequestBody UserDto user) {
-        ValidationUtil.isTrue(Errors.USER_NAME_EXIST, userService.checkExistsAccount(user.getAccount()));
-        ValidationUtil.isTrue(Errors.USER_PHONE_EXIST, userService.checkExistsPhone(user));
-        ValidationUtil.isTrue(Errors.USER_MAIL_EXIST, userService.checkExistsEmail(user));
-        boolean bool = userService.create(user);
-        return RestObject.builder().data(bool).build();
+    @PostMapping("/add")
+    public RestObject add(@RequestBody UserDto user) {
+    	UserQuery query = UserQuery.builder()
+    			.account(user.getAccount())
+    			.email(user.getEmail())
+    			.phone(user.getPhone()).build();
+        ValidationUtil.isTrue(Errors.USER_NAME_EXIST, userService.checkUniqueProperty(query));
+        ValidationUtil.isTrue(Errors.USER_PHONE_EXIST, userService.checkUniqueProperty(query));
+        ValidationUtil.isTrue(Errors.USER_MAIL_EXIST, userService.checkUniqueProperty(query));
+        String id = userService.create(user);
+        log.info("添加用户");
+        return RestObject.builder().data(id).build();
     }
 
+    /**
+     * 更新用户
+     * @param user 用户数据
+     * @return
+     */
     @PostMapping("/update")
     public RestObject update(@RequestBody UserDto user) {
-        ValidationUtil.isTrue(Errors.USER_PHONE_EXIST, userService.checkExistsPhone(user));
-        ValidationUtil.isTrue(Errors.USER_MAIL_EXIST, userService.checkExistsEmail(user));
-        boolean update = userService.update(user);
-        return RestObject.builder().data(update).build();
+    	UserQuery query = UserQuery.builder()
+    			.account(user.getAccount())
+    			.email(user.getEmail())
+    			.phone(user.getPhone()).build();
+        ValidationUtil.isTrue(Errors.USER_PHONE_EXIST, userService.checkUniqueProperty(query));
+        ValidationUtil.isTrue(Errors.USER_MAIL_EXIST, userService.checkUniqueProperty(query));
+        boolean ret = userService.update(user);
+        log.info("更新用户");
+        return RestObject.builder().data(ret).build();
     }
-
-    @PostMapping("/page")
-    public Page<UserVo> page(@RequestBody Pageable<UserVo> pageable) {
-        return userService.page(pageable);
-    }
-
+    
     /**
-     * 禁用用户
-     *
-     * @param id 用户编号
-     * @return RestObject
+     * 删除用户
+     * @param id 用户ID
+     * @return {@link RestObject}
      */
-    @PostMapping("/disable/{id}")
-    public RestObject disable(@PathVariable String id) {
-        int result = userService.disable(id);
-        return RestObject.builder().data(result).build();
-    }
-
-    /**
-     * 启用用户
-     *
-     * @param id 用户编号
-     * @return RestObject
-     */
-    @PostMapping("/enable/{id}")
-    public RestObject enable(@PathVariable String id) {
-        int result = userService.enable(id);
-        return RestObject.builder().data(result).build();
-    }
-
-    @PostMapping("/password")
-    public RestObject password(@RequestBody User user) {
-        if (userService.resetUserPwd(user)) {
-            // 重新登录,清除缓存...
-        }
-        return RestObject.builder().build();
+    @GetMapping("/delete/{id}")
+    public RestObject delete(@PathVariable("id") String id) {
+    	boolean ret = userService.deleteById(id);
+    	return RestObject.builder().data(ret).build();
     }
 
     /**
@@ -96,48 +92,43 @@ public class UserController {
      * @return RestObject
      */
     @GetMapping("/get/{id}")
-    public RestObject get(@PathVariable String id) {
-        User user = userService.get(id);
-        log.debug("查询用户");
+    public RestObject get(@PathVariable("id") String id) {
+        UserVo user = userService.findById(id);
         return RestObject.builder().data(user).build();
     }
 
-    /**
+	/**
      * 置顶用户
      *
      * @param id 用户id
-     * @return RestObject
+     * @return {@link RestObject}
      */
-    @PostMapping("/top/{id}")
+    @GetMapping("/top/{id}")
     public RestObject top(@PathVariable String id) {
         userService.top(id);
         return RestObject.builder().data(id).build();
     }
 
     /**
-     * 校验用户名
+     * 检测用户不重复属性是否存在
+     * @param query 手机号，邮箱，账号等不重复属性
+     * @return {@link RestObject}
      */
-    @GetMapping("/check-exists-account")
-    public RestObject checkExistsAccount(String account) {
-        boolean bool = userService.checkExistsAccount(account);
+    @GetMapping("/check-unique-property")
+    public RestObject checkUniqueProperty(UserQuery query) {
+        boolean bool = userService.checkUniqueProperty(query);
         return RestObject.builder().data(bool).build();
     }
+    
 
     /**
-     * 校验手机号码
+     * 人员分页查询
+     * @param pageable 分页参数
+     * @return 分页数据 {@link Page} {@link UserVo}
      */
-    @GetMapping("/check-exists-phone")
-    public RestObject checkExistsPhone(User user) {
-        boolean bool = userService.checkExistsPhone(user);
-        return RestObject.builder().data(bool).build();
-    }
-
-    /**
-     * 校验email邮箱
-     */
-    @GetMapping("/check-exists-email")
-    public RestObject checkExistsEmail(User user) {
-        boolean bool = userService.checkExistsEmail(user);
-        return RestObject.builder().data(bool).build();
+    @PostMapping("/page")
+    public RestObject page(@RequestBody Pageable<UserQuery> pageable) {
+    	Page<UserVo> page = userService.page(pageable);
+    	return RestObject.builder().data(page).build();
     }
 }

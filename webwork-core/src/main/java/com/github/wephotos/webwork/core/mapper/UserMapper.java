@@ -3,6 +3,7 @@ package com.github.wephotos.webwork.core.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.wephotos.webwork.core.entity.User;
 import com.github.wephotos.webwork.core.entity.UserVo;
+import com.github.wephotos.webwork.core.entity.query.UserQuery;
 import com.github.wephotos.webwork.http.Pageable;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,21 +15,13 @@ import java.util.List;
  */
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
-    /**
-     * 根据账号获取用户
-     *
-     * @param account 账号
-     * @return User
-     */
-    User getByAccount(String account);
 
-    /**
-     * 用户分页
-     *
-     * @param page 分页参数
-     * @return Page<User>
-     */
-    List<UserVo> page(Pageable<UserVo> page);
+	/**
+	 * 根据用户ID查询用户详细信息
+	 * @param id 用户ID
+	 * @return {@link UserVo}
+	 */
+	UserVo findById(String id);
 
     /**
      * 分页总数
@@ -36,5 +29,13 @@ public interface UserMapper extends BaseMapper<User> {
      * @param page 参数
      * @return 总记录数
      */
-    long pageCount(Pageable<UserVo> page);
+    long pageCount(Pageable<UserQuery> page);
+    /**
+     * 用户分页
+     *
+     * @param page 分页参数
+     * @return Page<User>
+     */
+    List<UserVo> pageList(Pageable<UserQuery> page);
+
 }

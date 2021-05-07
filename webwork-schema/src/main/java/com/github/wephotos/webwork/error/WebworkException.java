@@ -7,42 +7,36 @@ import lombok.Getter;
  * @date 2021-03-10 21:50
  */
 @Getter
-public class WebworkException extends RuntimeException {
+public class WebworkException extends Exception {
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private final String msg;
     private final Integer code;
 
-    public WebworkException(Integer code, String msg) {
-        super(msg);
-        this.code = code;
-        this.msg = msg;
+    public WebworkException(String message) {
+    	super(message);
+    	this.code = 500;
+    }
+    
+    public WebworkException(Throwable cause) {
+    	super(cause);
+    	this.code = 500;
     }
 
-    public WebworkException(String msg) {
-        super(msg);
-        this.code = 500;
-        this.msg = msg;
-    }
-
-    public WebworkException(String msg, Throwable e) {
-        super(msg, e);
-        this.msg = msg;
+    public WebworkException(String message, Throwable cause) {
+        super(message, cause);
         this.code = 500;
     }
 
-    public WebworkException(String msg, int code) {
-        super(msg);
-        this.msg = msg;
+    public WebworkException(int code, String message) {
+        super(message);
         this.code = code;
     }
 
-    public WebworkException(String msg, int code, Throwable e) {
-        super(msg, e);
-        this.msg = msg;
+    public WebworkException(int code, String message, Throwable cause) {
+        super(message, cause);
         this.code = code;
     }
 }

@@ -1,45 +1,44 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.wephotos.webwork.core.mapper.UserMapper">
-
     <resultMap id="BaseResultMap" type="com.github.wephotos.webwork.core.entity.UserVo">
         <result column="id" property="id" jdbcType="CHAR"/>
         <result column="account" property="account" jdbcType="VARCHAR"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="email" property="email" jdbcType="VARCHAR"/>
         <result column="phone" property="phone" jdbcType="VARCHAR"/>
-        <result column="status" property="status" jdbcType="CHAR"/>
-        <result column="depName" property="depName" jdbcType="VARCHAR"/>
+        <result column="sort" property="sort" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="org_id" property="orgId" jdbcType="CHAR"/>
+        <result column="dept_id" property="depId" jdbcType="CHAR"/>
+        <result column="dep_name" property="depName" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, account, name, password, email, phone, status,create_time,top_time
+        id, account, name, email, phone, status, create_time
     </sql>
 
-    <!--根据账号获取用户-->
-    <select id="getByAccount" resultType="com.github.wephotos.webwork.core.entity.User">
-        select id, account, name, password, email, phone, status
-        from sys_user
-        where account = #{account}
-    </select>
-
     <!--分页-->
-    <select id="page" resultMap="BaseResultMap">
+    <select id="pageList" resultMap="BaseResultMap">
         SELECT
-        a.id,
-        a.account,
-        a.name,
-        a.email,
-        a.phone,
-        a.sort,
-        a.status,
-        a.create_time,
-        a.top_time,
-        c.name depName
+	        a.id,
+	        a.account,
+	        a.name,
+	        a.email,
+	        a.phone,
+	        a.sort,
+	        a.status,
+	        a.create_time,
+	        a.update_time,
+	        b.org_id,
+	        b.dept_id,
+	        c.name dep_name
         FROM
-        sys_user a,
-        sys_user_org b,
-        sys_organization c
+	        sys_user a,
+	        sys_user_org b,
+	        sys_organization c
         <where>
             <include refid="pageCond"/>
         </where>
@@ -52,9 +51,9 @@
         SELECT
         count(1)
         FROM
-        sys_user a,
-        sys_user_org b,
-        sys_organization c
+	        sys_user a,
+	        sys_user_org b,
+	        sys_organization c
         <where>
             <include refid="pageCond"/>
         </where>
@@ -62,8 +61,13 @@
 
     <!--查询条件-->
     <sql id="pageCond">
-        a.id = b.user_id AND b.dept_id = c.id
+        a.id = b.user_id 
+        AND 
+        b.dept_id = c.id
         <if test="condition != null">
+        	<if test="condition.orgcode != null and condition.orgcode != ''">
+                AND c.code LIKE CONCAT(#{condition.orgcode,jdbcType=VARCHAR},'%')
+            </if>
             <if test="condition.account != null and condition.account != ''">
                 AND a.account LIKE CONCAT('%',#{condition.account,jdbcType=VARCHAR},'%')
             </if>
@@ -75,15 +79,6 @@
             </if>
             <if test="condition.phone != null and condition.phone != ''">
                 AND a.phone LIKE CONCAT('%',#{condition.phone,jdbcType=VARCHAR},'%')
-            </if>
-            <if test="condition.status != null">
-                AND a.status = #{condition.status,jdbcType=INTEGER}
-            </if>
-            <if test="condition.depName != null">
-                AND c.name = #{condition.name,jdbcType=INTEGER}
-            </if>
-            <if test="condition.depId != null">
-                AND b.dept_id = #{condition.depId,jdbcType=INTEGER}z
             </if>
         </if>
     </sql>

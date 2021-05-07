@@ -1,5 +1,15 @@
 package com.github.wephotos.webwork.core.service;
 
+import java.util.Arrays;
+import java.util.Objects;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
@@ -9,16 +19,7 @@ import com.github.wephotos.webwork.core.entity.dto.RoleDto;
 import com.github.wephotos.webwork.core.mapper.RoleMapper;
 import com.github.wephotos.webwork.core.mapper.RoleResourceMapper;
 import com.github.wephotos.webwork.http.EntityState;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Objects;
-
-import static com.github.wephotos.webwork.core.utils.WebWorkUtil.uuid;
+import com.github.wephotos.webwork.utils.WebworkUtils;
 
 /**
  * @author chengzi
@@ -33,7 +34,7 @@ public class RoleService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean save(RoleDto role) {
-        role.setId(uuid());
+        role.setId(WebworkUtils.uuid());
         role.setStatus(1);
         // 保存角色
         roleMapper.insert(role);
@@ -94,7 +95,7 @@ public class RoleService {
         if (ArrayUtils.isNotEmpty(role.getMenuIds())) {
             Arrays.stream(role.getMenuIds()).map(resourceId -> {
                 RoleResource rs = new RoleResource();
-                rs.setId(uuid());
+                rs.setId(WebworkUtils.uuid());
                 rs.setResourceId(resourceId);
                 rs.setRoleId(role.getId());
                 return rs;

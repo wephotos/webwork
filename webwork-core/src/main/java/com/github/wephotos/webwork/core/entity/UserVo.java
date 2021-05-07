@@ -19,13 +19,17 @@ public class UserVo extends User {
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
+	 * 部门id
+	 */
+	private String depId;
+	/**
      * 部门名称
      */
     private String depName;
     /**
-     * 部门id
+     * 单位ID
      */
-    private String depId;
+    private String orgId;
     /**
      * 组织名称
      */

@@ -3,6 +3,7 @@
     :load-data="onLoadData"
     :tree-data="treeData"
     v-model:expandedKeys="expandedKeys"
+    draggable
     @select="onSelect"
     style="height: 100%"
     @contextmenu.prevent
@@ -13,6 +14,7 @@
         <template #overlay>
           <a-menu
             @click="({ key: menuKey }) => onContextMenuClick(node, menuKey)"
+            @contextmenu.prevent
           >
             <!-- 单位菜单 -->
             <template v-if="node.type == 1">
@@ -102,7 +104,7 @@ export default class GroupVue extends Vue {
   /**
    * 加载节点数据
    */
-  onLoadData(treeNode: TreeDataItem & {dataRef: TreeDataItem}) {
+  onLoadData(treeNode: TreeDataItem & { dataRef: TreeDataItem }) {
     return new Promise((resolve: (value?: unknown) => void) => {
       if (treeNode.dataRef.children) {
         resolve()
@@ -119,7 +121,6 @@ export default class GroupVue extends Vue {
   // 节点点击事件
   onSelect(selectedKeys: string[], info: SelectEvent) {
     this.$emit('select', selectedKeys, info)
-    console.log('selected', selectedKeys, info)
   }
 
   // 右键菜单
@@ -254,6 +255,7 @@ export default class GroupVue extends Vue {
       key: data.id,
       type: data.type, // 节点类型 0虚拟节点 1组织 2部门
       title: data.name,
+      code: data.code,
       isLeaf: data.type === 2
     } as TreeDataItem
   }

@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WebworkException.class)
     public RestObject handleWebworkException(WebworkException e) {
         log.error(e.getMessage());
-        return RestObject.builder().code(e.getCode()).msg(e.getMsg()).build();
+        return RestObject.builder().code(e.getCode()).msg(e.getMessage()).build();
     }
 
     /**
@@ -44,6 +44,10 @@ public class GlobalExceptionHandler {
             return null;
         }
         log.error("系统错误", ex);
-        return RestObject.builder().code(500).msg(ex.getMessage()).build();
+        String message = ex.getMessage();
+        if(message == null) {
+        	message = "内部错误请联系管理员";
+        }
+        return RestObject.builder().code(500).msg(message).build();
     }
 }
