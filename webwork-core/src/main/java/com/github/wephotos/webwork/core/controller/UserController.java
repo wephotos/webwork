@@ -64,9 +64,10 @@ public class UserController {
     @PostMapping("/update")
     public RestObject update(@RequestBody UserDto user) {
     	UserQuery query = UserQuery.builder()
-    			.account(user.getAccount())
+    			.id(user.getId())
+    			.phone(user.getPhone())
     			.email(user.getEmail())
-    			.phone(user.getPhone()).build();
+    			.account(user.getAccount()).build();
         ValidationUtil.isTrue(Errors.USER_PHONE_EXIST, userService.checkUniqueProperty(query));
         ValidationUtil.isTrue(Errors.USER_MAIL_EXIST, userService.checkUniqueProperty(query));
         boolean ret = userService.update(user);

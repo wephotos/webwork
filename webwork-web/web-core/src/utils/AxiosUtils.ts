@@ -11,6 +11,7 @@ class AxiosUtils {
 
     /** 初始化 */
     constructor() {
+        this.instance.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
         this.instance.interceptors.request.use(config => {
             return config
         }, error => {
@@ -20,7 +21,12 @@ class AxiosUtils {
         this.instance.interceptors.response.use(response => {
             return response
         }, error => {
-            return Promise.reject(error)
+            // 无权限跳转至登录页面
+            if (error.response?.status === 401) {
+                window.location.href = '/login'
+            } else {
+                return Promise.reject(error)
+            }
         })
     }
 

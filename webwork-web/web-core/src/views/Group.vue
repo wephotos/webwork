@@ -10,14 +10,13 @@
   >
     <template #title="node">
       <a-dropdown :trigger="['contextmenu']">
-        <span>{{ node.title }}</span>
+        <span @contextmenu.prevent>{{ node.title }}</span>
         <template #overlay>
           <a-menu
             @click="({ key: menuKey }) => onContextMenuClick(node, menuKey)"
-            @contextmenu.prevent
           >
             <!-- 单位菜单 -->
-            <template v-if="node.type == 1">
+            <template v-if="node.type == 1 || node.type == 0">
               <a-menu-item :key="contextMenuKeys.ADD_DEPT"
                 >新增部门</a-menu-item
               >
@@ -193,11 +192,22 @@ export default class GroupVue extends Vue {
       this.$dialog({
         title: '新增用户',
         width: 550,
-        height: 750,
+        height: 650,
+        max: false,
         content: {
           handle: true,
           component: UserForm,
           props: { deptId: node.key, deptName: name }
+        },
+        ok: () => {
+            this.$emit('select', [node.key], {
+                node: {
+                    dataRef: {
+                        code: node.code
+                    }
+                }
+            })
+            return true
         }
       })
       return false

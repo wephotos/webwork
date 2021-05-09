@@ -18,6 +18,10 @@ public class UploadResult {
      */
     private String id;
     /**
+     * 关联外键
+     */
+    private String owner;
+    /**
      * 附件名称
      */
     private String name;

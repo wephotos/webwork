@@ -1,8 +1,6 @@
 package com.github.wephotos.webwork.core.service;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -10,16 +8,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.wephotos.webwork.core.entity.Organization;
 import com.github.wephotos.webwork.core.entity.User;
+import com.github.wephotos.webwork.core.entity.UserOrg;
 import com.github.wephotos.webwork.core.entity.UserVo;
 import com.github.wephotos.webwork.core.entity.dto.UserDto;
 import com.github.wephotos.webwork.core.entity.query.UserQuery;
-import com.github.wephotos.webwork.core.mapper.OrganizationMapper;
 import com.github.wephotos.webwork.core.mapper.UserMapper;
 import com.github.wephotos.webwork.core.mapper.UserOrgMapper;
-import com.github.wephotos.webwork.core.mapper.UserRoleMapper;
 import com.github.wephotos.webwork.http.EntityState;
 import com.github.wephotos.webwork.http.Page;
 import com.github.wephotos.webwork.http.Pageable;
@@ -36,11 +33,9 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     @Resource
     private UserMapper userMapper;
     @Resource
-    private UserRoleMapper userRoleMapper;
-    @Resource
-    private OrganizationMapper organizationMapper;
-    @Resource
     private UserOrgMapper userOrgMapper;
+    @Resource
+    private OrganizationService organizationService;
     
     /**
      * 根据用户ID，查询用户详细信息，包含部门单位角色等
@@ -49,14 +44,6 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      */
     public UserVo findById(String id) {
     	return userMapper.findById(id);
-    }
-    /**
-     * 查询唯一用户记录
-     * @param query 包含可唯一标识用户的字段属性
-     * @return {@link User}
-     */
-    public User selectOne(UserQuery query) {
-    	return selectOne(query, false);
     }
 
     /**
@@ -76,21 +63,10 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * @param password 是否包含密码
      * @return {@link User}
      */
-	@SuppressWarnings("unchecked")
-	public User selectOne(UserQuery query, boolean password) {
+	public User selectOne(UserQuery query) {
     	LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-    	List<SFunction<User, ?>> columns = new ArrayList<>();
-    	columns.add(User::getId);
-    	columns.add(User::getName);
-    	columns.add(User::getAccount);
-    	columns.add(User::getEmail);
-    	columns.add(User::getPhone);
-    	columns.add(User::getStatus);
-    	//包含密码
-    	if(password) {
-    		columns.add(User::getPassword);
-    	}
-        wrapper.select(columns.toArray(new SFunction[0]));
+        wrapper.select(User::getId, User::getName, User::getAccount, User::getPassword, 
+        		User::getEmail, User::getPhone, User::getStatus);
         if(StringUtils.isNotBlank(query.getId())) {
         	wrapper.eq(User::getId, query.getId());
         }else if(StringUtils.isNotBlank(query.getAccount())) {
@@ -110,12 +86,14 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * @param query 查询条件
      * @return 用户数量
      */
-    public int selectCount(UserQuery query) {
+    public boolean checkUniqueProperty(UserQuery query) {
     	LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
     	if(query != null) {
+    		// 不包含当前用户
 	    	if(StringUtils.isNotBlank(query.getId())) {
-	        	wrapper.eq(User::getId, query.getId());
-	        }else if(StringUtils.isNotBlank(query.getAccount())) {
+	        	wrapper.ne(User::getId, query.getId());
+	        }
+	    	if(StringUtils.isNotBlank(query.getAccount())) {
 	        	wrapper.eq(User::getAccount, query.getAccount());
 	        }else if(StringUtils.isNotBlank(query.getPhone())) {
 				wrapper.eq(User::getPhone, query.getPhone());
@@ -123,16 +101,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 	        	wrapper.eq(User::getEmail, query.getEmail());
 	        }
     	}
-    	return userMapper.selectCount(wrapper);
-    }
-    
-    /**
-     * 检测唯一属性是否唯一
-     * @param query 查询条件 账号，邮箱，手机
-     * @return 不存在返回true
-     */
-    public boolean checkUniqueProperty(UserQuery query) {
-        return selectCount(query) == 0;
+    	return userMapper.selectCount(wrapper) == 0;
     }
 
     /**
@@ -142,7 +111,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      */
     public User getByAccount(String account) {
     	UserQuery query = UserQuery.builder().account(account).build();
-        return selectOne(query, true);
+        return selectOne(query);
     }
 
     /**
@@ -164,12 +133,31 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * @return
      */
     public String create(UserDto user) {
-        user.setId(WebworkUtils.uuid());
-        user.setStatus(EntityState.ENABLED.getValue());
+    	String deptId = user.getDeptId();
+    	if(StringUtils.isBlank(deptId)) {
+    		throw new IllegalArgumentException("部门ID不能为空");
+    	}
+    	if(StringUtils.isBlank(user.getId())) {
+    		user.setId(WebworkUtils.uuid());
+    	}
+    	if(user.getStatus() == null) {
+    		user.setStatus(EntityState.ENABLED.getValue());
+    	}
+    	int sort = userMapper.maxSortByDeptId(deptId);
+    	user.setSort(sort);
         Date time = WebworkUtils.timestamp();
         user.setCreateTime(time);
         user.setUpdateTime(time);
+        user.setTopTime(time);
         userMapper.insert(user);
+        // 获取部门单位
+        Organization org = organizationService.findDepartGroup(deptId);
+        UserOrg userOrg = new UserOrg();
+        userOrg.setId(WebworkUtils.uuid());
+        userOrg.setUserId(user.getId());
+        userOrg.setDeptId(deptId);
+        userOrg.setOrgId(org.getId());
+        userOrgMapper.insert(userOrg);
         return user.getId();
     }
 

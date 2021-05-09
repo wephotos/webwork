@@ -9,8 +9,8 @@
         @click="handleClick"
       >
         <a-menu-item key="user">组织人员</a-menu-item>
-        <a-menu-item key="role">用户角色</a-menu-item>
-        <a-menu-item key="resource">功能模块</a-menu-item>
+        <a-menu-item key="resource">应用管理</a-menu-item>
+        <a-menu-item key="role">角色管理</a-menu-item>
         <a-menu-item key="dictionary">数据字典</a-menu-item>
         <a-menu-item key="config">配置中心</a-menu-item>
       </a-menu>

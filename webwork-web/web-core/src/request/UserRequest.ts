@@ -24,6 +24,14 @@ export class UserRequest extends BaseRequest {
     update(user: User) {
         return super.post('/user/update', user)
     }
+    /**
+     * 用户置顶
+     * @param id 用户ID
+     * @returns R<boolean>
+     */
+    top(id: string) {
+        return super.get(`/user/top/${id}`)
+    }
 
     /** 分页查询 */
     pageList(pageable: Pageable) {

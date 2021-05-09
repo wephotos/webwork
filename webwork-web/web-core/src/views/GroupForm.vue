@@ -15,13 +15,13 @@
         v-model:value="formData.parentId"
         :defaultValue="formData.parentName"
         :disabled="!!id"
-        :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
         :tree-data="treeData"
         :load-data="onLoadData"
         @treeExpand="onSelectTreeExpand"
+        tree-default-expand-all
         style="width: 100%"
         placeholder="请选择上级单位"
-        tree-default-expand-all
+        :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
       />
     </a-form-item>
     <a-form-item v-if="type == 1" label="虚拟节点" name="virtual">

@@ -21,11 +21,11 @@ public class UserVo extends User {
 	/**
 	 * 部门id
 	 */
-	private String depId;
+	private String deptId;
 	/**
      * 部门名称
      */
-    private String depName;
+    private String deptName;
     /**
      * 单位ID
      */

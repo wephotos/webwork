@@ -22,7 +22,12 @@ public interface UserMapper extends BaseMapper<User> {
 	 * @return {@link UserVo}
 	 */
 	UserVo findById(String id);
-
+	/**
+	 * 获取部门下最大人员排序
+	 * @param deptId 部门ID
+	 * @return 最大排序
+	 */
+	int maxSortByDeptId(String deptId);
     /**
      * 分页总数
      *

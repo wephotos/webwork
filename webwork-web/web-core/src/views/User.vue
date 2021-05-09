@@ -18,6 +18,13 @@
         <!-- 操作列模板 -->
         <template #operation="{ record }">
           <a-space>
+            <a-popconfirm
+              v-if="users.length"
+              title="您确定要删除吗?"
+              @confirm="onUserDel(record)"
+            >
+              <a href="javascript:void(0);">删除</a>
+            </a-popconfirm>
             <a href="javascript:void(0);" @click="onUserTop(record)">置顶</a>
             <a href="javascript:void(0);" @click="onUserEdit(record)">编辑</a>
           </a-space>
@@ -68,7 +75,7 @@
             :style="{ color: filtered ? '#108ee9' : undefined }"
           />
         </template>
-        <template #customRender="{ text, column }">
+        <template #name="{ text, column }">
           <span v-if="searchText && searchedColumn === column.dataIndex">
             <template
               v-for="(fragment, i) in text
@@ -89,21 +96,26 @@
             {{ text }}
           </template>
         </template>
+        <!-- 用户状态 -->
+        <template #status="{record}">
+          <a-switch :checked="record.status == 1" @click="onUserChange(record)" />
+        </template>
       </a-table>
     </a-layout-content>
   </a-layout>
 </template>
 <script lang="ts">
-import { User } from '@/types/User'
+import { ref, unref } from 'vue'
+import { message } from 'ant-design-vue'
 import { Options, Vue } from 'vue-class-component'
 import { SearchOutlined } from '@ant-design/icons-vue'
-import { TableState, TableStateFilters } from 'ant-design-vue/es/table/interface'
-import { ref, unref } from 'vue'
-import userRequest from '@/request/UserRequest'
-import Pageable from '@/types/Pageable'
-import UserForm from './UserForm.vue'
-import Group from './Group.vue'
 import { SelectEvent } from 'ant-design-vue/es/tree/Tree'
+import { TableState, TableStateFilters } from 'ant-design-vue/es/table/interface'
+import { User } from '@/types/User'
+import Group from './Group.vue'
+import UserForm from './UserForm.vue'
+import Pageable from '@/types/Pageable'
+import request from '@/request/UserRequest'
 // 分页数据类型
 type Pagination = TableState['pagination'];
 // 排序映射
@@ -136,7 +148,7 @@ export default class VueUser extends Vue {
       slots: {
         filterDropdown: 'filterDropdown',
         filterIcon: 'filterIcon',
-        customRender: 'customRender'
+        customRender: 'name'
       },
       onFilterDropdownVisibleChange: (visible: boolean) => {
         if (visible) {
@@ -150,7 +162,13 @@ export default class VueUser extends Vue {
     { title: '账号', dataIndex: 'account' },
     { title: '手机', dataIndex: 'phone', width: 200 },
     { title: '邮箱', dataIndex: 'email', width: 200 },
-    { title: '更新时间', dataIndex: 'updateTime', width: 200, sorter: true, sortField: 'update_time' },
+    { title: '更新时间', dataIndex: 'updateTime', width: 200, sorter: true, key: 'update_time' },
+    {
+        title: '状态',
+        width: 100,
+        dataIndex: 'status',
+        slots: { customRender: 'status' }
+    },
     {
       title: '操作',
       dataIndex: 'operation',
@@ -160,16 +178,7 @@ export default class VueUser extends Vue {
   ]
 
   // 表格数据
-  users: User[] = [
-    {
-      id: 'tianqi',
-      name: '田奇',
-      account: 'tianq',
-      phone: '18709827703',
-      email: 'tq_email@qq.com',
-      updateTime: '2021-04-03 17:23:36'
-    }
-  ]
+  users: User[] = []
 
   // 搜索
   searchInput = ref<HTMLInputElement>()
@@ -196,12 +205,13 @@ export default class VueUser extends Vue {
 
   // 分页查询用户
   async pageQueryUser() {
-    const result = await userRequest.pageList(this.pageable)
+    const result = await request.pageList(this.pageable)
     if (result.code === 0) {
       this.users = result.data.data
       this.pagination.total = result.data.count
       // 处理序号
       for (let i = 0; i < this.users.length; i++) {
+        this.users[i].enabled = this.users[i].status === 1
         this.users[i].number = (this.pageable.curr - 1) * this.pageable.size + i + 1
       }
     } else {
@@ -210,9 +220,9 @@ export default class VueUser extends Vue {
   }
 
   // 表格变动监听
-  handleTableChange(pag: Pagination, filters: TableStateFilters, sorter: {field: string; order: string; column: {sortField: string}}) {
+  handleTableChange(pag: Pagination, filters: TableStateFilters, sorter: {field: string; order: string; columnKey: string}) {
       this.pagination.current = pag?.current || 1
-      this.pageable.sortField = (sorter.column && sorter.column.sortField) || ''
+      this.pageable.sortField = sorter.columnKey || ''
       this.pageable.sortOrder = orderMap[sorter.order] || ''
       this.pageable.condition.name = (filters.name instanceof Array ? filters.name[0] : '')
       this.pageQueryUser()
@@ -231,23 +241,57 @@ export default class VueUser extends Vue {
     this.searchText = ''
   }
 
+  /** 删除人员 */
+  async onUserDel(user: User) {
+    const ret = await request.delete(user.id as string)
+    if (ret.code === 0) {
+      this.pageQueryUser()
+    } else {
+      message.error(`删除失败:${ret.msg}`)
+    }
+  }
+
   // 编辑人员
   onUserEdit(user: User) {
     this.$dialog({
       title: '用户信息',
       width: 550,
-      height: 750,
+      height: 650,
+      max: false,
       content: {
         handle: true,
         component: UserForm,
         props: { id: user.id }
+      },
+      ok: () => {
+        this.pageQueryUser()
+        return true
       }
     })
   }
 
   // 人员置顶
-  onUserTop(user: User) {
-    console.log(user.sort)
+  async onUserTop(user: User) {
+    const ret = await request.top(user.id as string)
+    if (ret.code === 0) {
+      this.pageQueryUser()
+    } else {
+      message.error(`置顶失败:${ret.msg}`)
+    }
+  }
+
+  userStatus(user: User) {
+    return user.status === 1
+  }
+
+  /** 改变用户状态 */
+  async onUserChange(user: User) {
+    user.status = user.status === 1 ? 0 : 1
+    const ret = await request.update(user)
+    if (ret.code !== 0) {
+      message.error(ret.msg)
+      user.status = user.status === 1 ? 0 : 1
+    }
   }
 
   // 节点选择

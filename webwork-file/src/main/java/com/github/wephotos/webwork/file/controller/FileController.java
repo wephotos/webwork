@@ -1,28 +1,39 @@
 package com.github.wephotos.webwork.file.controller;
 
-import com.github.wephotos.webwork.file.entity.UploadResult;
-import com.github.wephotos.webwork.file.entity.WebworkFile;
-import com.github.wephotos.webwork.file.service.FileService;
-import com.github.wephotos.webwork.http.RestObject;
-import com.github.wephotos.webwork.security.entity.User;
-import com.github.wephotos.webwork.security.storage.SessionUserStorage;
-import com.github.wephotos.webwork.utils.ImageUtils;
-import com.github.wephotos.webwork.utils.WebworkUtils;
-import org.apache.commons.io.IOUtils;
-import org.springframework.util.Base64Utils;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
+
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.springframework.util.Base64Utils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.github.wephotos.webwork.file.entity.UploadResult;
+import com.github.wephotos.webwork.file.entity.WebworkFile;
+import com.github.wephotos.webwork.file.service.FileService;
+import com.github.wephotos.webwork.http.RestObject;
+import com.github.wephotos.webwork.logging.LoggerFactory;
+import com.github.wephotos.webwork.security.entity.User;
+import com.github.wephotos.webwork.security.storage.SessionUserStorage;
+import com.github.wephotos.webwork.utils.ImageUtils;
+import com.github.wephotos.webwork.utils.WebworkUtils;
 
 /**
  * 文件模块HTTP接口
@@ -32,12 +43,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/file")
 public class FileController {
-
-    @RequestMapping("index")
-    public String index() {
-        return "ind";
-    }
-
+	// 日志
+	private static final Logger log = LoggerFactory.getLogger(FileController.class);
     @Resource
     private FileService fileService;
 
@@ -51,10 +58,10 @@ public class FileController {
     public RestObject upload(@RequestParam("file") MultipartFile file, WebworkFile workFile, HttpSession session) throws IOException {
         User user = SessionUserStorage.get(session);
         try (InputStream input = file.getInputStream()) {
-            workFile.setName(file.getOriginalFilename());
             workFile.setInputStream(input);
-            workFile.setContentType(file.getContentType());
             workFile.setSize(file.getSize());
+            workFile.setName(file.getOriginalFilename());
+            workFile.setContentType(file.getContentType());
             if(user != null) {
             	workFile.setUserId(user.getId());
             	workFile.setUserName(user.getName());
@@ -63,34 +70,6 @@ public class FileController {
             return RestObject.builder().data(upload).build();
         }
     }
-
-    /**
-     * 文件下载
-     *
-     * @param id       附件id
-     * @param request  request
-     * @param response response
-     * @throws IOException IOException
-     */
-    @GetMapping("/get/{id}")
-    public void get(@PathVariable("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        WebworkFile file = fileService.getFile(id);
-        response.reset();
-        response.setCharacterEncoding("UTF-8");
-        String userAgent = request.getHeader("User-Agent");
-        String filename = URLEncoder.encode(file.getName(), StandardCharsets.UTF_8.name());
-        if (userAgent != null && userAgent.toLowerCase().contains("firefox")) {
-            response.addHeader("Content-Disposition", "attachment;filename*=UTF-8''" + filename);
-        } else {
-            response.addHeader("Content-Disposition", "attachment;filename=" + filename);
-        }
-        response.addHeader("Content-Length", "" + file.getSize());
-        response.setContentType(file.getContentType());
-        try (InputStream input = file.getInputStream()) {
-            IOUtils.copy(input, response.getOutputStream());
-        }
-    }
-
 
     /**
      * 删除附件
@@ -168,6 +147,20 @@ public class FileController {
     }
 
     /**
+     * 文件下载
+     *
+     * @param id       附件id
+     * @param request  request
+     * @param response response
+     * @throws IOException IOException
+     */
+    @GetMapping("/get/{id}")
+    public void get(@PathVariable("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        WebworkFile file = fileService.getFile(id);
+        output(file, request, response);
+    }
+
+    /**
      * 获取缩略图
      *
      * @param id       附件id
@@ -175,10 +168,95 @@ public class FileController {
      * @param response response
      * @throws IOException IOException
      */
-    @GetMapping("/thumb/get/{id}")
+    @GetMapping("/get/thumb/{id}")
     public void getThumb(@PathVariable("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
         WebworkFile file = fileService.getFile(id);
-        response.reset();
+        outputThumb(file, request, response);
+    }
+    
+    /**
+     * 根据存储对象名获取文件
+     * @param request 请求对象
+     * @param response 响应对象
+     * @throws IOException 
+     */
+    @GetMapping("/download/**")
+    public void getByObjectName(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	String objectName = getObjectName("/download/", request);
+		WebworkFile file = fileService.getFileByObjectName(objectName);
+		output(file, request, response);
+    }
+    
+    /**
+     * 根据存储对象名获取文件
+     * @param request 请求对象
+     * @param response 响应对象
+     * @throws IOException 
+     */
+    @GetMapping("/download/thumb/**")
+    public void getThumbByObjectName(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String objectName = getObjectName("/download/thumb/", request);
+		WebworkFile file = fileService.getFileByObjectName(objectName);
+		outputThumb(file, request, response);
+    }
+    
+    /**
+     * 从请求中获取存储对象名
+     * @param base 基础路径
+     * @param request  请求对象
+     * @return 存储对象名
+     */
+    private String getObjectName(String base, HttpServletRequest request) {
+    	String path = request.getRequestURI();
+		String objectName = path.substring(path.indexOf(base) + base.length());
+		try {
+			objectName = URLDecoder.decode(objectName, StandardCharsets.UTF_8.name());
+		} catch (UnsupportedEncodingException e) {
+			log.warn("不支持的编码:{}", e.getMessage());
+		}
+		return objectName;
+    }
+    
+    /**
+     * 输出文件流
+     * @param file 文件对象
+     * @param request 请求对象
+     * @param response 响应对象
+     * @throws IOException I/O异常
+     */
+    private void output(WebworkFile file, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	addHeader(file, request, response);
+        try (InputStream input = file.getInputStream()) {
+            IOUtils.copy(input, response.getOutputStream());
+        }
+    }
+    
+    /**
+     * 输出文件流
+     * @param file 文件对象
+     * @param request 请求对象
+     * @param response 响应对象
+     * @throws IOException I/O异常
+     */
+    private void outputThumb(WebworkFile file, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	addHeader(file, request, response);
+        try (InputStream input = file.getInputStream()) {
+            byte[] data = ImageUtils.compressionStream(input, 100, 100, 0.75F);
+            response.setHeader("Content-Length", "" + data.length);
+            IOUtils.write(data, response.getOutputStream());
+        }
+    }
+    
+    
+    /**
+     * 添加下载头信息
+     * @param file 文件对象
+     * @param request 请求对象
+     * @param response 响应对象
+     * @throws UnsupportedEncodingException
+     */
+    private void addHeader(WebworkFile file, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+    	response.reset();
         response.setCharacterEncoding("UTF-8");
         String userAgent = request.getHeader("User-Agent");
         String filename = URLEncoder.encode(file.getName(), StandardCharsets.UTF_8.name());
@@ -187,13 +265,7 @@ public class FileController {
         } else {
             response.addHeader("Content-Disposition", "attachment;filename=" + filename);
         }
+        response.addHeader("Content-Length", "" + file.getSize());
         response.setContentType(file.getContentType());
-        try (InputStream input = file.getInputStream()) {
-            byte[] data = ImageUtils.compressionStream(input, 100, 100, 0.75F);
-            response.addHeader("Content-Length", "" + data.length);
-            IOUtils.write(data, response.getOutputStream());
-        }
     }
-
-
 }

@@ -2,7 +2,6 @@ package com.github.wephotos.webwork.core.service;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import javax.annotation.Resource;
 
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
+import com.github.wephotos.webwork.core.entity.OrgType;
 import com.github.wephotos.webwork.core.entity.Organization;
 import com.github.wephotos.webwork.core.entity.dto.DropSort;
 import com.github.wephotos.webwork.core.mapper.OrganizationMapper;
@@ -67,8 +67,27 @@ public class OrganizationService {
         return SqlHelper.retBool(organizationMapper.updateById(org));
     }
 
-    public Organization get(String id) {
+    /**
+     * 获取节点对象
+     * @param id 节点ID
+     * @return 节点对象
+     */
+    public Organization selectById(String id) {
         return organizationMapper.selectById(id);
+    }
+    
+    /**
+     * 获取部门所在单位
+     * @param deptId 部门ID
+     * @return 单位对象
+     */
+    public Organization findDepartGroup(String deptId) {
+    	Organization dept = selectById(deptId);
+    	Organization node = selectById(dept.getParentId());
+    	while(node.getType() != OrgType.GROUP.getType()) {
+    		node = selectById(node.getParentId());
+    	}
+    	return node;
     }
 
     /**
@@ -81,7 +100,7 @@ public class OrganizationService {
     public List<Organization> children(String parentId, User user) {
         // 父节点为空，返回当前单位节点
         if (StringUtils.isBlank(parentId)) {
-            Organization root = get(user.getGroupId());
+            Organization root = selectById(user.getGroupId());
             return Arrays.asList(root);
         }
         LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
@@ -94,13 +113,25 @@ public class OrganizationService {
         return organizationMapper.selectList(wrapper);
     }
 
-    public boolean checkExistsName(Organization org) {
+    /**
+     * 检测当前层级下是否存在相同名称的节点
+     * @param org 部门/单位节点对象
+     * @return 是否存在同名
+     */
+    public boolean isExistsName(Organization org) {
         LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(Organization::getId).eq(Organization::getName, org.getName());
-        Organization result = organizationMapper.selectOne(wrapper);
-        return Objects.isNull(result) || StringUtils.equals(result.getId(), org.getId());
+        if(StringUtils.isNotBlank(org.getId())) {
+        	wrapper.ne(Organization::getId, org.getId());
+        }
+        wrapper.eq(Organization::getName, org.getName()).eq(Organization::getParentId, org.getParentId());
+        return organizationMapper.selectCount(wrapper) == 1;
     }
 
+    /**
+     * 拖动排序
+     * @param dropSort 拖动参数
+     * @return 影响行数
+     */
     public int dropSort(DropSort dropSort) {
         return organizationMapper.dropSort(dropSort);
     }

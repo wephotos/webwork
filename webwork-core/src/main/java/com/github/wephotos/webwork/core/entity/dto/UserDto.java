@@ -1,12 +1,11 @@
 package com.github.wephotos.webwork.core.entity.dto;
 
 import com.github.wephotos.webwork.core.entity.User;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.List;
 
 /**
  * @author chengzi
@@ -21,12 +20,8 @@ public class UserDto extends User {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	/**
-     * 角色id集合
-     */
-    private List<String> roles;
     /**
      * 部门id
      */
-    private String depId;
+    private String deptId;
 }

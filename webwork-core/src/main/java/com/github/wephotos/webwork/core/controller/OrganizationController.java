@@ -64,7 +64,7 @@ public class OrganizationController {
      */
     @GetMapping("/get/{id}")
     public RestObject get(@PathVariable String id) {
-        Organization org = organizationService.get(id);
+        Organization org = organizationService.selectById(id);
         return RestObject.builder().data(org).build();
     }
 
@@ -94,7 +94,7 @@ public class OrganizationController {
      */
     @GetMapping("/check-exists-name")
     public RestObject checkExistsName(Organization org) {
-        boolean bool = organizationService.checkExistsName(org);
+        boolean bool = organizationService.isExistsName(org);
         return RestObject.builder().data(bool).build();
     }
 }

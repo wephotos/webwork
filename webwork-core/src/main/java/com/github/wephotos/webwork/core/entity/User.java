@@ -33,6 +33,10 @@ public class User implements Serializable {
      */
     private String account;
     /**
+     * 用户头像
+     */
+    private String avatar;
+    /**
      * 密码
      */
     private String password;
@@ -52,6 +56,10 @@ public class User implements Serializable {
      * 联系方式
      */
     private String phone;
+    /**
+     * 职务
+     */
+    private String post;
     /**
      * 状态 启用：1，0：禁用，2：删除
      */

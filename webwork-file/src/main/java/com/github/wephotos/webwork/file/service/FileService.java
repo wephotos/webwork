@@ -16,15 +16,10 @@ import com.github.wephotos.webwork.http.EntityState;
 import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * @author chengzi
  * @date 2021-03-08 19:59
  */
-@Getter
-@Setter
 @Service
 public class FileService {
 
@@ -52,9 +47,6 @@ public class FileService {
      * @throws IOException IO异常
      */
     public UploadResult upload(WebworkFile file) throws IOException {
-        if (StringUtils.isBlank(file.getOwner())) {
-            throw new IllegalArgumentException("附件关联外键不能为空");
-        }
         // 是否覆盖原文件
         boolean isOverwrite = false;
         String objectName = file.getObjectName();
@@ -73,6 +65,9 @@ public class FileService {
         	file.setId(WebworkUtils.uuid());
         	file.setStatus(EntityState.ENABLED.getValue());
         	file.setCreateTime(WebworkUtils.timestamp());
+        	if (StringUtils.isBlank(file.getOwner())) {
+                file.setOwner(WebworkUtils.uuid());
+            }
         	fileMapper.insert(file);
         }
         //存储文件
@@ -81,6 +76,7 @@ public class FileService {
         return UploadResult.builder()
                            .id(file.getId())
                            .name(file.getName())
+                           .owner(file.getOwner())
                            .objectName(file.getObjectName()).build();
     }
 
@@ -106,6 +102,19 @@ public class FileService {
      */
     public WebworkFile getFile(String id) throws IOException {
         WebworkFile file = fileMapper.selectByPrimaryKey(id);
+        file.setInputStream(fileStor.get(file.getObjectName()));
+        return file;
+    }
+    
+    /**
+     * 获取文件，包含文件流
+     *
+     * @param objectName 存储对象名
+     * @return {@link WebworkFile}
+     * @throws IOException IO异常
+     */
+    public WebworkFile getFileByObjectName(String objectName) throws IOException {
+        WebworkFile file = fileMapper.selectByObjectName(objectName);
         file.setInputStream(fileStor.get(file.getObjectName()));
         return file;
     }

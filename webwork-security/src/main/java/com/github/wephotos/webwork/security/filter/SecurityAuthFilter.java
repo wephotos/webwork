@@ -25,10 +25,19 @@ public class SecurityAuthFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(SecurityAuthFilter.class);
 
     /**
+     * 重定向页面
+     */
+    private String redirect = "/login";
+    /**
+     * 忽略地址
+     */
+    private final List<String> patternList = new ArrayList<>(Arrays.asList("/security/auth"));
+
+    /**
      * 无参构造
      */
     public SecurityAuthFilter() {
-
+    	this(null, null);
     }
 
     /**
@@ -43,16 +52,9 @@ public class SecurityAuthFilter implements Filter {
         if (StringUtils.isNotBlank(ignorePatterns)) {
             patternList.addAll(Arrays.asList(ignorePatterns.split(",")));
         }
+        log.debug("未授权转发地址:{}", this.redirect);
+        log.debug("无需授权访问地址:{}", this.patternList);
     }
-
-    /**
-     * 重定向页面
-     */
-    private String redirect = "/login";
-    /**
-     * 忽略地址
-     */
-    private final List<String> patternList = new ArrayList<>(Arrays.asList("/security/auth"));
 
     /**
      * 权限过滤
@@ -63,13 +65,11 @@ public class SecurityAuthFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) sRequest;
         HttpServletResponse response = (HttpServletResponse) sResponse;
         String URI = request.getRequestURI();
-        log.debug("当前请求地址:{}, 登录地址为:{}", URI, redirect);
         // 认证页面
         if (redirect.equals(URI)) {
             chain.doFilter(request, response);
             return;
         }
-        log.debug("忽略地址为:{}", patternList);
         // 忽略路径
         for (String path : patternList) {
             if (URI.contains(path)) {
@@ -77,13 +77,27 @@ public class SecurityAuthFilter implements Filter {
                 return;
             }
         }
+        log.debug("请求地址:{}", URI);
         HttpSession session = request.getSession();
         User user = SessionUserStorage.get(session);
-        log.debug("当前用户为:{}", user);
         if (user == null) {
-            response.sendRedirect(redirect);
+        	if(!isXMLHttpRequest(request)) {
+        		response.sendRedirect(redirect);
+        	}else {
+        		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "未登录");
+        	}
             return;
         }
         chain.doFilter(request, response);
+    }
+    
+    /**
+     * 是否AJAX请求
+     * @param request HTTP请求
+     * @return AJAX返回true
+     */
+    private static boolean isXMLHttpRequest(HttpServletRequest request) {
+        String xRequestedWith = request.getHeader("X-Requested-With");
+        return xRequestedWith != null && xRequestedWith.contains("XMLHttpRequest");
     }
 }
