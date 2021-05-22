@@ -1,10 +1,10 @@
 package com.github.wephotos.webwork.core.service;
 
-import com.github.wephotos.webwork.core.entity.dto.UserOrgDto;
-import com.github.wephotos.webwork.core.mapper.UserOrgMapper;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import com.github.wephotos.webwork.core.mapper.UserOrgMapper;
 
 /**
  * @author chengzi
@@ -15,7 +15,4 @@ public class UserOrgService {
     @Resource
     private UserOrgMapper userOrgMapper;
 
-    public UserOrgDto getByUserId(String userId) {
-        return userOrgMapper.find(userId);
-    }
 }

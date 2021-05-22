@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.wephotos.webwork.core.entity.Organization;
 import com.github.wephotos.webwork.core.entity.dto.DropSort;
+import com.github.wephotos.webwork.core.entity.vo.TreeNode;
 import com.github.wephotos.webwork.core.service.OrganizationService;
 import com.github.wephotos.webwork.http.RestObject;
 import com.github.wephotos.webwork.security.entity.User;
@@ -79,6 +80,18 @@ public class OrganizationController {
         User user = SessionUserStorage.get(session);
         List<Organization> organizationList = organizationService.children(parentId, user);
         return RestObject.builder().data(organizationList).build();
+    }
+    
+    /**
+     * 获取当前用户所在组织节点树 - 包含除部门外的所有节点
+     * @param session 会话
+     * @return {@link TreeNode}
+     */
+    @GetMapping("/deep-tree-nodes")
+    public RestObject deepTreeNodes(HttpSession session) {
+    	User user = SessionUserStorage.get(session);
+    	List<TreeNode> nodes = organizationService.deepTreeNodes(user.getGroupId());
+    	return RestObject.builder().data(nodes).build();
     }
 
     @PostMapping("/drop-sort")

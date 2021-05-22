@@ -103,7 +103,7 @@ export default class GroupVue extends Vue {
   /**
    * 加载节点数据
    */
-  onLoadData(treeNode: TreeDataItem & { dataRef: TreeDataItem }) {
+  onLoadData(treeNode: TreeDataItem) {
     return new Promise((resolve: (value?: unknown) => void) => {
       if (treeNode.dataRef.children) {
         resolve()
@@ -231,7 +231,11 @@ export default class GroupVue extends Vue {
           node.dataRef.title = data.name
         } else if (node.key === data.parentId) {
           // 当前节点下新增
-          node.dataRef.children.push(this.dataToTreeDataItem(data))
+          if (node.dataRef.children) {
+            node.dataRef.children.push(this.dataToTreeDataItem(data))
+          } else {
+            this.onLoadData(node)
+          }
         } else {
           // 非当前节点下新增
           this.loop(

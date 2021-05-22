@@ -2,8 +2,8 @@ package com.github.wephotos.webwork.core.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.wephotos.webwork.core.entity.User;
-import com.github.wephotos.webwork.core.entity.UserVo;
 import com.github.wephotos.webwork.core.entity.query.UserQuery;
+import com.github.wephotos.webwork.core.entity.vo.UserVo;
 import com.github.wephotos.webwork.http.Pageable;
 import org.apache.ibatis.annotations.Mapper;
 

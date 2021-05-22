@@ -11,13 +11,19 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface OrganizationMapper extends BaseMapper<Organization> {
+	
     /**
-     * get maxCode
+     * 获取最大编码
      *
-     * @param parentId parentId
-     * @return code
+     * @param parentId 父ID
+     * @return 当前最大编码
      */
-    String findMaxCode(String parentId);
+    String getMaxCode(String parentId);
 
+    /**
+     * 拖动排序
+     * @param dropSort 拖动排序参数
+     * @return 数据更新行数
+     */
     int dropSort(DropSort dropSort);
 }

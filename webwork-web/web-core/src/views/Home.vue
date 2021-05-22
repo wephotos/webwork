@@ -30,6 +30,13 @@ export default class Home extends Vue {
   handleClick(e: {key: string; [key: string]: unknown}) {
     this.$router.push(e.key)
   }
+
+  mounted() {
+    const name = this.$route.name?.toString().toLowerCase()
+    if (name) {
+      this.current = [name]
+    }
+  }
 }
 </script>
 <style lang="scss">

@@ -1,4 +1,6 @@
-package com.github.wephotos.webwork.core.entity;
+package com.github.wephotos.webwork.core.entity.vo;
+
+import com.github.wephotos.webwork.core.entity.User;
 
 import lombok.Getter;
 import lombok.Setter;

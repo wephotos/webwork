@@ -32,4 +32,13 @@ public class UserOrg {
      * 部门id
      */
     private String deptId;
+    
+    /**
+     * 部门内排序
+     */
+    private Integer sort;
+    /**
+     * 是否主部门
+     */
+    private boolean mainDept;
 }

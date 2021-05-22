@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.wephotos.webwork.core.entity.UserVo;
 import com.github.wephotos.webwork.core.entity.dto.UserDto;
 import com.github.wephotos.webwork.core.entity.query.UserQuery;
+import com.github.wephotos.webwork.core.entity.vo.UserVo;
 import com.github.wephotos.webwork.core.service.UserService;
 import com.github.wephotos.webwork.core.utils.ValidationUtil;
 import com.github.wephotos.webwork.error.Errors;

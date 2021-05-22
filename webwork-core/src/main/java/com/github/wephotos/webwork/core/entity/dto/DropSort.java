@@ -1,21 +1,30 @@
 package com.github.wephotos.webwork.core.entity.dto;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 /**
+ * 拖动排序参数
  * @author xc
  * @date 2021-04-14 21:32
  */
 
 @Getter
 @Setter
-@NoArgsConstructor
-@ToString(callSuper = true)
+@ToString
 public class DropSort {
-    private Integer targetSort;
+	
+	/**
+	 * 父节点
+	 */
+	private String parent;
+	/**
+	 * 当前序号
+	 */
     private Integer sort;
-    private String parent;
+    /**
+     * 目录序号
+     */
+    private Integer targetSort;
 }

@@ -1,4 +1,5 @@
 import { Group } from '@/types/Group'
+import { TreeNode } from '@/types/TreeNode'
 import BaseRequest from './BaseRequest'
 
 /** 组织机构接口请求 */
@@ -26,6 +27,10 @@ export class GroupRequest extends BaseRequest {
     /** 查询子级  */
     children(parentId = '') {
         return super.get<Group[]>(`/organization/children?parentId=${parentId}`)
+    }
+    /** 当前组织节点树 */
+    deepTreeNodes() {
+        return super.get<TreeNode[]>('/organization/deep-tree-nodes')
     }
 }
 

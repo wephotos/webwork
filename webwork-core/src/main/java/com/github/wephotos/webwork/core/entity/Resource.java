@@ -1,6 +1,10 @@
 package com.github.wephotos.webwork.core.entity;
 
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.github.wephotos.webwork.http.EntityState;
+
 import lombok.*;
 
 /**
@@ -25,7 +29,7 @@ public class Resource {
      */
     private String name;
     /**
-     * 1:菜单，2:按钮权限
+     * {@link ResourceType}
      */
     private Integer type;
     /**
@@ -41,7 +45,7 @@ public class Resource {
      */
     private String parentId;
     /**
-     * 状态  启用：1，0：禁用，2：删除
+     * {@link EntityState}
      */
     private Integer status;
     /**
@@ -49,15 +53,27 @@ public class Resource {
      */
     private String url;
     /**
-     * 备注
+     * 图标
      */
     private String icon;
     /**
-     * 序号
+     * 排序
      */
     private Integer sort;
+    /**
+     * 是否通用权限
+     */
+    private boolean common;
     /**
      * 备注
      */
     private String remark;
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 }

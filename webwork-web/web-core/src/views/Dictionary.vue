@@ -4,7 +4,7 @@
 <script lang="ts">
 import { Vue } from 'vue-class-component'
 
-export default class Dictionary extends Vue {
+export default class DictionaryVue extends Vue {
 }
 </script>
 <style scoped>

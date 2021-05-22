@@ -1,14 +1,26 @@
 package com.github.wephotos.webwork.core.service;
 
-import java.util.Objects;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
+import com.github.wephotos.webwork.core.entity.OrgType;
+import com.github.wephotos.webwork.core.entity.Organization;
 import com.github.wephotos.webwork.core.entity.Resource;
+import com.github.wephotos.webwork.core.entity.ResourceType;
+import com.github.wephotos.webwork.core.entity.query.OrgQuery;
+import com.github.wephotos.webwork.core.entity.query.ResQuery;
+import com.github.wephotos.webwork.core.entity.vo.TreeNode;
 import com.github.wephotos.webwork.core.mapper.ResourceMapper;
+import com.github.wephotos.webwork.http.EntityState;
+import com.github.wephotos.webwork.http.Page;
+import com.github.wephotos.webwork.http.Pageable;
+import com.github.wephotos.webwork.security.entity.User;
+import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
 /**
@@ -17,43 +29,141 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
  */
 @Service
 public class ResourceService {
+	
     @javax.annotation.Resource
     private ResourceMapper resourceMapper;
+    
+    @javax.annotation.Resource
+    private OrganizationService organizationService;
 
-    public boolean save(Resource resource) {
-        String maxCode = resourceMapper.findMaxCode(resource.getParentId());
-        resource.setId(WebworkUtils.uuid());
-        resource.setStatus(1);
-        if (StringUtils.isNotBlank(resource.getParentId())) {
-            Resource parent = resourceMapper.selectById(resource.getParentId());
-            resource.setCode(parent.getCode().concat(maxCode));
-        } else {
-            resource.setCode(maxCode);
-        }
-        return SqlHelper.retBool(resourceMapper.insert(resource));
-    }
-
-    public boolean update(Resource resource) {
-        return SqlHelper.retBool(resourceMapper.updateById(resource));
-    }
-
+    /**
+     * 获取资源数据
+     * @param id 资源ID
+     * @return 资源对象
+     */
     public Resource get(String id) {
-        LambdaQueryWrapper<Resource> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(Resource::getId).eq(Resource::getId, id);
-        return resourceMapper.selectOne(wrapper);
+        return resourceMapper.selectById(id);
     }
 
-    public boolean checkExistsName(Resource resource) {
-        LambdaQueryWrapper<Resource> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(Resource::getId).eq(Resource::getName, resource.getName());
-        com.github.wephotos.webwork.core.entity.Resource result = resourceMapper.selectOne(wrapper);
-        return Objects.isNull(result) || StringUtils.equals(result.getId(), resource.getId());
+    /**
+     * 新增资源
+     * @param record 资源对象
+     * @return 添加是否成功
+     */
+    public synchronized String add(Resource record) {
+    	record.setId(WebworkUtils.uuid());
+    	record.setStatus(EntityState.ENABLED.getValue());
+        Date time = WebworkUtils.timestamp();
+        record.setCreateTime(time);
+        record.setUpdateTime(time);
+        String parentId = record.getParentId();
+    	Resource parent = resourceMapper.selectById(parentId);
+    	// 添加应用
+    	if(parent == null) {
+    		record.setCode(resourceMapper.getMaxCodeApp());
+    	}else {
+    		String maxCode = resourceMapper.getMaxCode(parentId);
+    		record.setCode(parent.getCode().concat(maxCode));
+    	}
+    	int sort = resourceMapper.getMaxSort(parentId);
+    	record.setSort(sort);
+        resourceMapper.insert(record);
+        return record.getId();
     }
 
-    public boolean checkExistsPermission(Resource resource) {
-        LambdaQueryWrapper<Resource> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(Resource::getId).eq(Resource::getCode, resource.getCode());
-        com.github.wephotos.webwork.core.entity.Resource result = resourceMapper.selectOne(wrapper);
-        return Objects.isNull(result) || StringUtils.equals(result.getId(), resource.getId());
+    /**
+     * 更新资源
+     * @param resource 资源对象
+     * @return 更新成功返回 true
+     */
+    public boolean update(Resource resource) {
+        resource.setUpdateTime(WebworkUtils.timestamp());
+        return resourceMapper.updateById(resource) == 1;
     }
+    
+    /**
+     * 删除权限
+     * @param id 唯一标识
+     * @return 删除成功返回true
+     */
+	public boolean deleteById(String id) {
+		Resource entity = new Resource();
+		entity.setId(id);
+		entity.setStatus(EntityState.DELETED.getValue());
+		return resourceMapper.updateById(entity) == 1;
+	}
+    
+    /**
+     * 检测权限编码是否存在
+     * @param resource 包含 ID和权限代码的资源对象
+     * @return 存在返回 true
+     */
+    public boolean isExistsPermission(Resource resource) {
+        LambdaQueryWrapper<Resource> wrapper = new LambdaQueryWrapper<>();
+        if(StringUtils.isNotBlank(resource.getId())) {
+        	wrapper.ne(Resource::getId, resource.getId());
+        }
+        wrapper.eq(Resource::getPermission, resource.getPermission());
+        return resourceMapper.selectCount(wrapper) > 0;
+    }
+    
+    /**
+     * 列表搜索
+     * @param query {@link ResQuery}
+     * @return 符合条件的资源集合
+     */
+    public List<Resource> listQuery(ResQuery query){
+    	LambdaQueryWrapper<Resource> wrapper = new LambdaQueryWrapper<>();
+    	wrapper.gt(Resource::getStatus, EntityState.DELETED.getValue());
+    	if(StringUtils.isNotBlank(query.getParentId())) {
+    		wrapper.eq(Resource::getParentId, query.getParentId());
+    	}
+    	return resourceMapper.selectList(wrapper);
+    }
+    
+    /**
+     * 分页查询
+     * @param pageable 分页参数
+     * @return 分页数据 {@link Page}
+     */
+    public Page<Resource> page(Pageable<ResQuery> pageable) {
+        Page<Resource> page = new Page<>();
+        page.setData(resourceMapper.pageList(pageable));
+        page.setCount(resourceMapper.pageCount(pageable));
+        return page;
+    }
+
+    /**
+     * 获取子级资源
+     * @param parentId 父ID
+     * @param user 会话用户
+     * @return 子节点集合
+     */
+	public List<TreeNode> listNodes(String parentId, User user) {
+		Organization org;
+		if(StringUtils.isBlank(parentId)) {
+			org = organizationService.selectById(user.getGroupId());
+			TreeNode node = TreeNode.from(org);
+			node.setType(ResourceType.ORG.getType());
+			return Arrays.asList(node);
+		}
+		ResQuery query = ResQuery.builder().parentId(parentId).build();
+		List<TreeNode> nodes = listQuery(query).stream()
+				.map(TreeNode::new).collect(Collectors.toList());
+		org = organizationService.selectById(parentId);
+		if(org != null) {
+			// 获取下级单位
+			OrgQuery orgQuery = OrgQuery.builder()
+					.parentId(parentId)
+					.neType(OrgType.DEPT.getType()).build();
+			List<Organization> orgs = organizationService.listQuery(orgQuery);
+			List<TreeNode> orgNodes = orgs.stream().map(TreeNode::new).map(node -> {
+				node.setType(ResourceType.ORG.getType());
+				return node;
+			}).collect(Collectors.toList());
+			nodes.addAll(orgNodes);
+		}
+		return nodes;
+	}
+
 }

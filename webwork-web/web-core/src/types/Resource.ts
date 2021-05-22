@@ -1,25 +1,29 @@
 /** 资源数据类型 */
 export declare class Resource {
     /** ID */
-    id: string;
+    id?: string;
     /** 名称 */
-    name: string;
+    name?: string;
     /** 类型 */
-    type: number;
+    type?: number;
     /** 权限代码 */
-    permission: string;
+    permission?: string;
     /** 编码 */
-    code: string;
+    code?: string;
     /** 父ID */
-    parentId: string;
+    parentId?: string;
     /** 状态 */
-    status: number;
+    status?: number;
+    /** 通用权限 */
+    common?: boolean;
     /** 链接 */
-    url: string;
+    url?: string;
     /** 图标 */
-    icon: string;
+    icon?: string;
     /** 排序 */
-    sort: number;
+    sort?: number;
     /** 备注 */
-    remark: string;
+    remark?: string;
+    // 其它属性
+    [key: string]: any;
 }

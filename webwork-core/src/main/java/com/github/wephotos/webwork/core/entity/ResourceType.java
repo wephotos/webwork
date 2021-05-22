@@ -1,35 +1,38 @@
 package com.github.wephotos.webwork.core.entity;
 
 /**
- * 组织节点类型
+ * 资源类型
  * @author TQ
  *
  */
-public enum OrgType {
-	// 虚拟节点
-	VIRTUAL(0, "虚拟节点"),
-	// 单位
-	GROUP(1, "单位"),
-	// 部门
-	DEPT(2, "部门");
-	
-	OrgType(int type, String name){
+public enum ResourceType {
+	ORG(0, "单位"),
+	APP(1, "应用"),
+	MODULE(2, "模块"),
+	FUNCTION(3, "功能");
+
+	/**
+	 * 枚举构造
+	 * @param type 类型
+	 * @param name 名称
+	 */
+	ResourceType(int type, String name) {
 		this.type = type;
-		this.name = name;
 	}
-	
+
 	/**
 	 * 节点类型
 	 */
 	private int type;
 	/**
-	 * 类型名称
+	 * 名称
 	 */
 	private String name;
-	
+
 	public int getType() {
 		return type;
 	}
+
 	public String getName() {
 		return name;
 	}

@@ -1,10 +1,9 @@
 package com.github.wephotos.webwork.core.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.wephotos.webwork.core.entity.UserOrg;
-import com.github.wephotos.webwork.core.entity.dto.UserOrgDto;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 /**
  * @author chengzi
@@ -12,11 +11,5 @@ import org.apache.ibatis.annotations.Param;
  */
 @Mapper
 public interface UserOrgMapper extends BaseMapper<UserOrg> {
-    /**
-     * 根据userId查找
-     *
-     * @param userId userId
-     * @return UserOrgDto
-     */
-    UserOrgDto find(@Param("userId") String userId);
+
 }

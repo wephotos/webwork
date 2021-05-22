@@ -4,7 +4,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
 
-import com.github.wephotos.webwork.core.entity.dto.UserOrgDto;
+import com.github.wephotos.webwork.core.entity.vo.UserVo;
 import com.github.wephotos.webwork.error.Errors;
 import com.github.wephotos.webwork.error.WebworkRuntimeException;
 import com.github.wephotos.webwork.http.EntityState;
@@ -18,10 +18,9 @@ import com.github.wephotos.webwork.security.entity.UserAuth;
  */
 @Component
 public class WebworkUserAuth implements SecurityAuth {
+	
     @Resource
     private UserService userService;
-    @Resource
-    private UserOrgService userOrgService;
 
     @Override
     public User auth(UserAuth auth) {
@@ -43,14 +42,14 @@ public class WebworkUserAuth implements SecurityAuth {
         String passwordParam = auth.getPassword();
         if (passwordDb.equals(passwordParam)) {
             // 获取部门与组织信息
-            UserOrgDto userOrgDto = userOrgService.getByUserId(user.getId());
+            UserVo vo = userService.findById(user.getId());
             User result = new User();
             result.setId(user.getId());
             result.setName(user.getName());
-            result.setDeptId(userOrgDto.getDeptId());
-            result.setDeptName(userOrgDto.getDepName());
-            result.setGroupId(userOrgDto.getOrgId());
-            result.setGroupName(userOrgDto.getGroupName());
+            result.setDeptId(vo.getDeptId());
+            result.setDeptName(vo.getDeptName());
+            result.setGroupId(vo.getOrgId());
+            result.setGroupName(vo.getOrgName());
             return result;
         } else {
             throw new WebworkRuntimeException(Errors.USERNAME_PASSWORD_ERROR.getCode(), Errors.USERNAME_PASSWORD_ERROR.getMessage());

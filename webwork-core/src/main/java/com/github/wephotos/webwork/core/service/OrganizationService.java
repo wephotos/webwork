@@ -1,7 +1,10 @@
 package com.github.wephotos.webwork.core.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -12,6 +15,8 @@ import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.github.wephotos.webwork.core.entity.OrgType;
 import com.github.wephotos.webwork.core.entity.Organization;
 import com.github.wephotos.webwork.core.entity.dto.DropSort;
+import com.github.wephotos.webwork.core.entity.query.OrgQuery;
+import com.github.wephotos.webwork.core.entity.vo.TreeNode;
 import com.github.wephotos.webwork.core.mapper.OrganizationMapper;
 import com.github.wephotos.webwork.http.EntityState;
 import com.github.wephotos.webwork.security.entity.User;
@@ -24,6 +29,7 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
  */
 @Service
 public class OrganizationService {
+	
     @Resource
     private OrganizationMapper organizationMapper;
 
@@ -32,14 +38,17 @@ public class OrganizationService {
      * @param data 节点数据
      * @return 主键
      */
-    public String add(Organization data) {
+    public synchronized String add(Organization data) {
         data.setId(WebworkUtils.uuid());
         String parentId = data.getParentId();
-        String maxCode = organizationMapper.findMaxCode(parentId);
-        Organization parent = organizationMapper.selectById(parentId);
-        if(parent == null) {
+        String maxCode = organizationMapper.getMaxCode(parentId);
+        if(StringUtils.isBlank(parentId)) {
         	data.setCode(maxCode);
         }else {
+        	Organization parent = organizationMapper.selectById(parentId);
+        	if(parent == null) {
+        		throw new IllegalArgumentException(String.format("上级节点不存在:%s", parentId));
+        	}
         	data.setCode(parent.getCode().concat(maxCode));
         }
         organizationMapper.insert(data);
@@ -77,6 +86,35 @@ public class OrganizationService {
     }
     
     /**
+     * 查询组织架构列表
+     * @param query 查询条件
+     * @return 组织架构列表
+     */
+    public List<Organization> listQuery(OrgQuery query){
+    	LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
+    	wrapper.select(Organization::getId, Organization::getName,
+                Organization::getCode, Organization::getStatus,
+                Organization::getType, Organization::getParentId);
+    	wrapper.gt(Organization::getStatus, EntityState.DELETED.getValue());
+    	if(query.getType() != null) {
+    		wrapper.eq(Organization::getType, query.getType());
+    	}
+    	if(query.getNeType() != null) {
+    		wrapper.ne(Organization::getType, query.getNeType());
+    	}
+    	if(StringUtils.isNotBlank(query.getName())) {
+    		wrapper.like(Organization::getName, query.getName());
+    	}
+    	if(StringUtils.isNotBlank(query.getCode())) {
+    		wrapper.likeRight(Organization::getCode, query.getCode());
+    	}
+    	if(StringUtils.isNotBlank(query.getParentId())) {
+    		wrapper.eq(Organization::getParentId, query.getParentId());
+    	}
+    	return organizationMapper.selectList(wrapper);
+    }
+    
+    /**
      * 获取部门所在单位
      * @param deptId 部门ID
      * @return 单位对象
@@ -103,14 +141,36 @@ public class OrganizationService {
             Organization root = selectById(user.getGroupId());
             return Arrays.asList(root);
         }
-        LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(Organization::getId, Organization::getName,
-                Organization::getCode, Organization::getStatus,
-                Organization::getType, Organization::getParentId);
-        wrapper
-        .eq(Organization::getParentId, parentId)
-        .ne(Organization::getStatus, EntityState.DELETED.getValue());
-        return organizationMapper.selectList(wrapper);
+        OrgQuery query = OrgQuery.builder().parentId(parentId).build();
+        return listQuery(query);
+    }
+    
+    /**
+     * 获取当前节点及其所有子节点的树结构
+     * @param id 当前节点标识
+     * @param user 会话用户
+     * @return {@link TreeNode}
+     */
+    public List<TreeNode> deepTreeNodes(String id){
+    	Objects.requireNonNull(id, "组织机构id不能为空");
+    	Organization org = selectById(id);
+    	OrgQuery query = OrgQuery.builder()
+    			.code(org.getCode())
+    			.neType(OrgType.DEPT.getType()).build();
+    	List<Organization> orgList = listQuery(query);
+    	List<TreeNode> flatNodes = orgList.stream().map(TreeNode::new).collect(Collectors.toList());
+    	List<TreeNode> treeNodes = new ArrayList<>();
+    	for(TreeNode node : flatNodes) {
+    		if(node.getParentId() == null) {
+    			treeNodes.add(node);
+    		}
+    		for(TreeNode child : flatNodes) {
+    			if(node.getId().equals(child.getParentId())) {
+    				node.addChild(child);
+    			}
+    		}
+    	}
+    	return treeNodes;
     }
 
     /**

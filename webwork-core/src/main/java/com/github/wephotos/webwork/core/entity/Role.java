@@ -1,5 +1,7 @@
 package com.github.wephotos.webwork.core.entity;
 
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
@@ -21,23 +23,31 @@ public class Role {
      */
     private String id;
     /**
-     * name
+     * 名称
      */
     private String name;
     /**
-     * status
+     * 编码
      */
     private String code;
     /**
-     * remark
+     * 状态
      */
     private Integer status;
     /**
-     * sort
+     * 上级(单位或应用)
+     */
+    private String parentId;
+    /**
+     * 排序
      */
     private Integer sort;
     /**
-     *
+     *备注
      */
     private String remark;
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 }

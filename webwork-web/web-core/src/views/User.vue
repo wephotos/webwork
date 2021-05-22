@@ -127,11 +127,6 @@ const orderMap: {[key: string]: string} = {
   components: {
     Group,
     SearchOutlined
-  },
-  watch: {
-    expandedKeys(value: string[], newValue: string[]) {
-      this.watchExpandedKeys(value, newValue)
-    }
   }
 })
 export default class VueUser extends Vue {
@@ -140,7 +135,14 @@ export default class VueUser extends Vue {
     {
       title: '序号',
       dataIndex: 'number',
-      width: 100
+      width: 100,
+      customRender: (info: {
+        text: string;
+        record: User;
+        index: number;
+      }) => {
+        return (this.pageable.curr - 1) * this.pageable.size + info.index + 1
+      }
     },
     {
       title: '姓名',
@@ -209,13 +211,8 @@ export default class VueUser extends Vue {
     if (result.code === 0) {
       this.users = result.data.data
       this.pagination.total = result.data.count
-      // 处理序号
-      for (let i = 0; i < this.users.length; i++) {
-        this.users[i].enabled = this.users[i].status === 1
-        this.users[i].number = (this.pageable.curr - 1) * this.pageable.size + i + 1
-      }
     } else {
-      this.$toast(result.msg)
+      message.error(result.msg)
     }
   }
 
