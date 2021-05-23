@@ -33,7 +33,7 @@ public class DictionaryService {
 	 * @param id 主键
 	 * @return 字典数据
 	 */
-	public Dictionary get(String id) {
+	public Dictionary selectById(String id) {
 		return dictionaryMapper.selectById(id);
 	}
 

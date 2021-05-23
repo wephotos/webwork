@@ -45,7 +45,7 @@ public class ResourceController {
      */
     @GetMapping("/get/{id}")
     public RestObject get(@PathVariable("id") String id) {
-        Resource resource = resourceService.get(id);
+        Resource resource = resourceService.selectById(id);
         return RestObject.builder().data(resource).build();
     }
     
@@ -106,8 +106,30 @@ public class ResourceController {
     @GetMapping("/list-nodes")
     public RestObject listNodes(String parentId, HttpSession session) {
     	User user = SessionUserStorage.get(session);
-    	List<TreeNode> nodes = resourceService.listNodes(parentId, user);
+    	List<TreeNode> nodes = resourceService.listTreeNodes(parentId, user);
     	return RestObject.builder().data(nodes).build();
+    }
+    
+    /**
+     * 获取资源树结构全部树节点
+     * @param session 会话
+     * @return {@link TreeNode}
+     */
+    @GetMapping("/deep-tree-nodes")
+    public RestObject deepTreeNodes(String parentId) {
+    	List<TreeNode> nodes = resourceService.deepTreeNodes(parentId);
+    	return RestObject.builder().data(nodes).build();
+    }
+    
+    /**
+     * 获取角色下配置的资源
+     * @param roleId 角色ID
+     * @return {@link RestObject} {@link Resource}
+     */
+    @GetMapping("/list-by-role")
+    public RestObject listByRoleId(String roleId) {
+    	List<Resource> resources = resourceService.listByRoleId(roleId);
+    	return RestObject.builder().data(resources).build();
     }
 
 }

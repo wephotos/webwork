@@ -1,8 +1,10 @@
 package com.github.wephotos.webwork.core.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -41,7 +43,7 @@ public class ResourceService {
      * @param id 资源ID
      * @return 资源对象
      */
-    public Resource get(String id) {
+    public Resource selectById(String id) {
         return resourceMapper.selectById(id);
     }
 
@@ -118,6 +120,9 @@ public class ResourceService {
     	if(StringUtils.isNotBlank(query.getParentId())) {
     		wrapper.eq(Resource::getParentId, query.getParentId());
     	}
+    	if(StringUtils.isNotBlank(query.getCode())) {
+    		wrapper.likeRight(Resource::getCode, query.getCode());
+    	}
     	return resourceMapper.selectList(wrapper);
     }
     
@@ -132,6 +137,31 @@ public class ResourceService {
         page.setCount(resourceMapper.pageCount(pageable));
         return page;
     }
+    
+    /**
+     * 获取当前节点及其所有子节点的树结构
+     * @param id 当前节点标识
+     * @return {@link TreeNode}
+     */
+    public List<TreeNode> deepTreeNodes(String id){
+    	Objects.requireNonNull(id, "资源id不能为空");
+    	Resource res = selectById(id);
+    	ResQuery query = ResQuery.builder().code(res.getCode()).build();
+    	List<Resource> resList = listQuery(query);
+    	List<TreeNode> flatNodes = resList.stream().map(TreeNode::new).collect(Collectors.toList());
+    	List<TreeNode> treeNodes = new ArrayList<>();
+    	for(TreeNode node : flatNodes) {
+    		if(id.equals(node.getId())) {
+    			treeNodes.add(node);
+    		}
+    		for(TreeNode child : flatNodes) {
+    			if(node.getId().equals(child.getParentId())) {
+    				node.addChild(child);
+    			}
+    		}
+    	}
+    	return treeNodes;
+    }
 
     /**
      * 获取子级资源
@@ -139,7 +169,7 @@ public class ResourceService {
      * @param user 会话用户
      * @return 子节点集合
      */
-	public List<TreeNode> listNodes(String parentId, User user) {
+	public List<TreeNode> listTreeNodes(String parentId, User user) {
 		Organization org;
 		if(StringUtils.isBlank(parentId)) {
 			org = organizationService.selectById(user.getGroupId());
@@ -164,6 +194,15 @@ public class ResourceService {
 			nodes.addAll(orgNodes);
 		}
 		return nodes;
+	}
+
+	/**
+	 * 获取角色下的资源
+	 * @param roleId 角色ID
+	 * @return 资源集合 {@link Resource}
+	 */
+	public List<Resource> listByRoleId(String roleId) {
+		return resourceMapper.listByRoleId(roleId);
 	}
 
 }

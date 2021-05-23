@@ -45,7 +45,7 @@ public class RoleController {
      */
     @GetMapping("/get/{id}")
     public RestObject get(@PathVariable("id") String id) {
-        Role role = roleService.get(id);
+        Role role = roleService.selectById(id);
         return RestObject.builder().data(role).build();
     }
     

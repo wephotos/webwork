@@ -38,7 +38,7 @@ public class DictionaryController {
 	 */
 	@GetMapping("/get/{id}")
 	public RestObject get(@PathVariable("id") String id) {
-		Dictionary data = dictionaryService.get(id);
+		Dictionary data = dictionaryService.selectById(id);
 		return RestObject.builder().data(data).build();
 	}
 	

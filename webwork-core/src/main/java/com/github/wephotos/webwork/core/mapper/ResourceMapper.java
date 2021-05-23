@@ -47,6 +47,13 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @return 分页数据
      */
 	List<Resource> pageList(Pageable<ResQuery> pageable);
+	
+	/**
+	 * 获取角色下的资源集合
+	 * @param roleId 角色ID
+	 * @return 资源集合 {@link Resource}
+	 */
+	List<Resource> listByRoleId(String roleId);
 
 
 }

@@ -35,6 +35,16 @@ export class ResRequest extends BaseRequest {
     pageList(pageable: Pageable) {
         return super.post<Page<Resource>>('/resource/page', pageable)
     }
+
+    /** 获取全部树节点，包含自己 */
+    deepListNodes(parentId = '') {
+        return super.get<TreeNode[]>(`/resource/deep-tree-nodes?parentId=${parentId}`)
+    }
+
+    /** 获取角色下全部资源 */
+    listByRoleId(roleId: string) {
+        return super.get<Resource[]>(`/resource/list-by-role?roleId=${roleId}`)
+    }
 }
 const request = new ResRequest()
 export default request

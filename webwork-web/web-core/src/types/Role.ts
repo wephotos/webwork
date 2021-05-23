@@ -13,9 +13,9 @@ export declare class Role {
     /** 备注 */
     remark?: string;
     /** 父级ID */
-    parent_id?: string;
+    parentId?: string;
     /** 创建时间 */
-    create_time?: string;
+    createTime?: string;
     /** 其它属性 */
     [key: string]: any;
 }

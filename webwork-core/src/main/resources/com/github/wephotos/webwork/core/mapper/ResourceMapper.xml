@@ -125,4 +125,29 @@
 			</otherwise>
 		</choose>
 	</sql>
+	
+	<!-- 获取角色下资源 -->
+	<select id="listByRoleId" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select
+		 a.id,
+		 a.name,
+		 a.type,
+		 a.code,
+		 a.parent_id,
+		 a.permission,
+		 a.status,
+		 a.url,
+		 a.icon,
+		 a.sort,
+		 a.remark
+		from
+		  sys_resource a,
+		  sys_role_resource b
+		where
+		  a.id = b.resource_id
+		  AND
+		  a.status > -1
+		  AND
+		  b.role_id = #{roleId, jdbcType=CHAR}
+	</select>
 </mapper>

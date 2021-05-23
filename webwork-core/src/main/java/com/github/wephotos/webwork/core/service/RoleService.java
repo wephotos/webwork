@@ -47,7 +47,7 @@ public class RoleService {
      * @param id 角色ID
      * @return 角色对象
      */
-    public Role get(String id) {
+    public Role selectById(String id) {
         return roleMapper.selectById(id);
     }
     
@@ -149,7 +149,7 @@ public class RoleService {
 			nodes = listQuery(query).stream().map(TreeNode::new).collect(Collectors.toList());
 		}else {
 			// 加载子单位和应用
-			nodes = resourceService.listNodes(parentId, user);
+			nodes = resourceService.listTreeNodes(parentId, user);
 			nodes.forEach(node -> {
 				if(node.getType() == ResourceType.ORG.getType()) {
 					node.setType(RoleNodeType.ORG.getType());

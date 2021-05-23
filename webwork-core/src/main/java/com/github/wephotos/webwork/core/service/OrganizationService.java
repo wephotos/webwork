@@ -34,6 +34,15 @@ public class OrganizationService {
     private OrganizationMapper organizationMapper;
 
     /**
+     * 获取节点对象
+     * @param id 节点ID
+     * @return 节点对象
+     */
+    public Organization selectById(String id) {
+        return organizationMapper.selectById(id);
+    }
+    
+    /**
      * 保存节点
      * @param data 节点数据
      * @return 主键
@@ -74,15 +83,6 @@ public class OrganizationService {
         org.setId(id);
         org.setStatus(EntityState.DELETED.getValue());
         return SqlHelper.retBool(organizationMapper.updateById(org));
-    }
-
-    /**
-     * 获取节点对象
-     * @param id 节点ID
-     * @return 节点对象
-     */
-    public Organization selectById(String id) {
-        return organizationMapper.selectById(id);
     }
     
     /**
@@ -148,7 +148,6 @@ public class OrganizationService {
     /**
      * 获取当前节点及其所有子节点的树结构
      * @param id 当前节点标识
-     * @param user 会话用户
      * @return {@link TreeNode}
      */
     public List<TreeNode> deepTreeNodes(String id){
