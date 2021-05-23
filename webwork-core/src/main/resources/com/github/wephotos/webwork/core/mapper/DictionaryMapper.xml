@@ -10,6 +10,7 @@
 		<result column="sort" property="sort" jdbcType="INTEGER" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="parent_id" property="parentId" jdbcType="VARCHAR" />
+		<result column="parent_name" property="parentName" jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
 	</resultMap>
 
@@ -33,7 +34,8 @@
 		  sort,
 		  status,
 		  parent_id,
-		  create_time
+		  create_time,
+		  (select i.name from sys_dictionary i where i.id = sys_dictionary.parent_id) parent_name
 		FROM
 		  sys_dictionary
 		<where>

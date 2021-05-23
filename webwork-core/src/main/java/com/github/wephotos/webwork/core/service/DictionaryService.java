@@ -96,6 +96,7 @@ public class DictionaryService {
 		}else {
 			wrapper.eq(Dictionary::getParentId, parentId);
 		}
+		wrapper.gt(Dictionary::getStatus, EntityState.DELETED.getValue());
 		List<Dictionary> dataList = dictionaryMapper.selectList(wrapper);
 		return dataList.stream().map(TreeNode::new).collect(Collectors.toList());
 	}

@@ -54,6 +54,10 @@ public class Dictionary implements Serializable {
 	 */
 	private String parentId;
 	/**
+	 * 父级名称
+	 */
+	private transient String parentName;
+	/**
 	 * 创建时间
 	 */
 	private Date createTime;

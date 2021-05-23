@@ -274,7 +274,7 @@ export default class ConfigVue extends Vue {
 
   /** 添加数据 */
   handleAdd() {
-    message.info('添加数据')
+    message.info('规划中')
   }
 }
 </script>
