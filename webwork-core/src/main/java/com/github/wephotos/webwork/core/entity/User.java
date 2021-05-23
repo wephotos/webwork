@@ -41,10 +41,6 @@ public class User implements Serializable {
      */
     private String password;
     /**
-     * 排序
-     */
-    private Integer sort;
-    /**
      * 中文名
      */
     private String name;
@@ -73,8 +69,4 @@ public class User implements Serializable {
      */
     private Date updateTime;
 
-    /**
-     * 置顶时间
-     */
-    private Date topTime;
 }

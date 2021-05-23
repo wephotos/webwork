@@ -12,6 +12,7 @@ import com.github.wephotos.webwork.core.mapper.UserOrgMapper;
  */
 @Service
 public class UserOrgService {
+	
     @Resource
     private UserOrgMapper userOrgMapper;
 

@@ -20,6 +20,11 @@ public class UserVo extends User {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * 人员部门内排序
+	 */
+	private int sort;
 	/**
 	 * 部门id
 	 */

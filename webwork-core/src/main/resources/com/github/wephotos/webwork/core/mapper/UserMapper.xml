@@ -9,9 +9,10 @@
         <result column="email" property="email" jdbcType="VARCHAR"/>
         <result column="phone" property="phone" jdbcType="VARCHAR"/>
         <result column="post" property="post" jdbcType="VARCHAR"/>
-        <result column="sort" property="sort" jdbcType="INTEGER"/>
         <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="user_sort" property="sort" jdbcType="INTEGER"/>
         <result column="org_id" property="orgId" jdbcType="CHAR"/>
+        <result column="org_name" property="orgName" jdbcType="VARCHAR"/>
         <result column="dept_id" property="deptId" jdbcType="CHAR"/>
         <result column="dept_name" property="deptName" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
@@ -32,28 +33,29 @@
 	      a.email,
 	      a.phone,
 	      a.post,
-	      a.sort,
 	      a.status,
-	      a.create_time,
-	      a.update_time,
 	      b.org_id,
 	      b.dept_id,
-	      c.name dept_name
+	      c.name dept_name,
+	      d.name org_name
     	from 
     	  sys_user a,
     	  sys_user_org b,
-	      sys_organization c
+	      sys_organization c,
+	      sys_organization d
 	    where
 	      a.id = b.user_id 
           AND 
           b.dept_id = c.id
-          and
+          AND
+          b.org_id = d.id
+          AND
           a.id = #{id, jdbcType=CHAR}
     </select>
     <!-- 获取部门内最大人员排序 -->
 	<select id="maxSortByDeptId" parameterType="java.lang.String" resultType="int">
 		select 
-		  (IFNULL(MAX(a.sort), 0) + 1) SORT
+		  (IFNULL(MAX(b.user_sort), 0) + 1) SORT
 		from 
 		  sys_user a, 
 		  sys_user_org b
@@ -70,17 +72,19 @@
 	        a.name,
 	        a.email,
 	        a.phone,
-	        a.sort,
 	        a.status,
 	        a.create_time,
 	        a.update_time,
 	        b.org_id,
 	        b.dept_id,
-	        c.name dept_name
+	        b.user_sort,
+	        c.name dept_name,
+	        d.name org_name
         FROM
 	        sys_user a,
 	        sys_user_org b,
-	        sys_organization c
+	        sys_organization c,
+	        sys_organization d
         <where>
             <include refid="pageCond"/>
         </where>
@@ -91,11 +95,12 @@
     <!--分页总数-->
     <select id="pageCount" resultType="java.lang.Long">
         SELECT
-        count(1)
+          count(1)
         FROM
 	        sys_user a,
 	        sys_user_org b,
-	        sys_organization c
+	        sys_organization c,
+	        sys_organization d
         <where>
             <include refid="pageCond"/>
         </where>
@@ -106,6 +111,8 @@
         a.id = b.user_id 
         AND 
         b.dept_id = c.id
+        AND
+        b.org_id = d.id
         AND
         a.status > -1
         <if test="condition != null">
@@ -138,9 +145,32 @@
                 </if>
             </when>
             <otherwise>
-                a.sort ASC, a.top_time DESC
+                b.user_sort ASC, a.top_time DESC
             </otherwise>
         </choose>
     </sql>
 
+	<!-- 查询部门下用户 -->
+	<select id="listUserByDeptId" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select 
+    	  a.id,
+	      a.name,
+	      a.avatar,
+	      a.account,
+	      a.email,
+	      a.phone,
+	      a.post,
+	      b.org_id,
+	      b.dept_id,
+	      b.user_sort
+    	from 
+    	  sys_user a,
+    	  sys_user_org b
+	    where
+	      a.id = b.user_id 
+          AND 
+          a.status > -1
+          AND
+          b.dept_id = #{deptId, jdbcType=CHAR}
+	</select>
 </mapper>

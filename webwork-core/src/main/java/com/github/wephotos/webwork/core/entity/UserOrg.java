@@ -1,5 +1,7 @@
 package com.github.wephotos.webwork.core.entity;
 
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
@@ -36,9 +38,14 @@ public class UserOrg {
     /**
      * 部门内排序
      */
-    private Integer sort;
+    private Integer userSort;
     /**
      * 是否主部门
      */
-    private boolean mainDept;
+    private Boolean mainDept;
+
+    /**
+     * 置顶时间
+     */
+    private Date topTime;
 }

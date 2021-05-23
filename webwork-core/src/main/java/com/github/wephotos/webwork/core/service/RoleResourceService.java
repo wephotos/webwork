@@ -29,6 +29,7 @@ public class RoleResourceService {
      */
     public String add(RoleResource record) {
     	record.setId(WebworkUtils.uuid());
+    	record.setCreateTime(WebworkUtils.timestamp());
     	roleResourceMapper.insert(record);
     	return record.getId();
     }
@@ -45,6 +46,7 @@ public class RoleResourceService {
     		return;
     	}
     	RoleResource entity = new RoleResource();
+    	entity.setCreateTime(WebworkUtils.timestamp());
     	resList.forEach(resourceId -> {
     		entity.setId(WebworkUtils.uuid());
     		entity.setRoleId(record.getRoleId());

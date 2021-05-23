@@ -178,8 +178,9 @@ export default class UserForm extends Vue {
   formRef = ref<AntType.Form>()
   // 验证规则
   rules = {
-    name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-    account: [{ required: true, message: '请输入账号', trigger: 'blur' }],
+    name: [{ required: true, message: '请输入姓名', trigger: 'blur' }, { max: 20, message: '最多输入20个字符' }],
+    account: [{ required: true, message: '请输入账号', trigger: 'blur' }, { max: 20, message: '最多输入20个字符' }],
+    post: [{ max: 20, message: '最多输入20个字符' }],
     password: [
       { required: true, message: '请输入密码', trigger: 'blur' },
       { min: 6, max: 15, message: '密码为6-15位字符串', trigger: 'blur' }
@@ -192,7 +193,8 @@ export default class UserForm extends Vue {
         pattern: /^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/,
         message: '邮箱地址错误',
         trigger: 'blur'
-      }
+      },
+      { max: 50, message: '最多输入50个字符' }
     ]
   }
 

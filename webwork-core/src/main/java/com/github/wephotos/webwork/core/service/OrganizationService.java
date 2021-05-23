@@ -135,14 +135,14 @@ public class OrganizationService {
      * @param user     当前用户
      * @return {@link Organization}
      */
-    public List<Organization> children(String parentId, User user) {
+    public List<TreeNode> children(String parentId, User user) {
         // 父节点为空，返回当前单位节点
         if (StringUtils.isBlank(parentId)) {
             Organization root = selectById(user.getGroupId());
-            return Arrays.asList(root);
+            return Arrays.asList(TreeNode.from(root));
         }
         OrgQuery query = OrgQuery.builder().parentId(parentId).build();
-        return listQuery(query);
+        return listQuery(query).stream().map(TreeNode::new).collect(Collectors.toList());
     }
     
     /**

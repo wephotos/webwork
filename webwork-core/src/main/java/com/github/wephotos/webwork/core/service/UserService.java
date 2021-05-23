@@ -1,6 +1,8 @@
 package com.github.wephotos.webwork.core.service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -9,11 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.wephotos.webwork.core.entity.OrgType;
 import com.github.wephotos.webwork.core.entity.Organization;
 import com.github.wephotos.webwork.core.entity.User;
 import com.github.wephotos.webwork.core.entity.UserOrg;
 import com.github.wephotos.webwork.core.entity.dto.UserDto;
 import com.github.wephotos.webwork.core.entity.query.UserQuery;
+import com.github.wephotos.webwork.core.entity.vo.TreeNode;
 import com.github.wephotos.webwork.core.entity.vo.UserVo;
 import com.github.wephotos.webwork.core.mapper.UserMapper;
 import com.github.wephotos.webwork.core.mapper.UserOrgMapper;
@@ -116,15 +120,18 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
     /**
      * 用户置顶
-     * @param id 用户ID
+     * @param userId 用户ID
+     * @param deptId 部门ID
      * @return 是否成功
      */
-    public boolean top(String id) {
-        User user = new User();
-        user.setId(id);
-        user.setTopTime(WebworkUtils.timestamp());
-        user.setSort(1);
-        return userMapper.updateById(user) == 1;
+    public boolean top(String userId, String deptId) {
+    	UserOrg entity = new UserOrg();
+    	entity.setUserSort(0);
+    	entity.setTopTime(WebworkUtils.timestamp());
+    	LambdaQueryWrapper<UserOrg> wrapper = new LambdaQueryWrapper<>();
+    	wrapper.eq(UserOrg::getUserId, userId);
+    	wrapper.eq(UserOrg::getDeptId, deptId);
+        return userOrgMapper.update(entity, wrapper) == 1;
     }
     
     /**
@@ -143,20 +150,21 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     	if(user.getStatus() == null) {
     		user.setStatus(EntityState.ENABLED.getValue());
     	}
-    	int sort = userMapper.maxSortByDeptId(deptId);
-    	user.setSort(sort);
         Date time = WebworkUtils.timestamp();
         user.setCreateTime(time);
         user.setUpdateTime(time);
-        user.setTopTime(time);
         userMapper.insert(user);
         // 获取部门单位
+        int sort = userMapper.maxSortByDeptId(deptId);
         Organization org = organizationService.findDepartGroup(deptId);
         UserOrg userOrg = new UserOrg();
         userOrg.setId(WebworkUtils.uuid());
         userOrg.setUserId(user.getId());
         userOrg.setDeptId(deptId);
         userOrg.setOrgId(org.getId());
+        userOrg.setUserSort(sort);
+        userOrg.setMainDept(true);
+        userOrg.setTopTime(time);
         userOrgMapper.insert(userOrg);
         return user.getId();
     }
@@ -184,5 +192,23 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return page;
     }
 
+    /**
+     * 获取用户树数据
+     * @param parentId 父ID
+     * @param user 会话用户
+     * @return 节点数据
+     */
+    public List<TreeNode> listTreeNodes(String parentId, com.github.wephotos.webwork.security.entity.User user){
+    	List<TreeNode> nodes = organizationService.children(parentId, user);
+    	if(StringUtils.isNotBlank(parentId)) {
+	    	Organization org = organizationService.selectById(parentId);
+	    	if(org != null && org.getType() == OrgType.DEPT.getType()) {
+	    		List<User> users = userMapper.listUserByDeptId(parentId);
+	    		List<TreeNode> userNodes = users.stream().map(TreeNode::new).collect(Collectors.toList());
+	    		nodes.addAll(userNodes);
+	    	}
+    	}
+    	return nodes;
+    }
 
 }

@@ -402,7 +402,7 @@ export default class RoleVue extends Vue {
       content: {
         handle: true,
         component: RoleUserVue,
-        props: { id: record.id }
+        props: { roleId: record.id }
       },
       ok: () => {
         return true

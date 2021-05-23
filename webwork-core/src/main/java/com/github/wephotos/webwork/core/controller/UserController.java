@@ -1,7 +1,10 @@
 package com.github.wephotos.webwork.core.controller;
 
 
+import java.util.List;
+
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.wephotos.webwork.core.entity.UserNodeType;
 import com.github.wephotos.webwork.core.entity.dto.UserDto;
 import com.github.wephotos.webwork.core.entity.query.UserQuery;
+import com.github.wephotos.webwork.core.entity.vo.TreeNode;
 import com.github.wephotos.webwork.core.entity.vo.UserVo;
 import com.github.wephotos.webwork.core.service.UserService;
 import com.github.wephotos.webwork.core.utils.ValidationUtil;
@@ -21,6 +26,8 @@ import com.github.wephotos.webwork.http.Page;
 import com.github.wephotos.webwork.http.Pageable;
 import com.github.wephotos.webwork.http.RestObject;
 import com.github.wephotos.webwork.logging.LoggerFactory;
+import com.github.wephotos.webwork.security.entity.User;
+import com.github.wephotos.webwork.security.storage.SessionUserStorage;
 
 /**
  * 用户管理
@@ -101,13 +108,14 @@ public class UserController {
 	/**
      * 置顶用户
      *
-     * @param id 用户id
+     * @param userId 用户id
+     * @param deptId 部门ID
      * @return {@link RestObject}
      */
-    @GetMapping("/top/{id}")
-    public RestObject top(@PathVariable String id) {
-        userService.top(id);
-        return RestObject.builder().data(id).build();
+    @GetMapping("/top")
+    public RestObject top(String userId, String deptId) {
+        boolean ret = userService.top(userId, deptId);
+        return RestObject.builder().data(ret).build();
     }
 
     /**
@@ -131,5 +139,18 @@ public class UserController {
     public RestObject page(@RequestBody Pageable<UserQuery> pageable) {
     	Page<UserVo> page = userService.page(pageable);
     	return RestObject.builder().data(page).build();
+    }
+    
+    /**
+     * 获取人员树节点接口
+     * @param parentId 父ID
+     * @param session 会话
+     * @return {@link RestObject} {@link TreeNode} {@link UserNodeType}
+     */
+    @GetMapping("/list-tree-nodes")
+    public RestObject listTreeNodes(String parentId, HttpSession session) {
+    	User user = SessionUserStorage.get(session);
+    	List<TreeNode> nodes = userService.listTreeNodes(parentId, user);
+    	return RestObject.builder().data(nodes).build();
     }
 }

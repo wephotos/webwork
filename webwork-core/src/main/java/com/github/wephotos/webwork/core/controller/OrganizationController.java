@@ -78,7 +78,7 @@ public class OrganizationController {
     @GetMapping("/children")
     public RestObject children(String parentId, HttpSession session) {
         User user = SessionUserStorage.get(session);
-        List<Organization> organizationList = organizationService.children(parentId, user);
+        List<TreeNode> organizationList = organizationService.children(parentId, user);
         return RestObject.builder().data(organizationList).build();
     }
     

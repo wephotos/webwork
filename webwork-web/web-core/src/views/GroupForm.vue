@@ -10,8 +10,12 @@
     <a-form-item label="节点名称" name="name">
       <a-input v-model:value="formData.name" />
     </a-form-item>
-    <a-form-item v-if="parentId || formData.parentId" label="上级单位" name="parentId">
-    <a-tree-select
+    <a-form-item
+      v-if="!isTop"
+      label="上级单位"
+      name="parentId"
+    >
+      <a-tree-select
         v-model:value="formData.parentId"
         :defaultValue="formData.parentName"
         :disabled="!!id"
@@ -22,16 +26,16 @@
         style="width: 100%"
         placeholder="请选择上级单位"
         :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-    />
+      />
     </a-form-item>
-    <a-form-item v-if="type == 1" label="虚拟节点" name="virtual">
-    <a-radio-group v-model:value="formData.virtual">
+    <a-form-item v-if="!isTop && type == 1" label="虚拟节点" name="virtual">
+      <a-radio-group v-model:value="formData.virtual">
         <a-radio :value="true">是</a-radio>
         <a-radio :value="false">否</a-radio>
-    </a-radio-group>
+      </a-radio-group>
     </a-form-item>
-    <a-form-item label="节点状态" name="enabled">
-    <a-switch v-model:checked="formData.enabled" />
+    <a-form-item v-if="!isTop" label="节点状态" name="enabled">
+      <a-switch v-model:checked="formData.enabled" />
     </a-form-item>
     <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
       <a-button type="primary" @click="onSubmit">提交</a-button>
@@ -65,7 +69,7 @@ import { TreeNode } from '@/types/TreeNode'
       type: String
     },
     parentName: {
-        type: String
+      type: String
     },
     dialog: Object as PropType<Dialog>
   }
@@ -99,8 +103,16 @@ export default class GroupForm extends Vue {
   formRef = ref<AntType.Form>()
   // 验证规则
   rules = {
-    name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+    name: [
+      { required: true, message: '请输入名称', trigger: 'blur' },
+      { max: 50, message: '名称最多50个字符' }
+    ],
     parentId: [{ required: true, message: '请选择上级单位', trigger: 'blur' }]
+  }
+
+  // 是否顶级单位
+  get isTop() {
+    return !(this.parentId || this.formData.parentId)
   }
 
   // 加载数据
@@ -130,7 +142,7 @@ export default class GroupForm extends Vue {
   /**
    * 加载节点数据
    */
-  onLoadData(treeNode: {dataRef: TreeDataItem}) {
+  onLoadData(treeNode: { dataRef: TreeDataItem }) {
     return new Promise((resolve: (value?: unknown) => void) => {
       if (treeNode.dataRef.children) {
         resolve()
@@ -145,7 +157,7 @@ export default class GroupForm extends Vue {
   }
 
   onSelectTreeExpand(expandedKeys: string[]) {
-      console.log(expandedKeys)
+    console.log(expandedKeys)
   }
 
   // 保存
@@ -169,9 +181,9 @@ export default class GroupForm extends Vue {
             data.id = ret.data
           }
           if (ret.code !== 0) {
-              message.error(`错误:${ret.msg}`)
+            message.error(`错误:${ret.msg}`)
           } else {
-              this.dialog._ok(data)
+            this.dialog._ok(data)
           }
         })
         .catch((error: ValidateErrorEntity<Group>) => {
@@ -202,8 +214,8 @@ export default class GroupForm extends Vue {
 
   // 转换为 Ant树节点
   toAntTreeNodes(nodes: TreeNode[]): TreeDataItem[] {
-    return nodes.map(node => {
-        return {
+    return nodes.map((node) => {
+      return {
         key: node.id,
         type: node.type, // 节点类型 0虚拟节点 1组织 2部门
         value: node.id,

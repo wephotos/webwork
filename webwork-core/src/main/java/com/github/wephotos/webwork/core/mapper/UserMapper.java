@@ -42,5 +42,12 @@ public interface UserMapper extends BaseMapper<User> {
      * @return Page<User>
      */
     List<UserVo> pageList(Pageable<UserQuery> page);
+    
+    /**
+     * 查询部门下的用户
+     * @param deptId 部门ID
+     * @return 用户集合
+     */
+	List<User> listUserByDeptId(String deptId);
 
 }

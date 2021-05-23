@@ -26,11 +26,12 @@ export class UserRequest extends BaseRequest {
     }
     /**
      * 用户置顶
-     * @param id 用户ID
+     * @param userId 用户ID
+     * @param deptId 部门ID
      * @returns R<boolean>
      */
-    top(id: string) {
-        return super.get(`/user/top/${id}`)
+    top(userId: string, deptId: string) {
+        return super.get(`/user/top?userId=${userId}&deptId=${deptId}`)
     }
 
     /** 分页查询 */

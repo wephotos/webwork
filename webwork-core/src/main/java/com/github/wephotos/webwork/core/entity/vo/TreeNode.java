@@ -11,6 +11,8 @@ import com.github.wephotos.webwork.core.entity.Organization;
 import com.github.wephotos.webwork.core.entity.Resource;
 import com.github.wephotos.webwork.core.entity.Role;
 import com.github.wephotos.webwork.core.entity.RoleNodeType;
+import com.github.wephotos.webwork.core.entity.User;
+import com.github.wephotos.webwork.core.entity.UserNodeType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -101,6 +103,16 @@ public class TreeNode {
 		setName(dict.getName());
 		setCode(dict.getCode());
 		setParentId(dict.getParentId());
+	}
+	
+	/**
+	 * 构建用户树节点
+	 * @param user 用户
+	 */
+	public TreeNode(User user) {
+		setId(user.getId());
+		setName(user.getName());
+		setType(UserNodeType.USER.getType());
 	}
 	
 	/**

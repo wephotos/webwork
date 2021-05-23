@@ -1,5 +1,7 @@
 package com.github.wephotos.webwork.core.entity;
 
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
@@ -28,4 +30,9 @@ public class RoleResource {
      * 菜单id
      */
     private String resourceId;
+    
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 }
