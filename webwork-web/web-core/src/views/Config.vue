@@ -2,9 +2,9 @@
   <div class="config-box">
   <a-button
     class="editable-add-btn"
-    @click="handleAdd"
+    @click="handleRefresh"
     style="margin-bottom: 8px"
-    >添加</a-button
+    >刷新配置</a-button
   >
   <a-table
     class="ant-table-striped"
@@ -146,6 +146,11 @@ export default class ConfigVue extends Vue {
       }
     },
     {
+      title: '环境',
+      dataIndex: 'profile',
+      width: '10%'
+    },
+    {
       title: '键',
       dataIndex: 'name',
       width: '40%',
@@ -272,9 +277,17 @@ export default class ConfigVue extends Vue {
     }
   }
 
-  /** 添加数据 */
-  handleAdd() {
-    message.info('规划中')
+  /** 刷新配置信息 */
+  handleRefresh() {
+    this.$loading(true, true)
+    this.req.get('/config/refresh').then(res => {
+      this.$loading(false, false)
+      if (res.code === 0) {
+        message.success('配置刷新成功')
+      } else {
+        message.error(`配置刷新失败:${res.msg}`)
+      }
+    })
   }
 }
 </script>

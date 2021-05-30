@@ -6,6 +6,7 @@
 		<result column="id" property="id" jdbcType="CHAR" />
 		<result column="name" property="name" jdbcType="VARCHAR" />
 		<result column="value" property="value" jdbcType="VARCHAR" />
+		<result column="profile" property="profile" jdbcType="VARCHAR"/>
 		<result column="sort" property="sort" jdbcType="INTEGER" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 	</resultMap>
@@ -24,6 +25,7 @@
 		  id,
 		  name,
 		  value,
+		  profile,
 		  sort
 		FROM
 		  sys_config
@@ -48,6 +50,9 @@
 	<!--查询条件 -->
 	<sql id="pageCond">
 		<if test="condition != null">
+			<if test="condition.profile != null and condition.profile != ''">
+				AND profile = #{condition.profile,jdbcType=VARCHAR}
+			</if>
 			<if test="condition.name != null and condition.name != ''">
 				AND name LIKE CONCAT('%', #{condition.name,jdbcType=VARCHAR}, '%')
 			</if>

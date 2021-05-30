@@ -43,6 +43,11 @@ public class Config implements Serializable {
 	private String value;
 	
 	/**
+	 * 当前配置环境
+	 */
+	private String profile;
+	
+	/**
 	 * 排序号
 	 */
 	private Integer sort;

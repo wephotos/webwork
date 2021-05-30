@@ -8,15 +8,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.wephotos.webwork.core.entity.Config;
 import com.github.wephotos.webwork.core.mapper.ConfigMapper;
+import com.github.wephotos.webwork.core.spring.HotConfigEnvironmentPostProcessor;
 import com.github.wephotos.webwork.http.EntityState;
 import com.github.wephotos.webwork.http.Page;
 import com.github.wephotos.webwork.http.Pageable;
+import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
 /**
@@ -25,23 +33,38 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
  *
  */
 @Service
-public class ConfigService {
+public class ConfigService implements EnvironmentAware {
+	
+	//日志
+	private static final Logger log = LoggerFactory.getLogger(ConfigService.class);
 	/**
 	 * 配置文件缓存
 	 */
 	private static final Map<String, String> CACHE = new ConcurrentHashMap<>();
-
+	/**
+	 * 环境变量
+	 */
+	@Resource
+	private Environment environment;
+	
 	@Resource
 	private ConfigMapper configMapper;
+	
+	@Resource
+	private com.github.wephotos.webwork.core.spring.scope.HotScope hotScope;
+	
+	@Override
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
+		log.info("{}", this.environment);
+	}
 	
 	/**
 	 * 初始化配置信息
 	 */
 	@PostConstruct
 	private void init() {
-		Wrapper<Config> wrapper = new QueryWrapper<>();
-		List<Config> list = configMapper.selectList(wrapper);
-		list.forEach(item -> CACHE.put(item.getName(), item.getValue()));
+		listAll().forEach(item -> CACHE.put(item.getName(), item.getValue()));
 	}
 	
 	/**
@@ -59,6 +82,14 @@ public class ConfigService {
 	 */
 	public String getValue(String name) {
 		return CACHE.get(name);
+	}
+	
+	/**
+	 * 获取所有配置信息
+	 * @return 配置信息集合
+	 */
+	public List<Config> listAll(){
+		return configMapper.selectList(new QueryWrapper<>());
 	}
 	
 	/**
@@ -96,5 +127,29 @@ public class ConfigService {
         page.setCount(configMapper.pageCount(pageable));
         return page;
     }
-	
+    
+    /**
+     * 刷新配置
+     */
+    public void refreshAll() {
+    	this.updateEnvironment();
+    	this.hotScope.destroy();
+    }
+
+	/**
+	 * 更新配置
+	 */
+	private void updateEnvironment() {
+		log.info("updateEnvironment:{}", this.environment);
+		if(!(this.environment instanceof ConfigurableEnvironment)) {
+			return;
+		}
+		MutablePropertySources propertySources = ((ConfigurableEnvironment)this.environment).getPropertySources();
+		PropertySource<?> propertySource = propertySources.get(HotConfigEnvironmentPostProcessor.HOT_CONFIG_NAME);
+		Map<String, Object> source = ((MapPropertySource)propertySource).getSource();
+		CACHE.forEach((key, value) -> {
+			source.put(key, value);
+		});
+	}
+
 }

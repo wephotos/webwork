@@ -13,7 +13,7 @@ import com.github.wephotos.webwork.security.storage.SessionUserStorage;
  *
  */
 @Component
-public class WebworkRunner implements CommandLineRunner {
+public class WebworkCoreRunner implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
