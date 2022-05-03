@@ -1,6 +1,6 @@
 package com.github.wephotos.webwork.file.stor;
 
-import com.github.wephotos.webwork.error.WebworkRuntimeException;
+import com.github.wephotos.webwork.schema.exception.WebworkRuntimeException;
 
 /**
  * 文件存储异常

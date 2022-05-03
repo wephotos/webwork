@@ -12,7 +12,7 @@ import com.github.wephotos.webwork.file.entity.UploadResult;
 import com.github.wephotos.webwork.file.entity.WebworkFile;
 import com.github.wephotos.webwork.file.mapper.FileMapper;
 import com.github.wephotos.webwork.file.stor.FileStor;
-import com.github.wephotos.webwork.http.EntityState;
+import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
@@ -62,12 +62,8 @@ public class FileService {
         	}
         }
         if(!isOverwrite) {
-        	file.setId(WebworkUtils.uuid());
         	file.setStatus(EntityState.ENABLED.getValue());
         	file.setCreateTime(WebworkUtils.timestamp());
-        	if (StringUtils.isBlank(file.getOwner())) {
-                file.setOwner(WebworkUtils.uuid());
-            }
         	fileMapper.insert(file);
         }
         //存储文件
@@ -134,10 +130,10 @@ public class FileService {
      *
      * @param id id
      */
-    public int logicDelete(String id) {
+    public int deleteSoftById(Integer id) {
         WebworkFile file = new WebworkFile();
         file.setId(id);
-        file.setStatus(EntityState.DISABLED.getValue());
+        file.setStatus(EntityState.DELETED.getValue());
         return fileMapper.updateByPrimaryKeySelective(file);
     }
 }

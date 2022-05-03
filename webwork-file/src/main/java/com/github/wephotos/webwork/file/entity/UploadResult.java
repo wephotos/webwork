@@ -16,11 +16,11 @@ public class UploadResult {
     /**
      * PK
      */
-    private String id;
+    private Integer id;
     /**
      * 关联外键
      */
-    private String owner;
+    private Integer owner;
     /**
      * 附件名称
      */

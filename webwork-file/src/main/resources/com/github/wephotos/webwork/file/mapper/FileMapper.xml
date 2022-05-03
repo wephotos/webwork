@@ -7,21 +7,21 @@
     </sql>
 
     <resultMap id="BaseResultMap" type="com.github.wephotos.webwork.file.entity.WebworkFile">
-        <id column="id" property="id" jdbcType="CHAR"/>
-        <result column="owner" property="owner" jdbcType="CHAR"/>
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="owner" property="owner" jdbcType="INTEGER"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="size" property="size" jdbcType="INTEGER"/>
         <result column="object_name" property="objectName" jdbcType="VARCHAR"/>
         <result column="content_type" property="contentType" jdbcType="VARCHAR"/>
-        <result column="user_id" property="userId" jdbcType="CHAR"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
         <result column="user_name" property="userName" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <insert id="insert">
-        insert into webwork_file(id, owner, name, size, object_name, content_type, user_id, user_name, create_time)
-        values (#{id,jdbcType=CHAR}, #{owner,jdbcType=CHAR}, #{name,jdbcType=VARCHAR}, #{size,jdbcType=INTEGER},
-                #{objectName,jdbcType=VARCHAR}, #{contentType,jdbcType=VARCHAR}, #{userId,jdbcType=CHAR},
+        insert into webwork_file(owner, name, size, object_name, content_type, user_id, user_name, create_time)
+        values (#{owner,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{size,jdbcType=INTEGER},
+                #{objectName,jdbcType=VARCHAR}, #{contentType,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER},
                 #{userName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
     </insert>
 
@@ -29,7 +29,7 @@
         update webwork_file
         <set>
             <if test="owner != null">
-                owner = #{owner,jdbcType=CHAR},
+                owner = #{owner,jdbcType=INTEGER},
             </if>
             <if test="name != null">
                 name = #{name,jdbcType=VARCHAR},
@@ -50,28 +50,31 @@
                 `status` = #{status,jdbcType=CHAR},
             </if>
         </set>
-        where id = #{id,jdbcType=CHAR}
+        where id = #{id,jdbcType=INTEGER}
     </update>
 
     <delete id="deleteByPrimaryKey">
         delete
         from webwork_file
-        where id = #{id,jdbcType=CHAR}
+        where 
+        id = #{id,jdbcType=INTEGER}
     </delete>
 
     <select id="list" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
         <include refid="Base_Column_List"/>
         from webwork_file
-        where owner = #{owner,jdbcType=CHAR}
-        and status = 1
+        where 
+         status = 1
+         and
+         owner = #{owner,jdbcType=INTEGER}
     </select>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from webwork_file
-        where id = #{id,jdbcType=CHAR}
+        where id = #{id,jdbcType=INTEGER}
     </select>
     
     <select id="selectByObjectName" resultMap="BaseResultMap">

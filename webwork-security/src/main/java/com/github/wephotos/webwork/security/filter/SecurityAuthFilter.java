@@ -1,19 +1,25 @@
 package com.github.wephotos.webwork.security.filter;
 
-import com.github.wephotos.webwork.logging.LoggerFactory;
-import com.github.wephotos.webwork.security.entity.User;
-import com.github.wephotos.webwork.security.storage.SessionUserStorage;
-import com.github.wephotos.webwork.utils.StringUtils;
-import org.slf4j.Logger;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.servlet.*;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
+import org.slf4j.Logger;
+
+import com.github.wephotos.webwork.logging.LoggerFactory;
+import com.github.wephotos.webwork.security.entity.SecurityUser;
+import com.github.wephotos.webwork.security.utils.SecurityUtils;
+import com.github.wephotos.webwork.utils.StringUtils;
 
 /**
  * 权限认证过滤器
@@ -29,9 +35,14 @@ public class SecurityAuthFilter implements Filter {
      */
     private String redirect = "/login";
     /**
-     * 忽略地址
+     * 不进行安全验证的访问路径
      */
-    private final List<String> patternList = new ArrayList<>(Arrays.asList("/security/auth"));
+    private static final Set<String> ignorePaths = new HashSet<>(8);
+    
+    static {
+    	ignorePaths.add("/resources");
+    	ignorePaths.add("/user-login/login");
+    }
 
     /**
      * 无参构造
@@ -50,10 +61,10 @@ public class SecurityAuthFilter implements Filter {
             this.redirect = redirect;
         }
         if (StringUtils.isNotBlank(ignorePatterns)) {
-            patternList.addAll(Arrays.asList(ignorePatterns.split(",")));
+        	ignorePaths.addAll(Arrays.asList(ignorePatterns.split(",")));
         }
         log.debug("未授权转发地址:{}", this.redirect);
-        log.debug("无需授权访问地址:{}", this.patternList);
+        log.debug("无需授权访问地址:{}", ignorePaths);
     }
 
     /**
@@ -71,7 +82,7 @@ public class SecurityAuthFilter implements Filter {
             return;
         }
         // 忽略路径
-        for (String path : patternList) {
+        for (String path : ignorePaths) {
             if (URI.contains(path)) {
                 chain.doFilter(request, response);
                 return;
@@ -79,7 +90,7 @@ public class SecurityAuthFilter implements Filter {
         }
         log.debug("请求地址:{}", URI);
         HttpSession session = request.getSession();
-        User user = SessionUserStorage.get(session);
+        SecurityUser user = SecurityUtils.getSecurityUser(session);
         if (user == null) {
         	if(!isXMLHttpRequest(request)) {
         		response.sendRedirect(redirect);

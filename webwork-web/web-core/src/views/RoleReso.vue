@@ -29,30 +29,30 @@ import { TreeNode } from '@/types/TreeNode'
 import BaseRequest from '@/request/BaseRequest'
 // 角色资源数据定义
 export type RoleReso = {
-  roleId: string;
-  resourceId: string;
+  roleId: number;
+  resourceId: number;
 }
 // 树选中对象
 export type CheckStrictly = {
-  checked: string[];
-  halfChecked: string[];
+  checked: number[];
+  halfChecked: number[];
 }
 @Options({
   props: {
     roleId: {
-      type: String
+      type: Number
     },
     parentId: {
-      type: String
+      type: Number
     },
     dialog: Object as PropType<Dialog>
   }
 })
 export default class RoleResoVue extends Vue {
   // 节点ID
-  roleId!: string
+  roleId!: number
   // 角色上级
-  parentId!: string
+  parentId!: number
   // 当前弹框
   dialog!: Dialog
   // 权限树数据源
@@ -66,7 +66,7 @@ export default class RoleResoVue extends Vue {
     // 加载已勾选资源
     const resret = await request.listByRoleId(this.roleId)
     if (resret.code === 0) {
-      this.checkedKeys.checked = resret.data.map(item => item.id as string)
+      this.checkedKeys.checked = resret.data.map(item => item.id as number)
     } else {
       message.error(resret.msg)
     }
@@ -88,7 +88,7 @@ export default class RoleResoVue extends Vue {
         resolve()
         return false
       }
-      request.listNodes(treeNode.dataRef.key as string).then((ret) => {
+      request.listNodes(treeNode.dataRef.key as number).then((ret) => {
         treeNode.dataRef.children = this.toTreeDataItem(ret.data)
         this.treeData = [...this.treeData]
         resolve()

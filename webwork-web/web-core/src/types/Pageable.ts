@@ -5,7 +5,7 @@ export default class Pageable {
     // 每页条数
     size = 10;
     // 用户ID
-    userId?: string;
+    userId?: number;
     // 排序字段
     sortField?: string;
     // ASC DESC

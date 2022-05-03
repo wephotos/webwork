@@ -1,7 +1,7 @@
 /** 用户数据类型 */
 export declare class User {
     /** ID */
-    id?: string;
+    id?: number;
     /** 姓名 */
     name?: string;
     // 头像
@@ -23,11 +23,11 @@ export declare class User {
     /** 更新时间 */
     updateTime?: string;
     /** 部门ID */
-    deptId?: string;
+    deptId?: number;
     /** 部门名称 */
     deptName?: string;
     /** 单位ID */
-    orgId?: string;
+    orgId?: number;
     /** 单位名称 */
     orgName?: string;
     // 其它属性

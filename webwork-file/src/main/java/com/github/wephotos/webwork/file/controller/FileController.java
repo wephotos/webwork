@@ -28,10 +28,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.github.wephotos.webwork.file.entity.UploadResult;
 import com.github.wephotos.webwork.file.entity.WebworkFile;
 import com.github.wephotos.webwork.file.service.FileService;
-import com.github.wephotos.webwork.http.RestObject;
 import com.github.wephotos.webwork.logging.LoggerFactory;
-import com.github.wephotos.webwork.security.entity.User;
-import com.github.wephotos.webwork.security.storage.SessionUserStorage;
+import com.github.wephotos.webwork.schema.entity.Result;
+import com.github.wephotos.webwork.schema.entity.Results;
+import com.github.wephotos.webwork.security.entity.SecurityUser;
+import com.github.wephotos.webwork.security.utils.SecurityUtils;
 import com.github.wephotos.webwork.utils.ImageUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
@@ -51,12 +52,12 @@ public class FileController {
     /**
      * 上传文件
      *
-     * @return {@link RestObject}
+     * @return {@link Result}
      * @throws IOException IO异常
      */
     @PostMapping("/upload")
-    public RestObject upload(@RequestParam("file") MultipartFile file, WebworkFile workFile, HttpSession session) throws IOException {
-        User user = SessionUserStorage.get(session);
+    public Result<UploadResult> upload(@RequestParam("file") MultipartFile file, WebworkFile workFile, HttpSession session) throws IOException {
+        SecurityUser user = SecurityUtils.getSecurityUser(session);
         try (InputStream input = file.getInputStream()) {
             workFile.setInputStream(input);
             workFile.setSize(file.getSize());
@@ -67,7 +68,7 @@ public class FileController {
             	workFile.setUserName(user.getName());
             }
             UploadResult upload = fileService.upload(workFile);
-            return RestObject.builder().data(upload).build();
+            return Results.newResult(upload);
         }
     }
 
@@ -75,25 +76,25 @@ public class FileController {
      * 删除附件
      *
      * @param id 附件id
-     * @return {@link RestObject}
+     * @return {@link Result}
      * @throws IOException IOException
      */
     @GetMapping("/delete/{id}")
-    public RestObject delete(@PathVariable("id") String id) throws IOException {
-        int i = fileService.deleteByPrimaryKey(id);
-        return RestObject.builder().data(i).build();
+    public Result<Integer> delete(@PathVariable("id") String id) throws IOException {
+        int rows = fileService.deleteByPrimaryKey(id);
+        return Results.newResult(rows);
     }
 
     /**
      * 逻辑删除
      *
      * @param id 附件id
-     * @return {@link RestObject}
+     * @return {@link Result}
      */
-    @GetMapping("/logic-delete/{id}")
-    public RestObject logicDelete(@PathVariable("id") String id) {
-        int i = fileService.logicDelete(id);
-        return RestObject.builder().data(i).build();
+    @GetMapping("/delete-soft/{id}")
+    public Result<Integer> deleteSoftById(@PathVariable("id") Integer id) {
+        int rows = fileService.deleteSoftById(id);
+        return Results.newResult(rows);
     }
 
     /**
@@ -103,9 +104,9 @@ public class FileController {
      * @return RestObject
      */
     @GetMapping("/list/{owner}")
-    public RestObject list(@PathVariable("owner") String owner) {
+    public Result<List<WebworkFile>> list(@PathVariable("owner") String owner) {
         List<WebworkFile> list = fileService.list(owner);
-        return RestObject.builder().data(list).build();
+        return Results.newResult(list);
     }
 
     /**
@@ -113,12 +114,12 @@ public class FileController {
      *
      * @param owner  归属
      * @param base64 图片BASE64编码
-     * @return {@link RestObject}
+     * @return {@link Result}
      * @throws IOException IOException
      */
     @PostMapping("/upload/base64-image")
-    public RestObject uploadBase64Image(String owner, String base64, HttpSession session) throws IOException {
-        User user = SessionUserStorage.get(session);
+    public Result<UploadResult> uploadBase64Image(Integer owner, String base64, HttpSession session) throws IOException {
+        SecurityUser user = SecurityUtils.getSecurityUser(session);
         //判断是否存在类似 data:image/png;base64, 的前缀
         String suffix;
         String contentType;
@@ -143,7 +144,7 @@ public class FileController {
         file.setSize(buf.length);
         file.setContentType(contentType);
         UploadResult upload = fileService.upload(file);
-        return RestObject.builder().data(upload).build();
+        return Results.newResult(upload);
     }
 
     /**

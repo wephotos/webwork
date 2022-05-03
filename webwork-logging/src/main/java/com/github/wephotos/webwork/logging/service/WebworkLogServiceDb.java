@@ -8,11 +8,11 @@ import javax.annotation.Resource;
 import org.slf4j.helpers.Util;
 import org.springframework.stereotype.Service;
 
-import com.github.wephotos.webwork.http.Page;
-import com.github.wephotos.webwork.http.Pageable;
 import com.github.wephotos.webwork.logging.disruptor.LoggingEventHandler;
 import com.github.wephotos.webwork.logging.entity.WebworkLog;
 import com.github.wephotos.webwork.logging.mapper.WebworkLogMapper;
+import com.github.wephotos.webwork.schema.entity.Page;
+import com.github.wephotos.webwork.schema.entity.Pageable;
 
 /**
  * 日志服务的入库实现

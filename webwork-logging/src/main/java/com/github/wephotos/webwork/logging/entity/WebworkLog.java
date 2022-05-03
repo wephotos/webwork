@@ -19,11 +19,15 @@ public class WebworkLog {
     /**
      * 主键
      */
-    private String id;
+    private Integer id;
     /**
      * 日志名称
      */
     private String name;
+    /**
+     * Trace ID
+     */
+    private String traceId;
     /**
      * 请求者的ip
      */
@@ -31,15 +35,15 @@ public class WebworkLog {
     /**
      * 操作者
      */
-    private String operator;
+    private String username;
     /**
      * 日志级别
      */
     private Level level;
     /**
-     * 浏览器
+     * 客户端信息
      */
-    private String browser;
+    private String client;
     /**
      * 请求路径
      */

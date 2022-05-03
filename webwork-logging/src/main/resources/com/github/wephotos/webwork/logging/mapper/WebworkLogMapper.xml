@@ -2,16 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.wephotos.webwork.logging.mapper.WebworkLogMapper">
     <sql id="Base_Column_List">
-        id, name, ip, operator, level, browser, url, create_time, content, stack_trace
+        id, name, traceId, ip, username, level, client, url, create_time, content, stack_trace
     </sql>
 
     <resultMap id="BaseResultMap" type="com.github.wephotos.webwork.logging.entity.WebworkLog">
         <id column="id" property="id" jdbcType="CHAR"/>
         <result column="ip" property="ip" jdbcType="VARCHAR"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
-        <result column="operator" property="operator" jdbcType="VARCHAR"/>
+        <result column="traceId" property="traceId" jdbcType="VARCHAR"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
         <result column="level" property="level" jdbcType="VARCHAR"/>
-        <result column="browser" property="browser" jdbcType="VARCHAR"/>
+        <result column="client" property="client" jdbcType="VARCHAR"/>
         <result column="url" property="url" jdbcType="VARCHAR"/>
         <result column="content" property="content" jdbcType="VARCHAR"/>
         <result column="stack_trace" property="stackTrace" jdbcType="VARCHAR"/>
@@ -19,11 +20,11 @@
     </resultMap>
 
     <insert id="insert" parameterType="com.github.wephotos.webwork.logging.entity.WebworkLog">
-        insert into webwork_log(id, name, ip, operator, level, browser, url, create_time, content, stack_trace)
-        values (#{id}, #{name}, #{ip}, #{operator}, #{level}, #{browser}, #{url}, #{createTime}, #{content}, #{stackTrace})
+        insert into webwork_log(name, trace_id, ip, username, level, client, url, create_time, content, stack_trace)
+        values (#{name}, #{traceId}, #{ip}, #{username}, #{level}, #{client}, #{url}, #{createTime}, #{content}, #{stackTrace})
     </insert>
     
-    <select id="pageCount" resultType="int" parameterType="com.github.wephotos.webwork.http.Pageable">
+    <select id="pageCount" resultType="int" parameterType="com.github.wephotos.webwork.schema.entity.Pageable">
     	SELECT 
     	  COUNT(1) 
     	FROM 
@@ -32,7 +33,7 @@
     		<include refid="pageCond" />
     	</where>
     </select>
-    <select id="pageList" resultMap="BaseResultMap" parameterType="com.github.wephotos.webwork.http.Pageable">
+    <select id="pageList" resultMap="BaseResultMap" parameterType="com.github.wephotos.webwork.schema.entity.Pageable">
     	SELECT 
     	  <include refid="Base_Column_List" />
     	FROM 

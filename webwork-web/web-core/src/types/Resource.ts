@@ -1,7 +1,7 @@
 /** 资源数据类型 */
 export declare class Resource {
     /** ID */
-    id?: string;
+    id?: number;
     /** 名称 */
     name?: string;
     /** 类型 */
@@ -11,7 +11,7 @@ export declare class Resource {
     /** 编码 */
     code?: string;
     /** 父ID */
-    parentId?: string;
+    parentId?: number;
     /** 状态 */
     status?: number;
     /** 通用权限 */

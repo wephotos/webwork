@@ -18,11 +18,11 @@ public class WebworkFile {
     /**
      * 主键
      */
-    private String id;
+    private Integer id;
     /**
      * 附件主体
      */
-    private String owner;
+    private Integer owner;
     /**
      * 文件名
      */
@@ -42,7 +42,7 @@ public class WebworkFile {
     /**
      * 上传人标识
      */
-    private String userId;
+    private Integer userId;
     /**
      * 上传人姓名
      */

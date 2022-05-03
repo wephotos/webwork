@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.wephotos.webwork.user.mapper.RoleMapper">
+
+	<resultMap id="BaseResultMap" type="com.github.wephotos.webwork.user.entity.Role">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="parent_id" property="parentId" jdbcType="INTEGER" />
+		<result column="sort" property="sort" jdbcType="INTEGER" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<resultMap type="com.github.wephotos.webwork.user.api.entity.ro.RoleRo" id="RoleRoResultMap" extends="BaseResultMap">
+		<result column="app" property="app" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- 获取当前层级角色最大序号 -->
+	<select id="getMaxSort" parameterType="java.lang.Integer" resultType="int">
+		select
+		  (IFNULL(MAX(sort), 0) + 1) SORT
+		from
+		  sys_role
+		where
+		  parent_id = #{parentId, jdbcType=INTEGER}
+	</select>
+	
+	<!--分页 -->
+	<select id="pageList" resultMap="RoleRoResultMap">
+		SELECT
+		  id,
+		  name,
+		  code,
+		  status,
+		  parent_id,
+		  sort,
+		  remark,
+		  create_time,
+		  (select name from sys_resource where id = sys_role.parent_id) app
+		FROM
+		  sys_role
+		<where>
+			<include refid="pageCond" />
+		</where>
+		<include refid="orderBy" />
+		LIMIT #{start}, #{size}
+	</select>
+
+	<!--分页总数 -->
+	<select id="pageCount" resultType="java.lang.Long">
+		SELECT
+		  count(1)
+		FROM
+		  sys_role
+		<where>
+			<include refid="pageCond" />
+		</where>
+	</select>
+
+	<!--查询条件 -->
+	<sql id="pageCond">
+		status > -1
+		<if test="condition != null">
+			<if test="condition.parentId != null and condition.parentId != ''">
+				AND parent_id = #{condition.parentId, jdbcType=INTEGER}
+			</if>
+			<if test="condition.name != null and condition.name != ''">
+				AND name LIKE CONCAT('%', #{condition.name,jdbcType=VARCHAR}, '%')
+			</if>
+		</if>
+	</sql>
+
+	<!-- 排序 -->
+	<sql id="orderBy">
+		ORDER BY
+		<choose>
+			<when test="sortField != null and sortField !=''">
+				${sortField}
+				<if test="sortOrder != null and sortOrder !=''">
+					${sortOrder}
+				</if>
+			</when>
+			<otherwise>
+				sort ASC
+			</otherwise>
+		</choose>
+	</sql>
+</mapper>

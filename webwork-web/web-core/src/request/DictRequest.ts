@@ -7,12 +7,12 @@ import BaseRequest from './BaseRequest'
 /** 数据字典接口请求类 */
 export class DictRequest extends BaseRequest {
     /** 查询 */
-    find(id: string) {
+    find(id: number) {
         return super.get<Dictionary>(`/dictionary/get/${id}`)
     }
 
     /** 删除 */
-    delete(id: string) {
+    delete(id: number) {
         return super.get(`/dictionary/delete/${id}`)
     }
 
@@ -27,8 +27,8 @@ export class DictRequest extends BaseRequest {
     }
 
     /** 获取权限子节点 */
-    listNodes(parentId = '') {
-        return super.get<TreeNode[]>(`/dictionary/list-nodes?parentId=${parentId}`)
+    listNodes(parentId?: number) {
+        return super.get<TreeNode[]>('/dictionary/list-nodes' + (parentId ? `?parentId=${parentId}` : ''))
     }
 
     /** 分页查询 */

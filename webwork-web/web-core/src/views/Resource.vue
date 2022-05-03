@@ -300,7 +300,7 @@ export default class ResourceVue extends Vue {
         resolve()
         return false
       }
-      request.listNodes(treeNode.dataRef.key as string).then((ret) => {
+      request.listNodes(treeNode.dataRef.key as number).then((ret) => {
         treeNode.dataRef.children = this.toTreeDataItem(ret.data)
         this.treeData = [...this.treeData]
         resolve()
@@ -325,7 +325,7 @@ export default class ResourceVue extends Vue {
         okType: 'danger',
         onOk: () => {
           request
-            .delete(node.key as string)
+            .delete(node.key as number)
             .then((res) => {
               if (res.code === 0) {
                 message.success('删除成功')
@@ -496,7 +496,7 @@ export default class ResourceVue extends Vue {
 
   /** 删除权限 */
   async onResourceDel(record: Resource) {
-    const ret = await request.delete(record.id as string)
+    const ret = await request.delete(record.id as number)
     if (ret.code === 0) {
       this.pageQuery()
     } else {

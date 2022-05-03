@@ -1,11 +1,11 @@
 package com.github.wephotos.webwork.logging.mapper;
 
-import com.github.wephotos.webwork.http.Pageable;
-import com.github.wephotos.webwork.logging.entity.WebworkLog;
-
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+
+import com.github.wephotos.webwork.logging.entity.WebworkLog;
+import com.github.wephotos.webwork.schema.entity.Pageable;
 
 /**
  * @author xc

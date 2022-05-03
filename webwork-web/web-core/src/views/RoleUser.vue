@@ -38,9 +38,9 @@ import { TreeNode } from '@/types/TreeNode'
 import BaseRequest from '@/request/BaseRequest'
 // 角色用户类型定义
 export type RoleUser = {
-  id?: string;
-  roleId?: string;
-  userId?: string;
+  id?: number;
+  roleId?: number;
+  userId?: number;
   userName?: string;
   userType?: number;
 }
@@ -51,14 +51,14 @@ export type RoleUser = {
   },
   props: {
     roleId: {
-      type: String
+      type: Number
     },
     dialog: Object as PropType<Dialog>
   }
 })
 export default class RoleUserVue extends Vue {
   // 角色ID
-  roleId!: string
+  roleId!: number
   // 当前弹框
   dialog!: Dialog
   // 组织树数据源
@@ -148,14 +148,14 @@ export default class RoleUserVue extends Vue {
   }
 
   // 获取角色成员
-  requestRoleUsers(roleId: string) {
+  requestRoleUsers(roleId: number) {
     return this.httpReq.get<RoleUser[]>(
       `/role-user/list-by-role?roleId=${roleId}`
     )
   }
 
   // 获取人员树节点
-  requestNodes(parentId = '') {
+  requestNodes(parentId = 0) {
     return this.httpReq.get<TreeNode[]>(
       `/user/list-tree-nodes?parentId=${parentId}`
     )

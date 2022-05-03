@@ -1,7 +1,7 @@
 /** 角色数据类型 */
 export declare class Role {
     /** ID */
-    id?: string;
+    id?: number;
     /** 名称 */
     name?: string;
     /** 编码 */
@@ -13,7 +13,7 @@ export declare class Role {
     /** 备注 */
     remark?: string;
     /** 父级ID */
-    parentId?: string;
+    parentId?: number;
     /** 创建时间 */
     createTime?: string;
     /** 其它属性 */

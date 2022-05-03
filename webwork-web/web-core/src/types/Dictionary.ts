@@ -1,7 +1,7 @@
 /** 数据字典数据类型 */
 export declare class Dictionary {
     /** ID */
-    id?: string;
+    id?: number;
     /** 名称 */
     name?: string;
     /** 字典值 */
@@ -9,7 +9,7 @@ export declare class Dictionary {
     /** 编码 */
     code?: string;
     /** 父ID */
-    parentId?: string;
+    parentId?: number;
     /** 状态 */
     status?: number;
     /** 排序 */

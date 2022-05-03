@@ -5,12 +5,12 @@ import BaseRequest from './BaseRequest'
 /** 组织机构接口请求 */
 export class GroupRequest extends BaseRequest {
     /** 根据ID查询组织 */
-    find(id: string) {
+    find(id: number) {
         return super.get<Group>(`/organization/get/${id}`)
     }
 
     /** 根据ID删除组织 */
-    delete(id: string) {
+    delete(id: number) {
         return super.get(`/organization/delete/${id}`)
     }
 
@@ -25,8 +25,8 @@ export class GroupRequest extends BaseRequest {
     }
 
     /** 查询子级  */
-    children(parentId = '') {
-        return super.get<Group[]>(`/organization/children?parentId=${parentId}`)
+    children(parentId?: number) {
+        return super.get<Group[]>('/organization/children' + (parentId ? `?parentId=${parentId}` : ''))
     }
     /** 当前组织节点树 */
     deepTreeNodes() {

@@ -7,12 +7,12 @@ import BaseRequest from './BaseRequest'
 /** 资源请求 */
 export class ResRequest extends BaseRequest {
     /** 查询 */
-    find(id: string) {
+    find(id: number) {
         return super.get<Resource>(`/resource/get/${id}`)
     }
 
     /** 删除 */
-    delete(id: string) {
+    delete(id: number) {
         return super.get(`/resource/delete/${id}`)
     }
 
@@ -27,8 +27,8 @@ export class ResRequest extends BaseRequest {
     }
 
     /** 获取权限子节点 */
-    listNodes(parentId = '') {
-        return super.get<TreeNode[]>(`/resource/list-nodes?parentId=${parentId}`)
+    listNodes(parentId?: number) {
+        return super.get<TreeNode[]>('/resource/list-nodes' + (parentId ? `?parentId=${parentId}` : ''))
     }
 
     /** 分页查询 */
@@ -37,12 +37,12 @@ export class ResRequest extends BaseRequest {
     }
 
     /** 获取全部树节点，包含自己 */
-    deepListNodes(parentId = '') {
-        return super.get<TreeNode[]>(`/resource/deep-tree-nodes?parentId=${parentId}`)
+    deepListNodes(parentId?: number) {
+        return super.get<TreeNode[]>('/resource/deep-tree-nodes' + (parentId ? `?parentId=${parentId}` : ''))
     }
 
     /** 获取角色下全部资源 */
-    listByRoleId(roleId: string) {
+    listByRoleId(roleId: number) {
         return super.get<Resource[]>(`/resource/list-by-role?roleId=${roleId}`)
     }
 }

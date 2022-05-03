@@ -250,7 +250,7 @@ export default class RoleVue extends Vue {
         resolve()
         return false
       }
-      request.listNodes(treeNode.dataRef.key as string).then((ret) => {
+      request.listNodes(treeNode.dataRef.key as number).then((ret) => {
         treeNode.dataRef.children = this.toTreeDataItem(ret.data)
         this.treeData = [...this.treeData]
         resolve()
@@ -365,7 +365,7 @@ export default class RoleVue extends Vue {
 
   /** 删除权限 */
   async onRoleDel(record: Role) {
-    const ret = await request.delete(record.id as string)
+    const ret = await request.delete(record.id as number)
     if (ret.code === 0) {
       this.pageQuery()
     } else {

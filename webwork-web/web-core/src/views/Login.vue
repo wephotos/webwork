@@ -63,11 +63,11 @@ interface UserAuth {
   password: string;
 }
 interface LoginUser {
-  id: string;
+  id: number;
   name: string;
-  deptId: string;
+  deptId: number;
   deptName: string;
-  groupId: string;
+  groupId: number;
   groupName: string;
 }
 @Options({
@@ -81,14 +81,14 @@ export default class Login extends Vue {
   // 表单数据
   formData: UserAuth = {
     username: 'admin',
-    password: '000000'
+    password: '123456'
   }
 
   // 认证通过登录
   async handleFinish(values: UserAuth) {
     const params = `username=${this.formData.username}&password=${this.formData.password}`
     const result = await axiosUtils.post<R<LoginUser>>(
-      '/security/auth',
+      '/user-login/login',
       params,
       {
         headers: {

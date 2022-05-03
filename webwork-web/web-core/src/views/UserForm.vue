@@ -148,10 +148,10 @@ interface FileInfo {
   },
   props: {
     id: {
-      type: String
+      type: Number
     },
     deptId: {
-      type: String
+      type: Number
     },
     dialog: Object as PropType<Dialog>
   }
@@ -160,9 +160,9 @@ export default class UserForm extends Vue {
   // 当前弹框
   dialog!: Dialog
   // 用户ID，传入参数
-  id!: string
+  id!: number
   // 部门ID
-  deptId!: string
+  deptId!: number
   // 用户对象数据
   user: User = {
     status: 1,
@@ -270,11 +270,11 @@ export default class UserForm extends Vue {
         resolve()
         return false
       }
-      GroupRequest.children(treeNode.dataRef.key as string).then((ret) => {
+      GroupRequest.children(treeNode.dataRef.key as number).then((ret) => {
         treeNode.dataRef.children = this.toChildren(ret)
         this.treeData = [...this.treeData]
         resolve()
-        this.user.deptId = this.user.deptId || ''
+        this.user.deptId = this.user.deptId || 0
       })
     })
   }

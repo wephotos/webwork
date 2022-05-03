@@ -7,12 +7,12 @@ import BaseRequest from './BaseRequest'
 /** 资源请求 */
 export class RoleRequest extends BaseRequest {
     /** 查询 */
-    find(id: string) {
+    find(id: number) {
         return super.get<Role>(`/role/get/${id}`)
     }
 
     /** 删除 */
-    delete(id: string) {
+    delete(id: number) {
         return super.get(`/role/delete/${id}`)
     }
 
@@ -27,8 +27,8 @@ export class RoleRequest extends BaseRequest {
     }
 
     /** 获取权限子节点 */
-    listNodes(parentId = '') {
-        return super.get<TreeNode[]>(`/role/list-nodes?parentId=${parentId}`)
+    listNodes(parentId?: number) {
+        return super.get<TreeNode[]>('/role/list-nodes' + (parentId ? `?parentId=${parentId}` : ''))
     }
 
     /** 分页查询 */

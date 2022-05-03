@@ -28,12 +28,17 @@
     </properties>
 
     <modules>
-        <module>../webwork-core</module>
+        <module>../webwork-boot</module>
+        <module>../webwork-config</module>
         <module>../webwork-schema</module>
         <module>../webwork-logging</module>
-        <module>../webwork-file</module>
         <module>../webwork-security</module>
+        <module>../webwork-file</module>
         <module>../webwork-utils</module>
+        <module>../webwork-user</module>
+        <module>../webwork-sso-server</module>
+        <module>../webwork-sso-client</module>
+        <module>../webwork-platform</module>
     </modules>
 
     <repositories>

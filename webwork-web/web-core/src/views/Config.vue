@@ -119,7 +119,7 @@ import Pageable from '@/types/Pageable'
 import BaseRequest from '@/request/BaseRequest'
 import Page from '@/types/Page'
 // 声明配置数据类型
-type Config = { id?: string; name?: string; value?: string }
+type Config = { id?: number; name?: string; value?: string }
 // 分页数据类型
 type Pagination = TableState['pagination']
 // 排序映射
@@ -255,14 +255,14 @@ export default class ConfigVue extends Vue {
   }
 
   /** 编辑数据 */
-  edit(id: string) {
+  edit(id: number) {
     this.editableData[id] = cloneDeep(
       this.configs.filter((item) => id === item.id)[0]
     )
   }
 
   /** 保存数据 */
-  async save(id: string) {
+  async save(id: number) {
     const item = this.configs.filter((item) => id === item.id)[0]
     Object.assign(
       item,

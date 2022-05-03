@@ -92,13 +92,13 @@ interface FileInfo {
   },
   props: {
     id: {
-      type: String
+      type: Number
     },
     type: {
       type: Number
     },
     parentId: {
-      type: String
+      type: Number
     },
     parentName: {
       type: String
@@ -108,11 +108,11 @@ interface FileInfo {
 })
 export default class ResourceForm extends Vue {
   // 节点ID
-  id!: string
+  id!: number
   // 节点类型
   type!: number
   // 父级节点
-  parentId!: string
+  parentId!: number
   parentName!: string
   // 当前弹框
   dialog!: Dialog

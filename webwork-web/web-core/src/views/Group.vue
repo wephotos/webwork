@@ -109,7 +109,7 @@ export default class GroupVue extends Vue {
         resolve()
         return false
       }
-      request.children(treeNode.dataRef.key as string).then((ret) => {
+      request.children(treeNode.dataRef.key as number).then((ret) => {
         treeNode.dataRef.children = this.toChildren(ret)
         this.treeData = [...this.treeData]
         resolve()
@@ -166,13 +166,13 @@ export default class GroupVue extends Vue {
         okType: 'danger',
         onOk: () => {
           request
-            .delete(node.key as string)
+            .delete(node.key as number)
             .then((res) => {
               if (res.code === 0) {
                 message.success('删除成功')
                 this.loop(
                   this.treeData,
-                  node.key as string,
+                  node.key as number,
                   (item, index, arr) => {
                     arr.splice(index, 1)
                   }
@@ -240,7 +240,7 @@ export default class GroupVue extends Vue {
           // 非当前节点下新增
           this.loop(
             this.treeData,
-            data.parentId as string,
+            data.parentId || 0,
             (item, index, arr) => {
               item.children && item.children.push(this.dataToTreeDataItem(data))
             }
@@ -277,7 +277,7 @@ export default class GroupVue extends Vue {
   // 查询树节点
   loop(
     data: TreeDataItem[],
-    key: string,
+    key: number,
     callback: (item: TreeDataItem, index: number, arr: TreeDataItem[]) => void
   ) {
     data.forEach((item, index, arr) => {

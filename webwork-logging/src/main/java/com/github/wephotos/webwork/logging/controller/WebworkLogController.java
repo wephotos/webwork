@@ -7,11 +7,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.wephotos.webwork.http.Page;
-import com.github.wephotos.webwork.http.Pageable;
-import com.github.wephotos.webwork.http.RestObject;
 import com.github.wephotos.webwork.logging.entity.WebworkLog;
 import com.github.wephotos.webwork.logging.service.WebworkLogServiceDb;
+import com.github.wephotos.webwork.schema.entity.Page;
+import com.github.wephotos.webwork.schema.entity.Pageable;
+import com.github.wephotos.webwork.schema.entity.Result;
+import com.github.wephotos.webwork.schema.entity.Results;
 
 /**
  * 日志WEB接口
@@ -28,11 +29,11 @@ public class WebworkLogController {
 	/**
 	 * 日志分页查询接口
 	 * @param pageable 分页参数
-	 * @return {@link RestObject} {@link Page}
+	 * @return {@link Result} {@link Page}
 	 */
 	@PostMapping("/page-query")
-	public RestObject pageQuery(@RequestBody Pageable<WebworkLog> pageable) {
+	public Result<Page<WebworkLog>> pageQuery(@RequestBody Pageable<WebworkLog> pageable) {
 		Page<WebworkLog> page = webworkLogServiceDb.pageQuery(pageable);
-		return RestObject.builder().data(page).build();
+		return Results.newResult(page);
 	}
 }

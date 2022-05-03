@@ -1,0 +1,2 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+com.github.wephotos.webwork.config.spring.HotConfigEnvironmentPostProcessor

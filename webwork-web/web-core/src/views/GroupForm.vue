@@ -60,13 +60,13 @@ import { TreeNode } from '@/types/TreeNode'
 @Options({
   props: {
     id: {
-      type: String
+      type: Number
     },
     type: {
       type: Number
     },
     parentId: {
-      type: String
+      type: Number
     },
     parentName: {
       type: String
@@ -76,11 +76,11 @@ import { TreeNode } from '@/types/TreeNode'
 })
 export default class GroupForm extends Vue {
   // 节点ID
-  id!: string
+  id!: number
   // 节点类型
   type!: number
   // 父级节点
-  parentId!: string
+  parentId!: number
   parentName!: string
   // 当前弹框
   dialog!: Dialog
@@ -107,7 +107,7 @@ export default class GroupForm extends Vue {
       { required: true, message: '请输入名称', trigger: 'blur' },
       { max: 50, message: '名称最多50个字符' }
     ],
-    parentId: [{ required: true, message: '请选择上级单位', trigger: 'blur' }]
+    parentId: [{ required: true, message: '请选择上级单位', trigger: 'blur', type: 'number' }]
   }
 
   // 是否顶级单位
@@ -148,7 +148,7 @@ export default class GroupForm extends Vue {
         resolve()
         return false
       }
-      request.children(treeNode.dataRef.key as string).then((ret) => {
+      request.children(treeNode.dataRef.key as number).then((ret) => {
         treeNode.dataRef.children = this.toChildren(ret)
         this.treeData = [...this.treeData]
         resolve()

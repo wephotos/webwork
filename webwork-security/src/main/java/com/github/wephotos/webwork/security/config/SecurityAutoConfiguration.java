@@ -1,16 +1,13 @@
 package com.github.wephotos.webwork.security.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 
-import com.github.wephotos.webwork.security.auth.SecurityAuth;
 import com.github.wephotos.webwork.security.filter.SecurityAuthFilter;
-import com.github.wephotos.webwork.security.service.SecurityService;
 
 /**
  * 配置类
@@ -28,20 +25,6 @@ public class SecurityAutoConfiguration {
     public SecurityAutoConfiguration(SecurityProperties props) {
         this.props = props;
     }
-    
-	/**
-	 * 初始化认证服务
-	 * @param securityAuth 认证接口
-	 * @return 认证服务对象
-	 */
-	@Bean
-	@ConditionalOnMissingBean
-	@ConditionalOnBean(value=SecurityAuth.class)
-	public SecurityService securityService(SecurityAuth securityAuth) {
-		SecurityService securityService = new SecurityService();
-		securityService.setSecurityAuth(securityAuth);
-		return securityService;
-	}
 	
 	/**
 	 * 初始化权限过滤器

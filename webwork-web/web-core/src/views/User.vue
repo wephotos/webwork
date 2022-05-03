@@ -240,7 +240,7 @@ export default class VueUser extends Vue {
 
   /** 删除人员 */
   async onUserDel(user: User) {
-    const ret = await request.delete(user.id as string)
+    const ret = await request.delete(user.id as number)
     if (ret.code === 0) {
       this.pageQueryUser()
     } else {
@@ -269,7 +269,7 @@ export default class VueUser extends Vue {
 
   // 人员置顶
   async onUserTop(user: User) {
-    const ret = await request.top(user.id as string, user.deptId as string)
+    const ret = await request.top(user.id as number, user.deptId as number)
     if (ret.code === 0) {
       this.pageQueryUser()
     } else {

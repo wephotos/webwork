@@ -291,7 +291,7 @@ export default class DictionaryVue extends Vue {
         resolve()
         return false
       }
-      request.listNodes(treeNode.dataRef.key as string).then((ret) => {
+      request.listNodes(treeNode.dataRef.key as number).then((ret) => {
         treeNode.dataRef.children = this.toTreeDataItem(ret.data)
         this.treeData = [...this.treeData]
         resolve()
@@ -305,7 +305,7 @@ export default class DictionaryVue extends Vue {
     this.formData = {
       name: '',
       value: '',
-      parentId: node.key as string,
+      parentId: node.key as number,
       parentName: node.title as string
     }
     this.currentTreeNode = node
@@ -341,7 +341,7 @@ export default class DictionaryVue extends Vue {
   // 查询树节点
   loop(
     data: TreeDataItem[],
-    key: string,
+    key: number,
     callback: (item: TreeDataItem, index: number, arr: TreeDataItem[]) => void
   ) {
     data.forEach((item, index, arr) => {
@@ -410,7 +410,7 @@ export default class DictionaryVue extends Vue {
             this.modalVisible = false
             this.loop(
               this.treeData,
-              this.formData.id || this.formData.parentId || '',
+              this.formData.id || this.formData.parentId || 0,
               (node) => {
                 if (!this.currentTreeNode) {
                     return false
@@ -421,7 +421,7 @@ export default class DictionaryVue extends Vue {
                 } else if (this.currentTreeNode.dataRef.children) {
                   this.currentTreeNode.dataRef.children.push(
                     this.toTreeDataItemOne({
-                      id: ret.data as string,
+                      id: ret.data as number,
                       ...data
                     })
                   )
@@ -441,10 +441,10 @@ export default class DictionaryVue extends Vue {
 
   /** 删除权限 */
   async onDictDel(record: Dictionary) {
-    const ret = await request.delete(record.id as string)
+    const ret = await request.delete(record.id as number)
     if (ret.code === 0) {
       this.pageQuery()
-      this.loop(this.treeData, record.id as string, (item, index, arr) => {
+      this.loop(this.treeData, record.id as number, (item, index, arr) => {
           arr.splice(index, 1)
       })
     } else {

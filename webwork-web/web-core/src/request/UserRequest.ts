@@ -6,12 +6,12 @@ import BaseRequest from './BaseRequest'
 /** 用户请求 */
 export class UserRequest extends BaseRequest {
     /** 根据ID查询用户 */
-    find(id: string) {
+    find(id: number) {
         return super.get<User>(`/user/get/${id}`)
     }
 
     /** 根据ID删除用户 */
-    delete(id: string) {
+    delete(id: number) {
         return super.get(`/user/delete/${id}`)
     }
 
@@ -30,7 +30,7 @@ export class UserRequest extends BaseRequest {
      * @param deptId 部门ID
      * @returns R<boolean>
      */
-    top(userId: string, deptId: string) {
+    top(userId: number, deptId: number) {
         return super.get(`/user/top?userId=${userId}&deptId=${deptId}`)
     }
 

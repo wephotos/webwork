@@ -10,7 +10,6 @@ import com.github.wephotos.webwork.logging.WebworkLoggingEvent.LoggerRequest;
 import com.github.wephotos.webwork.logging.entity.WebworkLog;
 import com.github.wephotos.webwork.logging.service.WebworkLogService;
 import com.github.wephotos.webwork.logging.service.WebworkLogServiceNop;
-import com.github.wephotos.webwork.utils.WebworkUtils;
 import com.lmax.disruptor.EventHandler;
 
 /**
@@ -48,7 +47,6 @@ public class LoggingEventHandler implements EventHandler<WebworkLoggingEvent> {
      */
     WebworkLog toWebworkLog(WebworkLoggingEvent event) {
     	WebworkLog log = new WebworkLog();
-    	log.setId(WebworkUtils.uuid());
     	log.setLevel(event.getLevel());
     	log.setName(event.getLoggerName());
     	log.setContent(event.getMessage());
@@ -65,8 +63,8 @@ public class LoggingEventHandler implements EventHandler<WebworkLoggingEvent> {
     	if(request != null) {
     		log.setIp(request.getIp());
     		log.setUrl(request.getRequestURL());
-    		log.setOperator(request.getOperator());
-    		log.setBrowser(request.getUserAgent());
+    		log.setUsername(request.getOperator());
+    		log.setClient(request.getUserAgent());
     	}
     	return log;
     }
