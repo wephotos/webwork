@@ -24,7 +24,7 @@ import com.github.wephotos.webwork.user.api.entity.po.UserPo;
 import com.github.wephotos.webwork.user.api.entity.po.UserQueryPo;
 import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
 import com.github.wephotos.webwork.user.api.entity.ro.UserRo;
-import com.github.wephotos.webwork.user.api.entity.ro.enums.UserNodeType;
+import com.github.wephotos.webwork.user.entity.enums.UserNodeType;
 import com.github.wephotos.webwork.user.service.UserService;
 import com.github.wephotos.webwork.user.utils.SessionUserUtils;
 import com.github.wephotos.webwork.user.utils.UserStateCode;

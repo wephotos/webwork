@@ -1,4 +1,4 @@
-package com.github.wephotos.webwork.user.api.entity.ro.enums;
+package com.github.wephotos.webwork.user.entity.enums;
 
 import lombok.Getter;
 
@@ -43,4 +43,13 @@ public enum ResNodeType {
 	 * 名称
 	 */
 	private String name;
+	
+	/**
+	 * 判断类型是否匹配
+	 * @param type 类型
+	 * @return {@link Boolean}
+	 */
+	public boolean is(Integer type) {
+		return type != null && type.equals(this.type);
+	}
 }

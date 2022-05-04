@@ -17,8 +17,8 @@ import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.user.api.entity.po.DropSortPo;
 import com.github.wephotos.webwork.user.api.entity.po.OrganizationQueryPo;
 import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
-import com.github.wephotos.webwork.user.api.entity.ro.enums.UserNodeType;
 import com.github.wephotos.webwork.user.entity.Organization;
+import com.github.wephotos.webwork.user.entity.enums.UserNodeType;
 import com.github.wephotos.webwork.user.mapper.OrganizationMapper;
 import com.github.wephotos.webwork.utils.StringUtils;
 

@@ -155,9 +155,9 @@ export default class RoleUserVue extends Vue {
   }
 
   // 获取人员树节点
-  requestNodes(parentId = 0) {
+  requestNodes(parentId?: number) {
     return this.httpReq.get<TreeNode[]>(
-      `/user/list-tree-nodes?parentId=${parentId}`
+      '/user/list-tree-nodes' + (parentId ? `?parentId=${parentId}` : '')
     )
   }
 }

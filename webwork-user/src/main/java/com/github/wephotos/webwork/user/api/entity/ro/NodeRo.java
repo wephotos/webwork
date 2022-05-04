@@ -6,13 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.github.wephotos.webwork.user.api.entity.ro.enums.RoleNodeType;
-import com.github.wephotos.webwork.user.api.entity.ro.enums.UserNodeType;
 import com.github.wephotos.webwork.user.entity.Dictionary;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.entity.Resource;
 import com.github.wephotos.webwork.user.entity.Role;
 import com.github.wephotos.webwork.user.entity.User;
+import com.github.wephotos.webwork.user.entity.enums.RoleNodeType;
+import com.github.wephotos.webwork.user.entity.enums.UserNodeType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

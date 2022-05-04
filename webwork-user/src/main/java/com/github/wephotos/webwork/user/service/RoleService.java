@@ -15,10 +15,10 @@ import com.github.wephotos.webwork.schema.entity.Pageable;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.user.api.entity.po.RoleQueryPo;
 import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
-import com.github.wephotos.webwork.user.api.entity.ro.enums.ResNodeType;
-import com.github.wephotos.webwork.user.api.entity.ro.enums.RoleNodeType;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.entity.Role;
+import com.github.wephotos.webwork.user.entity.enums.ResNodeType;
+import com.github.wephotos.webwork.user.entity.enums.RoleNodeType;
 import com.github.wephotos.webwork.user.mapper.RoleMapper;
 import com.github.wephotos.webwork.user.mapper.RoleResourceMapper;
 import com.github.wephotos.webwork.utils.WebworkUtils;
@@ -148,13 +148,17 @@ public class RoleService {
 		}else {
 			// 加载子单位和应用
 			nodes = resourceService.listTreeNodes(parentId, user);
-			nodes.forEach(node -> {
-				if(node.getType() == ResNodeType.GROUP.getType()) {
+			// 过滤出单位和应用节点
+			nodes = nodes.stream().filter(node -> {
+				if(ResNodeType.GROUP.is(node.getType())) {
 					node.setType(RoleNodeType.GROUP.getType());
-				}else {
+				}else if(ResNodeType.APP.is(node.getType())) {
 					node.setType(RoleNodeType.APP.getType());
+				}else {
+					return false;
 				}
-			});
+				return true;
+			}).collect(Collectors.toList());
 		}
 		return nodes;
 	}

@@ -1,4 +1,4 @@
-package com.github.wephotos.webwork.user.api.entity.ro.enums;
+package com.github.wephotos.webwork.user.entity.enums;
 
 import lombok.Getter;
 

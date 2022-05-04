@@ -1,4 +1,4 @@
-package com.github.wephotos.webwork.user.api.impl;
+package com.github.wephotos.webwork.user.service.api;
 
 import javax.annotation.Resource;
 

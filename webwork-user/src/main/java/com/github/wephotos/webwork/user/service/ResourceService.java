@@ -17,10 +17,10 @@ import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.user.api.entity.po.OrganizationQueryPo;
 import com.github.wephotos.webwork.user.api.entity.po.ResourceQueryPo;
 import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
-import com.github.wephotos.webwork.user.api.entity.ro.enums.ResNodeType;
-import com.github.wephotos.webwork.user.api.entity.ro.enums.UserNodeType;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.entity.Resource;
+import com.github.wephotos.webwork.user.entity.enums.ResNodeType;
+import com.github.wephotos.webwork.user.entity.enums.UserNodeType;
 import com.github.wephotos.webwork.user.mapper.ResourceMapper;
 import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
@@ -139,22 +139,24 @@ public class ResourceService {
     
     /**
      * 获取当前节点及其所有子节点的树结构
-     * @param id 当前节点标识
+     * @param parentId 父节点ID
      * @return {@link NodeRo}
      */
-    public List<NodeRo> deepTreeNodes(Integer id){
-    	Objects.requireNonNull(id, "资源id不能为空");
-    	Resource res = selectById(id);
+    public List<NodeRo> deepTreeNodes(Integer parentId){
+    	Objects.requireNonNull(parentId, "资源id不能为空");
+    	Resource res = selectById(parentId);
     	ResourceQueryPo query = ResourceQueryPo.builder().code(res.getCode()).build();
     	List<Resource> resList = listQuery(query);
     	List<NodeRo> flatNodes = resList.stream().map(NodeRo::new).collect(Collectors.toList());
     	List<NodeRo> treeNodes = new ArrayList<>();
     	for(NodeRo node : flatNodes) {
-    		if(id.equals(node.getId())) {
+    		if(parentId.equals(node.getId())) {
     			treeNodes.add(node);
     		}
     		for(NodeRo child : flatNodes) {
-    			if(node.getId().equals(child.getParentId())) {
+    			// 应用不作为子级，和单位ID存在冲突
+    			if(!ResNodeType.APP.is(child.getType()) 
+    					&& node.getId().equals(child.getParentId())) {
     				node.addChild(child);
     			}
     		}

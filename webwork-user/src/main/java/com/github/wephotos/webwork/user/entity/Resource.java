@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.wephotos.webwork.schema.entity.EntityState;
+import com.github.wephotos.webwork.user.entity.enums.ResNodeType;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,7 +36,7 @@ public class Resource {
      */
     private String name;
     /**
-     * {@link ResourceType}
+     * {@link ResNodeType}
      */
     private Integer type;
     /**
