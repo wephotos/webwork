@@ -16,7 +16,7 @@ import com.github.wephotos.webwork.schema.entity.Pageable;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.user.api.entity.po.OrganizationQueryPo;
 import com.github.wephotos.webwork.user.api.entity.po.ResourceQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.entity.Resource;
 import com.github.wephotos.webwork.user.entity.enums.NodeTypeEnum;
@@ -63,11 +63,11 @@ public class ResourceService {
     	if(parent == null) {
     		record.setCode(resourceMapper.getMaxCodeApp());
     	}else {
-    		String maxCode = resourceMapper.getMaxCode(parentId);
+    		String maxCode = resourceMapper.getMaxCode(parentId, record.getParentType());
     		record.setCode(parent.getCode().concat(maxCode));
     	}
-    	int sort = resourceMapper.getMaxSort(parentId);
-    	record.setSort(sort);
+    	int maxSort = resourceMapper.getMaxSort(parentId, record.getParentType());
+    	record.setSort(maxSort);
         resourceMapper.insert(record);
         return record.getId();
     }
@@ -140,21 +140,21 @@ public class ResourceService {
     /**
      * 获取当前节点及其所有子节点的树结构
      * @param parentId 父节点ID
-     * @return {@link TreeNodeRo}
+     * @return {@link NodeRo}
      */
-    public List<TreeNodeRo> deepTreeNodes(Integer parentId){
+    public List<NodeRo> deepTreeNodes(Integer parentId){
     	Objects.requireNonNull(parentId, "父节点不能为空");
     	Resource res = selectById(parentId);
     	ResourceQueryPo query = ResourceQueryPo.builder().code(res.getCode()).build();
-    	List<TreeNodeRo> flatNodes = listQuery(query).stream()
+    	List<NodeRo> flatNodes = listQuery(query).stream()
     			.map(TreeNodeConverter::from).collect(Collectors.toList());
     	
-    	List<TreeNodeRo> treeNodes = new ArrayList<>();
-    	for(TreeNodeRo node : flatNodes) {
+    	List<NodeRo> treeNodes = new ArrayList<>();
+    	for(NodeRo node : flatNodes) {
     		if(parentId.equals(node.getRawId())) {
     			treeNodes.add(node);
     		}
-    		for(TreeNodeRo child : flatNodes) {
+    		for(NodeRo child : flatNodes) {
     			if(node.getId().equals(child.getParentId())) {
     				node.addChild(child);
     			}
@@ -169,14 +169,14 @@ public class ResourceService {
      * @param user 会话用户
      * @return 子节点集合
      */
-	public List<TreeNodeRo> listTreeNodes(Integer parentId, SecurityUser user) {
+	public List<NodeRo> listTreeNodes(Integer parentId, SecurityUser user) {
 		Organization org;
 		if(parentId == null) {
 			org = organizationService.selectById(user.getGroupId());
 			return Arrays.asList(TreeNodeConverter.from(org));
 		}
 		ResourceQueryPo query = ResourceQueryPo.builder().parentId(parentId).build();
-		List<TreeNodeRo> nodes = listQuery(query).stream()
+		List<NodeRo> nodes = listQuery(query).stream()
 				.map(TreeNodeConverter::from).collect(Collectors.toList());
 		// 加载下级单位
 		org = organizationService.selectById(parentId);
@@ -186,7 +186,7 @@ public class ResourceService {
 					.parentId(parentId)
 					.neType(NodeTypeEnum.DEPT.getCode()).build();
 			List<Organization> orgs = organizationService.listQuery(orgQuery);
-			List<TreeNodeRo> orgNodes = orgs.stream().map(TreeNodeConverter::from).collect(Collectors.toList());
+			List<NodeRo> orgNodes = orgs.stream().map(TreeNodeConverter::from).collect(Collectors.toList());
 			nodes.addAll(orgNodes);
 		}
 		return nodes;

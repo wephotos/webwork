@@ -18,7 +18,7 @@ import com.github.wephotos.webwork.schema.entity.Results;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.security.utils.SecurityUtils;
 import com.github.wephotos.webwork.user.api.entity.po.DropSortPo;
-import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.service.OrganizationService;
 
@@ -77,21 +77,21 @@ public class OrganizationController {
      * @return {@link Result}
      */
     @GetMapping("/children")
-    public Result<List<TreeNodeRo>> children(Integer parentId, HttpSession session) {
+    public Result<List<NodeRo>> children(Integer parentId, HttpSession session) {
         SecurityUser user = SecurityUtils.getSecurityUser(session);
-        List<TreeNodeRo> data = organizationService.children(parentId, user);
+        List<NodeRo> data = organizationService.children(parentId, user);
         return Results.newResult(data);
     }
     
     /**
      * 获取当前用户所在组织节点树 - 包含除部门外的所有节点
      * @param session 会话
-     * @return {@link TreeNodeRo}
+     * @return {@link NodeRo}
      */
     @GetMapping("/deep-tree-nodes")
-    public Result<List<TreeNodeRo>> deepTreeNodes(HttpSession session) {
+    public Result<List<NodeRo>> deepTreeNodes(HttpSession session) {
     	SecurityUser user = SecurityUtils.getSecurityUser(session);
-    	List<TreeNodeRo> nodes = organizationService.deepTreeNodes(user.getGroupId());
+    	List<NodeRo> nodes = organizationService.deepTreeNodes(user.getGroupId());
     	return Results.newResult(nodes);
     }
 

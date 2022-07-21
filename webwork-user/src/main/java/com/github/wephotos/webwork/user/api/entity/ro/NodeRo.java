@@ -27,7 +27,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class TreeNodeRo implements Serializable {
+public class NodeRo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -61,7 +61,7 @@ public class TreeNodeRo implements Serializable {
 	 * 子节点集合
 	 */
 	@Builder.Default
-	private List<TreeNodeRo> children = Collections.emptyList();
+	private List<NodeRo> children = Collections.emptyList();
 	/**
 	 * 扩展属性
 	 */
@@ -100,7 +100,7 @@ public class TreeNodeRo implements Serializable {
 	 * 添加子节点
 	 * @param child 子节点
 	 */
-	public TreeNodeRo addChild(TreeNodeRo child) {
+	public NodeRo addChild(NodeRo child) {
 		if(this.children == Collections.EMPTY_LIST) {
 			this.children = new ArrayList<>();
 		}
@@ -114,7 +114,7 @@ public class TreeNodeRo implements Serializable {
 	 * @param value
 	 * @return
 	 */
-	public TreeNodeRo addExtAttr(String key, String value) {
+	public NodeRo addExtAttr(String key, String value) {
 		extAttrs.put(key, value);
 		return this;
 	}

@@ -8,6 +8,7 @@
 		<result column="type" property="type" jdbcType="INTEGER" />
 		<result column="code" property="code" jdbcType="VARCHAR" />
 		<result column="parent_id" property="parentId" jdbcType="INTEGER" />
+		<result column="parent_type" property="parentType" jdbcType="INTEGER" />
 		<result column="permission" property="permission" jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="url" property="url" jdbcType="VARCHAR" />
@@ -25,7 +26,7 @@
 		FROM
 		sys_resource
 		WHERE
-		type = 1
+		type = 20
 	</select>
 
 	<!-- 查询最大的code -->
@@ -43,6 +44,7 @@
 				parent_id = #{parentId,jdbcType=INTEGER}
 			</otherwise>
 		</choose>
+		and parent_type = #{parentType,jdbcType=INTEGER}
 	</select>
 
 	<!-- 获取当前层级资源最大序号 -->
@@ -53,6 +55,8 @@
 		sys_resource
 		where
 		parent_id = #{parentId, jdbcType=INTEGER}
+		and 
+		parent_type = #{parentType,jdbcType=INTEGER}
 	</select>
 
 	<!--分页 -->
@@ -63,6 +67,7 @@
 		type,
 		code,
 		parent_id,
+		parent_type,
 		permission,
 		status,
 		url,
@@ -98,14 +103,17 @@
 			<if test="condition.type != null">
 				AND type = #{condition.type, jdbcType=INTEGER}
 			</if>
+			<if test="condition.parentId != null">
+				AND parent_id = #{condition.parentId, jdbcType=INTEGER}
+			</if>
+			<if test="condition.parentType != null">
+				AND parent_type = #{condition.parentType, jdbcType=INTEGER}
+			</if>
 			<if test="condition.name != null and condition.name != ''">
 				AND name LIKE CONCAT('%', #{condition.name,jdbcType=VARCHAR}, '%')
 			</if>
 			<if test="condition.code != null and condition.code != ''">
 				AND code LIKE CONCAT(#{condition.code,jdbcType=VARCHAR}, '%')
-			</if>
-			<if test="condition.parentId != null and condition.parentId != ''">
-				AND parent_id = #{condition.parentId, jdbcType=INTEGER}
 			</if>
 		</if>
 	</sql>
@@ -134,6 +142,7 @@
 		 a.type,
 		 a.code,
 		 a.parent_id,
+		 a.parent_type,
 		 a.permission,
 		 a.status,
 		 a.url,

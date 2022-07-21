@@ -8,6 +8,7 @@
 		<result column="code" property="code" jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="parent_id" property="parentId" jdbcType="INTEGER" />
+		<result column="parent_type" property="parentType" jdbcType="INTEGER" />
 		<result column="sort" property="sort" jdbcType="INTEGER" />
 		<result column="remark" property="remark" jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -25,6 +26,8 @@
 		  sys_role
 		where
 		  parent_id = #{parentId, jdbcType=INTEGER}
+		  and
+		  parent_type = #{parentType, jdbcType=INTEGER}
 	</select>
 	
 	<!--分页 -->
@@ -35,6 +38,7 @@
 		  code,
 		  status,
 		  parent_id,
+		  parent_type,
 		  sort,
 		  remark,
 		  create_time,
@@ -63,8 +67,11 @@
 	<sql id="pageCond">
 		status > -1
 		<if test="condition != null">
-			<if test="condition.parentId != null and condition.parentId != ''">
+			<if test="condition.parentId != null">
 				AND parent_id = #{condition.parentId, jdbcType=INTEGER}
+			</if>
+			<if test="condition.parentType != null">
+				AND parent_type = #{condition.parentType, jdbcType=INTEGER}
 			</if>
 			<if test="condition.name != null and condition.name != ''">
 				AND name LIKE CONCAT('%', #{condition.name,jdbcType=VARCHAR}, '%')

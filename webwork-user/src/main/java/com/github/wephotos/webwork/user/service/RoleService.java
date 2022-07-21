@@ -14,7 +14,7 @@ import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.user.api.entity.po.RoleQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.entity.Role;
 import com.github.wephotos.webwork.user.entity.enums.NodeTypeEnum;
@@ -70,7 +70,7 @@ public class RoleService {
     public Integer add(Role role) {
         role.setStatus(EntityState.ENABLED.getValue());
         role.setCreateTime(WebworkUtils.timestamp());
-        int sort = roleMapper.getMaxSort(role.getParentId());
+        int sort = roleMapper.getMaxSort(role.getParentId(), role.getParentType());
         role.setSort(sort);
         roleMapper.insert(role);
         return role.getId();
@@ -131,13 +131,13 @@ public class RoleService {
      * @param user 会话用户
      * @return 子节点
      */
-	public List<TreeNodeRo> listNodes(Integer parentId, SecurityUser user) {
+	public List<NodeRo> listNodes(Integer parentId, SecurityUser user) {
 		Organization org;
 		if(parentId == null) {
 			org = organizationService.selectById(user.getGroupId());
 			return Arrays.asList(TreeNodeConverter.from(org));
 		}
-		List<TreeNodeRo> nodes;
+		List<NodeRo> nodes;
 		org = organizationService.selectById(parentId);
 		// 获取不到单位则节点为应用节点
 		if(org == null) {

@@ -18,7 +18,7 @@ import com.github.wephotos.webwork.schema.exception.StateCode;
 import com.github.wephotos.webwork.schema.exception.WebworkRuntimeException;
 import com.github.wephotos.webwork.user.api.entity.po.UserPo;
 import com.github.wephotos.webwork.user.api.entity.po.UserQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
 import com.github.wephotos.webwork.user.api.entity.ro.UserRo;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.entity.User;
@@ -201,13 +201,13 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * @param user 会话用户
      * @return 节点数据
      */
-    public List<TreeNodeRo> listTreeNodes(Integer parentId, com.github.wephotos.webwork.security.entity.SecurityUser user){
-    	List<TreeNodeRo> nodes = organizationService.children(parentId, user);
+    public List<NodeRo> listTreeNodes(Integer parentId, com.github.wephotos.webwork.security.entity.SecurityUser user){
+    	List<NodeRo> nodes = organizationService.children(parentId, user);
     	if(parentId != null) {
 	    	Organization org = organizationService.selectById(parentId);
 	    	if(org != null && NodeTypeEnum.DEPT.is(org.getType())) {
 	    		List<User> users = userMapper.listUserByDeptId(parentId);
-	    		List<TreeNodeRo> userNodes = users.stream().map(TreeNodeConverter::from).collect(Collectors.toList());
+	    		List<NodeRo> userNodes = users.stream().map(TreeNodeConverter::from).collect(Collectors.toList());
 	    		nodes.addAll(userNodes);
 	    	}
     	}

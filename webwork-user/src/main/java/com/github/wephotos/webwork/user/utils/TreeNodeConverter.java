@@ -1,6 +1,6 @@
 package com.github.wephotos.webwork.user.utils;
 
-import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
 import com.github.wephotos.webwork.user.api.enums.NodeTypeEnum;
 import com.github.wephotos.webwork.user.entity.Dictionary;
 import com.github.wephotos.webwork.user.entity.Organization;
@@ -21,13 +21,13 @@ public final class TreeNodeConverter {
 	 * 
 	 * @param org 组织架构对象
 	 */
-	public static TreeNodeRo from(Organization org) {
-		return TreeNodeRo.builder()
+	public static NodeRo from(Organization org) {
+		return NodeRo.builder()
 				.rawId(org.getId())
 				.name(org.getName())
 				.code(org.getCode())
 				.type(org.getType())
-				.parentId(TreeNodeRo.joinId(org.getParentType(), org.getParentId())).build();
+				.parentId(NodeRo.joinId(org.getParentType(), org.getParentId())).build();
 	}
 
 	/**
@@ -35,8 +35,8 @@ public final class TreeNodeConverter {
 	 * 
 	 * @param user 用户
 	 */
-	public static TreeNodeRo from(User user) {
-		return TreeNodeRo.builder()
+	public static NodeRo from(User user) {
+		return NodeRo.builder()
 				.rawId(user.getId())
 				.name(user.getName())
 				.type(NodeTypeEnum.USER.getCode()).build();
@@ -47,13 +47,13 @@ public final class TreeNodeConverter {
 	 * 
 	 * @param org 组织架构对象
 	 */
-	public static TreeNodeRo from(Resource res) {
-		return TreeNodeRo.builder()
+	public static NodeRo from(Resource res) {
+		return NodeRo.builder()
 				.rawId(res.getId())
 				.name(res.getName())
 				.code(res.getCode())
 				.type(res.getType())
-				.parentId(TreeNodeRo.joinId(res.getParentType(), res.getParentId())).build();
+				.parentId(NodeRo.joinId(res.getParentType(), res.getParentId())).build();
 	}
 
 	/**
@@ -61,13 +61,13 @@ public final class TreeNodeConverter {
 	 * 
 	 * @param org 组织架构对象
 	 */
-	public static TreeNodeRo from(Role role) {
-		return TreeNodeRo.builder()
+	public static NodeRo from(Role role) {
+		return NodeRo.builder()
 				.rawId(role.getId())
 				.name(role.getName())
 				.code(role.getCode())
 				.type(NodeTypeEnum.ROLE.getCode())
-				.parentId(TreeNodeRo.joinId(role.getParentType(), role.getParentId())).build();
+				.parentId(NodeRo.joinId(role.getParentType(), role.getParentId())).build();
 	}
 
 	/**
@@ -75,8 +75,8 @@ public final class TreeNodeConverter {
 	 * 
 	 * @param dict 数据字典
 	 */
-	public static TreeNodeRo from(Dictionary dict) {
-		return TreeNodeRo.builder()
+	public static NodeRo from(Dictionary dict) {
+		return NodeRo.builder()
 				.rawId(dict.getId())
 				.name(dict.getName())
 				.code(dict.getCode())

@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
-import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
 import com.github.wephotos.webwork.user.entity.Dictionary;
 import com.github.wephotos.webwork.user.mapper.DictionaryMapper;
 import com.github.wephotos.webwork.user.utils.TreeNodeConverter;
@@ -89,7 +89,7 @@ public class DictionaryService {
 	 * @param parentId 父ID
 	 * @return 子节点集合
 	 */
-	public List<TreeNodeRo> listNodes(String parentId){
+	public List<NodeRo> listNodes(String parentId){
 		LambdaQueryWrapper<Dictionary> wrapper = new LambdaQueryWrapper<>();
 		if(StringUtils.isBlank(parentId)) {
 			wrapper.isNull(Dictionary::getParentId);

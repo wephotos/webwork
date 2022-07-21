@@ -23,7 +23,7 @@ import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.security.utils.SecurityUtils;
 import com.github.wephotos.webwork.user.api.entity.po.UserPo;
 import com.github.wephotos.webwork.user.api.entity.po.UserQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
 import com.github.wephotos.webwork.user.api.entity.ro.UserRo;
 import com.github.wephotos.webwork.user.service.UserService;
 import com.github.wephotos.webwork.user.utils.UserStateCode;
@@ -145,12 +145,12 @@ public class UserController {
      * 获取人员树节点接口
      * @param parentId 父ID
      * @param session 会话
-     * @return {@link Result} {@link TreeNodeRo} {@link UserNodeType}
+     * @return {@link Result} {@link NodeRo} {@link UserNodeType}
      */
     @GetMapping("/list-tree-nodes")
-    public Result<List<TreeNodeRo>> listTreeNodes(Integer parentId, HttpSession session) {
+    public Result<List<NodeRo>> listTreeNodes(Integer parentId, HttpSession session) {
     	SecurityUser user = SecurityUtils.getSecurityUser(session);
-    	List<TreeNodeRo> nodes = userService.listTreeNodes(parentId, user);
+    	List<NodeRo> nodes = userService.listTreeNodes(parentId, user);
     	return Results.newResult(nodes);
     }
 }

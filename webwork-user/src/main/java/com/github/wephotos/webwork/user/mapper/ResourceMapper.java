@@ -3,6 +3,7 @@ package com.github.wephotos.webwork.user.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.wephotos.webwork.schema.entity.Pageable;
@@ -25,16 +26,18 @@ public interface ResourceMapper extends BaseMapper<Resource> {
     /**
      * 获取最大模块或功能编码
      *
-     * @param parentId 父ID
+     * @param parentId 父节点ID
+     * @param parentType 父节点类型
      * @return 当前最大编码
      */
-    String getMaxCode(Integer parentId);
+    String getMaxCode(@Param("parentId") Integer parentId, @Param("parentType") Integer parentType);
     /**
      * 获取当前最大排序号
-     * @param parentId 父ID
+     * @param parentId 父节点ID
+     * @param parentType 父节点类型
      * @return 序号
      */
-    int getMaxSort(Integer parentId);
+    int getMaxSort(@Param("parentId") Integer parentId, @Param("parentType") Integer parentType);
     /**
      * 获取分页数据总条数
      * @param pageable 分页条件
