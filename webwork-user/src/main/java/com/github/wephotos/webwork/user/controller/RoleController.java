@@ -17,11 +17,11 @@ import com.github.wephotos.webwork.schema.entity.Pageable;
 import com.github.wephotos.webwork.schema.entity.Result;
 import com.github.wephotos.webwork.schema.entity.Results;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
+import com.github.wephotos.webwork.security.utils.SecurityUtils;
 import com.github.wephotos.webwork.user.api.entity.po.RoleQueryPo;
 import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
 import com.github.wephotos.webwork.user.entity.Role;
 import com.github.wephotos.webwork.user.service.RoleService;
-import com.github.wephotos.webwork.user.utils.SessionUserUtils;
 import com.github.wephotos.webwork.user.utils.UserStateCode;
 import com.github.wephotos.webwork.user.utils.ValidationUtil;
 
@@ -106,7 +106,7 @@ public class RoleController {
      */
     @GetMapping("/list-nodes")
     public Result<List<TreeNodeRo>> listNodes(Integer parentId, HttpSession session) {
-    	SecurityUser user = SessionUserUtils.getUser(session);
+    	SecurityUser user = SecurityUtils.getSecurityUser(session);
     	List<TreeNodeRo> nodes = roleService.listNodes(parentId, user);
     	return Results.newResult(nodes);
     }

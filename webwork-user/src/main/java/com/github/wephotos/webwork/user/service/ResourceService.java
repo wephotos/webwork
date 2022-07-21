@@ -143,20 +143,19 @@ public class ResourceService {
      * @return {@link TreeNodeRo}
      */
     public List<TreeNodeRo> deepTreeNodes(Integer parentId){
-    	Objects.requireNonNull(parentId, "资源id不能为空");
+    	Objects.requireNonNull(parentId, "父节点不能为空");
     	Resource res = selectById(parentId);
     	ResourceQueryPo query = ResourceQueryPo.builder().code(res.getCode()).build();
-    	List<Resource> resList = listQuery(query);
-    	List<TreeNodeRo> flatNodes = resList.stream().map(TreeNodeConverter::from).collect(Collectors.toList());
+    	List<TreeNodeRo> flatNodes = listQuery(query).stream()
+    			.map(TreeNodeConverter::from).collect(Collectors.toList());
+    	
     	List<TreeNodeRo> treeNodes = new ArrayList<>();
     	for(TreeNodeRo node : flatNodes) {
-    		if(parentId.equals(node.getId())) {
+    		if(parentId.equals(node.getRawId())) {
     			treeNodes.add(node);
     		}
     		for(TreeNodeRo child : flatNodes) {
-    			// 应用不作为子级，和单位ID存在冲突
-    			if(!NodeTypeEnum.APP.is(child.getType()) 
-    					&& node.getId().equals(child.getParentId())) {
+    			if(node.getId().equals(child.getParentId())) {
     				node.addChild(child);
     			}
     		}
@@ -174,13 +173,12 @@ public class ResourceService {
 		Organization org;
 		if(parentId == null) {
 			org = organizationService.selectById(user.getGroupId());
-			TreeNodeRo node = TreeNodeConverter.from(org);
-			node.setType(NodeTypeEnum.GROUP.getCode());
-			return Arrays.asList(node);
+			return Arrays.asList(TreeNodeConverter.from(org));
 		}
 		ResourceQueryPo query = ResourceQueryPo.builder().parentId(parentId).build();
 		List<TreeNodeRo> nodes = listQuery(query).stream()
 				.map(TreeNodeConverter::from).collect(Collectors.toList());
+		// 加载下级单位
 		org = organizationService.selectById(parentId);
 		if(org != null) {
 			// 获取下级单位
@@ -188,10 +186,7 @@ public class ResourceService {
 					.parentId(parentId)
 					.neType(NodeTypeEnum.DEPT.getCode()).build();
 			List<Organization> orgs = organizationService.listQuery(orgQuery);
-			List<TreeNodeRo> orgNodes = orgs.stream().map(TreeNodeConverter::from).map(node -> {
-				node.setType(NodeTypeEnum.GROUP.getCode());
-				return node;
-			}).collect(Collectors.toList());
+			List<TreeNodeRo> orgNodes = orgs.stream().map(TreeNodeConverter::from).collect(Collectors.toList());
 			nodes.addAll(orgNodes);
 		}
 		return nodes;

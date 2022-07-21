@@ -86,8 +86,8 @@ public class RoleService {
     }
     
     /**
-     * 检测权限编码是否存在
-     * @param resource 包含 ID和权限代码的资源对象
+     * 判断角色名称是否存在
+     * @param role 角色对象
      * @return 存在返回 true
      */
     public boolean isExistsName(Role role) {
@@ -135,16 +135,18 @@ public class RoleService {
 		Organization org;
 		if(parentId == null) {
 			org = organizationService.selectById(user.getGroupId());
-			TreeNodeRo node = TreeNodeConverter.from(org);
-			node.setType(NodeTypeEnum.GROUP.getCode());
-			return Arrays.asList(node);
+			return Arrays.asList(TreeNodeConverter.from(org));
 		}
 		List<TreeNodeRo> nodes;
 		org = organizationService.selectById(parentId);
-		// 加载应用下角色
+		// 获取不到单位则节点为应用节点
 		if(org == null) {
+			// 加载应用下的角色
 			RoleQueryPo query = RoleQueryPo.builder().parentId(parentId).build();
-			nodes = listQuery(query).stream().map(TreeNodeConverter::from).collect(Collectors.toList());
+			nodes = listQuery(query).stream().filter(x -> {
+				x.setParentType(NodeTypeEnum.APP.getCode());
+				return true;
+			}).map(TreeNodeConverter::from).collect(Collectors.toList());
 		}else {
 			// 加载子单位和应用
 			nodes = resourceService.listTreeNodes(parentId, user);

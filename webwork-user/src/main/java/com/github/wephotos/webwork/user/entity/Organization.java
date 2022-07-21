@@ -39,7 +39,12 @@ public class Organization {
      */
     private Integer parentId;
     /**
-     * 0:虚拟机构, 1:单位, 2:部门
+     * 父节点类型
+     * {@link NodeTypeEnum}
+     */
+    private Integer parentType;
+    /**
+     * 节点类型
      * @see NodeTypeEnum
      */
     private Integer type;

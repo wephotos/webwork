@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.wephotos.webwork.schema.entity.Result;
 import com.github.wephotos.webwork.schema.entity.Results;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
+import com.github.wephotos.webwork.security.utils.SecurityUtils;
 import com.github.wephotos.webwork.user.api.entity.po.DropSortPo;
 import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.service.OrganizationService;
-import com.github.wephotos.webwork.user.utils.SessionUserUtils;
 
 /**
  * 组织
@@ -78,7 +78,7 @@ public class OrganizationController {
      */
     @GetMapping("/children")
     public Result<List<TreeNodeRo>> children(Integer parentId, HttpSession session) {
-        SecurityUser user = SessionUserUtils.getUser(session);
+        SecurityUser user = SecurityUtils.getSecurityUser(session);
         List<TreeNodeRo> data = organizationService.children(parentId, user);
         return Results.newResult(data);
     }
@@ -90,7 +90,7 @@ public class OrganizationController {
      */
     @GetMapping("/deep-tree-nodes")
     public Result<List<TreeNodeRo>> deepTreeNodes(HttpSession session) {
-    	SecurityUser user = SessionUserUtils.getUser(session);
+    	SecurityUser user = SecurityUtils.getSecurityUser(session);
     	List<TreeNodeRo> nodes = organizationService.deepTreeNodes(user.getGroupId());
     	return Results.newResult(nodes);
     }

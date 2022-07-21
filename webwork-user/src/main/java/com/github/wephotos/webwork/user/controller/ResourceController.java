@@ -17,11 +17,11 @@ import com.github.wephotos.webwork.schema.entity.Pageable;
 import com.github.wephotos.webwork.schema.entity.Result;
 import com.github.wephotos.webwork.schema.entity.Results;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
+import com.github.wephotos.webwork.security.utils.SecurityUtils;
 import com.github.wephotos.webwork.user.api.entity.po.ResourceQueryPo;
 import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
 import com.github.wephotos.webwork.user.entity.Resource;
 import com.github.wephotos.webwork.user.service.ResourceService;
-import com.github.wephotos.webwork.user.utils.SessionUserUtils;
 import com.github.wephotos.webwork.user.utils.UserStateCode;
 import com.github.wephotos.webwork.user.utils.ValidationUtil;
 
@@ -106,14 +106,14 @@ public class ResourceController {
      */
     @GetMapping("/list-nodes")
     public Result<List<TreeNodeRo>> listNodes(Integer parentId, HttpSession session) {
-    	SecurityUser user = SessionUserUtils.getUser(session);
+    	SecurityUser user = SecurityUtils.getSecurityUser(session);
     	List<TreeNodeRo> nodes = resourceService.listTreeNodes(parentId, user);
     	return Results.newResult(nodes);
     }
     
     /**
      * 获取资源树结构全部树节点
-     * @param session 会话
+     * @param parentId 父节点ID
      * @return {@link TreeNodeRo}
      */
     @GetMapping("/deep-tree-nodes")

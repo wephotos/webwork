@@ -28,14 +28,18 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TreeNodeRo implements Serializable {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
+	
 	/**
-	 * 标识
+	 * 树节点ID，节点ID由以下二个属性组成，以下划线连接
+	 * {@link #type}_{@link #rawId}
 	 */
-	private Integer id;
+	private String id;
+	/**
+	 * 原始数据ID
+	 */
+	private Object rawId;
 	/**
 	 * 名称
 	 */
@@ -50,9 +54,9 @@ public class TreeNodeRo implements Serializable {
 	 */
 	private Integer type;
 	/**
-	 * 父节点
+	 * 父节点ID
 	 */
-	private Integer parentId;
+	private Object parentId;
 	/**
 	 * 子节点集合
 	 */
@@ -65,14 +69,43 @@ public class TreeNodeRo implements Serializable {
 	private Map<String, String> extAttrs = new HashMap<>();
 	
 	/**
+	 * 连接节点ID
+	 * @param type 节点类型 {@link NodeTypeEnum}
+	 * @param rawId 原始ID
+	 * @return 树节点ID
+	 */
+	public static String joinId(Integer type, Object rawId) {
+		if(rawId == null) {
+			return null;
+		}
+		if(type == null) {
+			return rawId.toString();
+		}
+		return String.format("%s_%s", type, rawId);
+	}
+	
+	/**
+	 * 获取节点ID，如果不存在，自动使用类型和原始ID拼接
+	 * @return 节点ID
+	 */
+	public String getId() {
+		if(this.id != null) {
+			return this.id;
+		}else {
+			return joinId(type, rawId);
+		}
+	}
+	
+	/**
 	 * 添加子节点
 	 * @param child 子节点
 	 */
-	public void addChild(TreeNodeRo child) {
+	public TreeNodeRo addChild(TreeNodeRo child) {
 		if(this.children == Collections.EMPTY_LIST) {
 			this.children = new ArrayList<>();
 		}
 		this.children.add(child);
+		return this;
 	}
 	
 	/**
@@ -81,7 +114,8 @@ public class TreeNodeRo implements Serializable {
 	 * @param value
 	 * @return
 	 */
-	public String addExtAttr(String key, String value) {
-		return extAttrs.put(key, value);
+	public TreeNodeRo addExtAttr(String key, String value) {
+		extAttrs.put(key, value);
+		return this;
 	}
 }

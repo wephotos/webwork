@@ -53,6 +53,11 @@ public class Resource {
      */
     private Integer parentId;
     /**
+     * 父节点类型
+     * @see NodeTypeEnum
+     */
+    private Integer parentType;
+    /**
      * 资源状态
      * @see {@link EntityState}
      */
