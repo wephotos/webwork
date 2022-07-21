@@ -15,7 +15,7 @@ import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
 import com.github.wephotos.webwork.schema.entity.Result;
 import com.github.wephotos.webwork.schema.entity.Results;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
 import com.github.wephotos.webwork.user.entity.Dictionary;
 import com.github.wephotos.webwork.user.service.DictionaryService;
 
@@ -90,11 +90,11 @@ public class DictionaryController {
      * 获取下级资源节点
      * @param parentId 父 节点
      * @param session 会话对象
-     * @return {@link NodeRo}
+     * @return {@link TreeNodeRo}
      */
     @GetMapping("/list-nodes")
-    public Result<List<NodeRo>> listNodes(String parentId) {
-    	List<NodeRo> nodes = dictionaryService.listNodes(parentId);
+    public Result<List<TreeNodeRo>> listNodes(String parentId) {
+    	List<TreeNodeRo> nodes = dictionaryService.listNodes(parentId);
     	return Results.newResult(nodes);
     }
 }

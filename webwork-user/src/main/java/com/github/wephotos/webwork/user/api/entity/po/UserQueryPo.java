@@ -1,5 +1,7 @@
 package com.github.wephotos.webwork.user.api.entity.po;
 
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,11 +17,15 @@ import lombok.ToString;
 @Getter
 @Setter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-public class UserQueryPo {
+public class UserQueryPo implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * 用户ID
 	 */

@@ -14,13 +14,13 @@ import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.user.api.entity.po.RoleQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.entity.Role;
-import com.github.wephotos.webwork.user.entity.enums.ResNodeType;
-import com.github.wephotos.webwork.user.entity.enums.RoleNodeType;
+import com.github.wephotos.webwork.user.entity.enums.NodeTypeEnum;
 import com.github.wephotos.webwork.user.mapper.RoleMapper;
 import com.github.wephotos.webwork.user.mapper.RoleResourceMapper;
+import com.github.wephotos.webwork.user.utils.TreeNodeConverter;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
 /**
@@ -131,33 +131,26 @@ public class RoleService {
      * @param user 会话用户
      * @return 子节点
      */
-	public List<NodeRo> listNodes(Integer parentId, SecurityUser user) {
+	public List<TreeNodeRo> listNodes(Integer parentId, SecurityUser user) {
 		Organization org;
 		if(parentId == null) {
 			org = organizationService.selectById(user.getGroupId());
-			NodeRo node = NodeRo.from(org);
-			node.setType(ResNodeType.GROUP.getType());
+			TreeNodeRo node = TreeNodeConverter.from(org);
+			node.setType(NodeTypeEnum.GROUP.getCode());
 			return Arrays.asList(node);
 		}
-		List<NodeRo> nodes;
+		List<TreeNodeRo> nodes;
 		org = organizationService.selectById(parentId);
 		// 加载应用下角色
 		if(org == null) {
 			RoleQueryPo query = RoleQueryPo.builder().parentId(parentId).build();
-			nodes = listQuery(query).stream().map(NodeRo::new).collect(Collectors.toList());
+			nodes = listQuery(query).stream().map(TreeNodeConverter::from).collect(Collectors.toList());
 		}else {
 			// 加载子单位和应用
 			nodes = resourceService.listTreeNodes(parentId, user);
 			// 过滤出单位和应用节点
 			nodes = nodes.stream().filter(node -> {
-				if(ResNodeType.GROUP.is(node.getType())) {
-					node.setType(RoleNodeType.GROUP.getType());
-				}else if(ResNodeType.APP.is(node.getType())) {
-					node.setType(RoleNodeType.APP.getType());
-				}else {
-					return false;
-				}
-				return true;
+				return NodeTypeEnum.GROUP.is(node.getType()) || NodeTypeEnum.APP.is(node.getType());
 			}).collect(Collectors.toList());
 		}
 		return nodes;

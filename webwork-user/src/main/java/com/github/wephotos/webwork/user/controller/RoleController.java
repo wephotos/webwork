@@ -18,7 +18,7 @@ import com.github.wephotos.webwork.schema.entity.Result;
 import com.github.wephotos.webwork.schema.entity.Results;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.user.api.entity.po.RoleQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
 import com.github.wephotos.webwork.user.entity.Role;
 import com.github.wephotos.webwork.user.service.RoleService;
 import com.github.wephotos.webwork.user.utils.SessionUserUtils;
@@ -102,12 +102,12 @@ public class RoleController {
      * 获取角色树节点数据
      * @param parentId 父 节点
      * @param session 会话对象
-     * @return {@link NodeRo}
+     * @return {@link TreeNodeRo}
      */
     @GetMapping("/list-nodes")
-    public Result<List<NodeRo>> listNodes(Integer parentId, HttpSession session) {
+    public Result<List<TreeNodeRo>> listNodes(Integer parentId, HttpSession session) {
     	SecurityUser user = SessionUserUtils.getUser(session);
-    	List<NodeRo> nodes = roleService.listNodes(parentId, user);
+    	List<TreeNodeRo> nodes = roleService.listNodes(parentId, user);
     	return Results.newResult(nodes);
     }
 }

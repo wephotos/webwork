@@ -11,7 +11,6 @@ import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.user.api.UserClient;
 import com.github.wephotos.webwork.user.api.entity.po.UserLoginPo;
 import com.github.wephotos.webwork.user.api.entity.ro.UserRo;
-import com.github.wephotos.webwork.user.entity.User;
 import com.github.wephotos.webwork.user.utils.UserStateCode;
 import com.github.wephotos.webwork.utils.BeanUtils;
 
@@ -22,7 +21,7 @@ public class UserLoginService {
 	private UserClient userClient;
 
 	public Result<SecurityUser> login(UserLoginPo po) {
-		User user = userClient.selectByAccount(po.getUsername());
+		UserRo user = userClient.selectByAccount(po.getUsername());
         if (user == null) {
             return Results.newFailedResult(UserStateCode.USER_NOT_EXISTS);
         }

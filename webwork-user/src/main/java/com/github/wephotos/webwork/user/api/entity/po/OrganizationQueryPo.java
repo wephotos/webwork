@@ -1,5 +1,7 @@
 package com.github.wephotos.webwork.user.api.entity.po;
 
+import java.io.Serializable;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -14,7 +16,11 @@ import lombok.Setter;
 @Setter
 @Builder
 @ToString
-public class OrganizationQueryPo {
+public class OrganizationQueryPo implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * 名称
 	 */

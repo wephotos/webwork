@@ -14,16 +14,20 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
+import com.github.wephotos.webwork.schema.exception.StateCode;
+import com.github.wephotos.webwork.schema.exception.WebworkRuntimeException;
 import com.github.wephotos.webwork.user.api.entity.po.UserPo;
 import com.github.wephotos.webwork.user.api.entity.po.UserQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
 import com.github.wephotos.webwork.user.api.entity.ro.UserRo;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.entity.User;
 import com.github.wephotos.webwork.user.entity.UserOrg;
-import com.github.wephotos.webwork.user.entity.enums.UserNodeType;
+import com.github.wephotos.webwork.user.entity.enums.NodeTypeEnum;
 import com.github.wephotos.webwork.user.mapper.UserMapper;
 import com.github.wephotos.webwork.user.mapper.UserOrgMapper;
+import com.github.wephotos.webwork.user.utils.TreeNodeConverter;
+import com.github.wephotos.webwork.utils.BeanUtils;
 import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
@@ -136,14 +140,15 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     
     /**
      * 创建用户
-     * @param user
+     * @param source
      * @return
      */
-    public Integer create(UserPo user) {
-    	Integer deptId = user.getDeptId();
+    public Integer create(UserPo source) {
+    	Integer deptId = source.getDeptId();
     	if(deptId == null) {
     		throw new IllegalArgumentException("部门ID不能为空");
     	}
+    	User user = BeanUtils.toBean(source, User.class);
     	if(user.getStatus() == null) {
     		user.setStatus(EntityState.ENABLED.getValue());
     	}
@@ -167,13 +172,15 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
     /**
      * 更新用户
-     * @param user
+     * @param source
      * @return
      */
-    public boolean update(UserPo user) {
-        
-    	userMapper.updateById(user);
-        return true;
+    public boolean update(UserPo source) {
+    	User user = BeanUtils.toBean(source, User.class);
+    	if(user.getId() == null) {
+    		throw new WebworkRuntimeException(StateCode.PARAMETER_MISSING, "用户ID不能为空");
+    	}
+    	return userMapper.updateById(user) == 1;
     }
 
     /**
@@ -194,13 +201,13 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * @param user 会话用户
      * @return 节点数据
      */
-    public List<NodeRo> listTreeNodes(Integer parentId, com.github.wephotos.webwork.security.entity.SecurityUser user){
-    	List<NodeRo> nodes = organizationService.children(parentId, user);
+    public List<TreeNodeRo> listTreeNodes(Integer parentId, com.github.wephotos.webwork.security.entity.SecurityUser user){
+    	List<TreeNodeRo> nodes = organizationService.children(parentId, user);
     	if(parentId != null) {
 	    	Organization org = organizationService.selectById(parentId);
-	    	if(org != null && org.getType() == UserNodeType.DEPT.getType()) {
+	    	if(org != null && NodeTypeEnum.DEPT.is(org.getType())) {
 	    		List<User> users = userMapper.listUserByDeptId(parentId);
-	    		List<NodeRo> userNodes = users.stream().map(NodeRo::new).collect(Collectors.toList());
+	    		List<TreeNodeRo> userNodes = users.stream().map(TreeNodeConverter::from).collect(Collectors.toList());
 	    		nodes.addAll(userNodes);
 	    	}
     	}

@@ -11,9 +11,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
 import com.github.wephotos.webwork.user.entity.Dictionary;
 import com.github.wephotos.webwork.user.mapper.DictionaryMapper;
+import com.github.wephotos.webwork.user.utils.TreeNodeConverter;
 import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
@@ -88,7 +89,7 @@ public class DictionaryService {
 	 * @param parentId 父ID
 	 * @return 子节点集合
 	 */
-	public List<NodeRo> listNodes(String parentId){
+	public List<TreeNodeRo> listNodes(String parentId){
 		LambdaQueryWrapper<Dictionary> wrapper = new LambdaQueryWrapper<>();
 		if(StringUtils.isBlank(parentId)) {
 			wrapper.isNull(Dictionary::getParentId);
@@ -97,7 +98,7 @@ public class DictionaryService {
 		}
 		wrapper.gt(Dictionary::getStatus, EntityState.DELETED.getValue());
 		List<Dictionary> dataList = dictionaryMapper.selectList(wrapper);
-		return dataList.stream().map(NodeRo::new).collect(Collectors.toList());
+		return dataList.stream().map(TreeNodeConverter::from).collect(Collectors.toList());
 	}
 	
 }

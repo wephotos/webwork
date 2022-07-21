@@ -18,7 +18,7 @@ import com.github.wephotos.webwork.schema.entity.Result;
 import com.github.wephotos.webwork.schema.entity.Results;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.user.api.entity.po.ResourceQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
 import com.github.wephotos.webwork.user.entity.Resource;
 import com.github.wephotos.webwork.user.service.ResourceService;
 import com.github.wephotos.webwork.user.utils.SessionUserUtils;
@@ -102,23 +102,23 @@ public class ResourceController {
      * 获取下级资源节点
      * @param parentId 父 节点
      * @param session 会话对象
-     * @return {@link NodeRo}
+     * @return {@link TreeNodeRo}
      */
     @GetMapping("/list-nodes")
-    public Result<List<NodeRo>> listNodes(Integer parentId, HttpSession session) {
+    public Result<List<TreeNodeRo>> listNodes(Integer parentId, HttpSession session) {
     	SecurityUser user = SessionUserUtils.getUser(session);
-    	List<NodeRo> nodes = resourceService.listTreeNodes(parentId, user);
+    	List<TreeNodeRo> nodes = resourceService.listTreeNodes(parentId, user);
     	return Results.newResult(nodes);
     }
     
     /**
      * 获取资源树结构全部树节点
      * @param session 会话
-     * @return {@link NodeRo}
+     * @return {@link TreeNodeRo}
      */
     @GetMapping("/deep-tree-nodes")
-    public Result<List<NodeRo>> deepTreeNodes(Integer parentId) {
-    	List<NodeRo> nodes = resourceService.deepTreeNodes(parentId);
+    public Result<List<TreeNodeRo>> deepTreeNodes(Integer parentId) {
+    	List<TreeNodeRo> nodes = resourceService.deepTreeNodes(parentId);
     	return Results.newResult(nodes);
     }
     

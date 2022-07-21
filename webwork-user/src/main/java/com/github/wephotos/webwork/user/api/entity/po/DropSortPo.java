@@ -1,5 +1,7 @@
 package com.github.wephotos.webwork.user.api.entity.po;
 
+import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,8 +15,12 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class DropSortPo {
+public class DropSortPo implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * 父节点
 	 */

@@ -6,7 +6,11 @@ import java.util.Map;
 import lombok.Getter;
 
 /**
- * 状态码
+ * 系统状态码定义
+ * 0   - 100：保留状态码
+ * 100 - 200: 客户端错误
+ * 200 - 300: 服务端错误
+ * 1000 - ∞ : 业务模块自定义错误
  * @author TQ
  *
  */
@@ -22,15 +26,22 @@ public final class StateCode {
 	 * 成功，code = 0
 	 */
 	public static final StateCode SUCCESS = new StateCode(0, "成功");
-	/**
-	 * 内部错误，code = 500
-	 */
-	public static final StateCode FAILED = new StateCode(500, "服务器内部错误");
 	
 	/**
-	 * 参数缺失或非法
+	 * 缺失参数
 	 */
-	public static final StateCode MISSING_ILLEGAL_PARAMETER = new StateCode(400, "错误的参数");
+	public static final StateCode PARAMETER_MISSING = new StateCode(100, "缺失参数");
+	
+	/**
+	 * 非法参数
+	 */
+	public static final StateCode PARAMETER_ILLEGAL = new StateCode(101, "非法参数");
+	
+	/**
+	 * 服务器未知错误
+	 */
+	public static final StateCode SERVER_ERROR = new StateCode(200, "服务器内部错误");
+	
 	
 	/**
 	 * 错误码

@@ -1,6 +1,8 @@
 package com.github.wephotos.webwork.user.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.github.wephotos.webwork.schema.entity.EntityState;
+
 import lombok.*;
 
 import java.io.Serializable;
@@ -58,6 +60,7 @@ public class User implements Serializable {
     private String post;
     /**
      * 状态 启用：1，0：禁用，2：删除
+     * @see EntityState
      */
     private Integer status;
     /**

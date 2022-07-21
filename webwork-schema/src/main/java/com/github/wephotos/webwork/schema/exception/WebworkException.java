@@ -17,17 +17,17 @@ public class WebworkException extends Exception {
 
     public WebworkException(String message) {
     	super(message);
-    	this.stateCode = StateCode.FAILED;
+    	this.stateCode = StateCode.SERVER_ERROR;
     }
     
     public WebworkException(Throwable cause) {
     	super(cause);
-    	this.stateCode = StateCode.FAILED;
+    	this.stateCode = StateCode.SERVER_ERROR;
     }
 
     public WebworkException(String message, Throwable cause) {
         super(message, cause);
-        this.stateCode = StateCode.FAILED;
+        this.stateCode = StateCode.SERVER_ERROR;
     }
 
     public WebworkException(StateCode stateCode, String message) {

@@ -16,12 +16,12 @@ import com.github.wephotos.webwork.schema.entity.Pageable;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.user.api.entity.po.OrganizationQueryPo;
 import com.github.wephotos.webwork.user.api.entity.po.ResourceQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.entity.Resource;
-import com.github.wephotos.webwork.user.entity.enums.ResNodeType;
-import com.github.wephotos.webwork.user.entity.enums.UserNodeType;
+import com.github.wephotos.webwork.user.entity.enums.NodeTypeEnum;
 import com.github.wephotos.webwork.user.mapper.ResourceMapper;
+import com.github.wephotos.webwork.user.utils.TreeNodeConverter;
 import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
@@ -140,22 +140,22 @@ public class ResourceService {
     /**
      * 获取当前节点及其所有子节点的树结构
      * @param parentId 父节点ID
-     * @return {@link NodeRo}
+     * @return {@link TreeNodeRo}
      */
-    public List<NodeRo> deepTreeNodes(Integer parentId){
+    public List<TreeNodeRo> deepTreeNodes(Integer parentId){
     	Objects.requireNonNull(parentId, "资源id不能为空");
     	Resource res = selectById(parentId);
     	ResourceQueryPo query = ResourceQueryPo.builder().code(res.getCode()).build();
     	List<Resource> resList = listQuery(query);
-    	List<NodeRo> flatNodes = resList.stream().map(NodeRo::new).collect(Collectors.toList());
-    	List<NodeRo> treeNodes = new ArrayList<>();
-    	for(NodeRo node : flatNodes) {
+    	List<TreeNodeRo> flatNodes = resList.stream().map(TreeNodeConverter::from).collect(Collectors.toList());
+    	List<TreeNodeRo> treeNodes = new ArrayList<>();
+    	for(TreeNodeRo node : flatNodes) {
     		if(parentId.equals(node.getId())) {
     			treeNodes.add(node);
     		}
-    		for(NodeRo child : flatNodes) {
+    		for(TreeNodeRo child : flatNodes) {
     			// 应用不作为子级，和单位ID存在冲突
-    			if(!ResNodeType.APP.is(child.getType()) 
+    			if(!NodeTypeEnum.APP.is(child.getType()) 
     					&& node.getId().equals(child.getParentId())) {
     				node.addChild(child);
     			}
@@ -170,26 +170,26 @@ public class ResourceService {
      * @param user 会话用户
      * @return 子节点集合
      */
-	public List<NodeRo> listTreeNodes(Integer parentId, SecurityUser user) {
+	public List<TreeNodeRo> listTreeNodes(Integer parentId, SecurityUser user) {
 		Organization org;
 		if(parentId == null) {
 			org = organizationService.selectById(user.getGroupId());
-			NodeRo node = NodeRo.from(org);
-			node.setType(ResNodeType.GROUP.getType());
+			TreeNodeRo node = TreeNodeConverter.from(org);
+			node.setType(NodeTypeEnum.GROUP.getCode());
 			return Arrays.asList(node);
 		}
 		ResourceQueryPo query = ResourceQueryPo.builder().parentId(parentId).build();
-		List<NodeRo> nodes = listQuery(query).stream()
-				.map(NodeRo::new).collect(Collectors.toList());
+		List<TreeNodeRo> nodes = listQuery(query).stream()
+				.map(TreeNodeConverter::from).collect(Collectors.toList());
 		org = organizationService.selectById(parentId);
 		if(org != null) {
 			// 获取下级单位
 			OrganizationQueryPo orgQuery = OrganizationQueryPo.builder()
 					.parentId(parentId)
-					.neType(UserNodeType.DEPT.getType()).build();
+					.neType(NodeTypeEnum.DEPT.getCode()).build();
 			List<Organization> orgs = organizationService.listQuery(orgQuery);
-			List<NodeRo> orgNodes = orgs.stream().map(NodeRo::new).map(node -> {
-				node.setType(ResNodeType.GROUP.getType());
+			List<TreeNodeRo> orgNodes = orgs.stream().map(TreeNodeConverter::from).map(node -> {
+				node.setType(NodeTypeEnum.GROUP.getCode());
 				return node;
 			}).collect(Collectors.toList());
 			nodes.addAll(orgNodes);

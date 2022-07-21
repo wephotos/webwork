@@ -3,6 +3,8 @@ package com.github.wephotos.webwork.user.entity;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.github.wephotos.webwork.user.entity.enums.NodeTypeEnum;
+
 import lombok.*;
 
 /**
@@ -38,6 +40,12 @@ public class Role {
      * 上级(单位或应用)
      */
     private Integer parentId;
+    
+    /**
+     * 父节点类型
+     * @see {@link NodeTypeEnum}
+     */
+    private Integer parentType;
     /**
      * 排序
      */

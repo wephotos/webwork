@@ -42,13 +42,13 @@ public class GlobalExceptionHandler {
      * @return Result
      */
     @ExceptionHandler(value = Exception.class)
-    public Result<Void> uncaughtException(HttpServletRequest request, HttpServletResponse response, Exception e) {
+    public Result<String> uncaughtException(HttpServletRequest request, HttpServletResponse response, Exception e) {
         // 忽略客户端导致的异常
         String simpleName = e.getClass().getSimpleName();
         if (CLIENT_ABORT_EXCEPTION_NAME.equals(simpleName)) {
             return null;
         }
         log.error("系统错误", e);
-        return new Result<>(StateCode.FAILED);
+        return new Result<>(e.getMessage(), StateCode.SERVER_ERROR);
     }
 }

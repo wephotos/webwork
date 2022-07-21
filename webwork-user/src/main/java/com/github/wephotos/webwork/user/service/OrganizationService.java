@@ -16,10 +16,11 @@ import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.user.api.entity.po.DropSortPo;
 import com.github.wephotos.webwork.user.api.entity.po.OrganizationQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
+import com.github.wephotos.webwork.user.api.entity.ro.TreeNodeRo;
 import com.github.wephotos.webwork.user.entity.Organization;
-import com.github.wephotos.webwork.user.entity.enums.UserNodeType;
+import com.github.wephotos.webwork.user.entity.enums.NodeTypeEnum;
 import com.github.wephotos.webwork.user.mapper.OrganizationMapper;
+import com.github.wephotos.webwork.user.utils.TreeNodeConverter;
 import com.github.wephotos.webwork.utils.StringUtils;
 
 /**
@@ -120,7 +121,7 @@ public class OrganizationService {
     public Organization findDepartGroup(Integer deptId) {
     	Organization dept = selectById(deptId);
     	Organization node = selectById(dept.getParentId());
-    	while(node.getType() != UserNodeType.GROUP.getType()) {
+    	while(node.getType() != NodeTypeEnum.GROUP.getCode()) {
     		node = selectById(node.getParentId());
     	}
     	return node;
@@ -133,35 +134,35 @@ public class OrganizationService {
      * @param user     当前用户
      * @return {@link Organization}
      */
-    public List<NodeRo> children(Integer parentId, SecurityUser user) {
+    public List<TreeNodeRo> children(Integer parentId, SecurityUser user) {
         // 父节点为空，返回当前单位节点
         if (parentId == null) {
             Organization root = selectById(user.getGroupId());
-            return Arrays.asList(NodeRo.from(root));
+            return Arrays.asList(TreeNodeConverter.from(root));
         }
         OrganizationQueryPo query = OrganizationQueryPo.builder().parentId(parentId).build();
-        return listQuery(query).stream().map(NodeRo::new).collect(Collectors.toList());
+        return listQuery(query).stream().map(TreeNodeConverter::from).collect(Collectors.toList());
     }
     
     /**
      * 获取当前节点及其所有子节点的树结构
      * @param id 当前节点标识
-     * @return {@link NodeRo}
+     * @return {@link TreeNodeRo}
      */
-    public List<NodeRo> deepTreeNodes(Integer id){
+    public List<TreeNodeRo> deepTreeNodes(Integer id){
     	Objects.requireNonNull(id, "组织机构id不能为空");
     	Organization org = selectById(id);
     	OrganizationQueryPo query = OrganizationQueryPo.builder()
     			.code(org.getCode())
-    			.neType(UserNodeType.DEPT.getType()).build();
+    			.neType(NodeTypeEnum.DEPT.getCode()).build();
     	List<Organization> orgList = listQuery(query);
-    	List<NodeRo> flatNodes = orgList.stream().map(NodeRo::new).collect(Collectors.toList());
-    	List<NodeRo> treeNodes = new ArrayList<>();
-    	for(NodeRo node : flatNodes) {
+    	List<TreeNodeRo> flatNodes = orgList.stream().map(TreeNodeConverter::from).collect(Collectors.toList());
+    	List<TreeNodeRo> treeNodes = new ArrayList<>();
+    	for(TreeNodeRo node : flatNodes) {
     		if(node.getParentId() == null) {
     			treeNodes.add(node);
     		}
-    		for(NodeRo child : flatNodes) {
+    		for(TreeNodeRo child : flatNodes) {
     			if(node.getId().equals(child.getParentId())) {
     				node.addChild(child);
     			}

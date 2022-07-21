@@ -1,6 +1,7 @@
 package com.github.wephotos.webwork.user.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.github.wephotos.webwork.user.entity.enums.NodeTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,6 +40,7 @@ public class Organization {
     private Integer parentId;
     /**
      * 0:虚拟机构, 1:单位, 2:部门
+     * @see NodeTypeEnum
      */
     private Integer type;
     /**
