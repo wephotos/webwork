@@ -38,7 +38,7 @@ public final class LoggerRequestHandler {
 		}
 		HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
 		LoggerRequest request2 = new LoggerRequest();
-		request2.setIp(request.getRemoteAddr());
+		request2.setClientHost(request.getRemoteAddr());
 		request2.setUserAgent(getUserAgent(request));
 		request2.setRequestURL(request.getRequestURL().toString());
 		

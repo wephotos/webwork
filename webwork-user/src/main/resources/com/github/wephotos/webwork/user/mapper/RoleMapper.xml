@@ -14,7 +14,7 @@
 		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
 	</resultMap>
 	
-	<resultMap type="com.github.wephotos.webwork.user.api.entity.ro.RoleRo" id="RoleRoResultMap" extends="BaseResultMap">
+	<resultMap type="com.github.wephotos.webwork.user.entity.vo.RoleVO" id="RoleVOResultMap" extends="BaseResultMap">
 		<result column="app" property="app" jdbcType="VARCHAR" />
 	</resultMap>
 
@@ -31,7 +31,7 @@
 	</select>
 	
 	<!--分页 -->
-	<select id="pageList" resultMap="RoleRoResultMap">
+	<select id="pageList" resultMap="RoleVOResultMap">
 		SELECT
 		  id,
 		  name,
@@ -94,4 +94,33 @@
 			</otherwise>
 		</choose>
 	</sql>
+	
+	<!-- 查询用户角色信息, 如果appId不为空，只查询出应用关联的角色 -->
+	<select id="listRoleByUserId" resultMap="BaseResultMap">
+	  SELECT
+	  	distinct
+		  r.id,
+		  r.name,
+		  r.code,
+		  r.status
+		FROM
+		  sys_role r,
+		  sys_role_user ru
+		  <if test="appId != null">
+		  ,sys_role_resource rr
+		  </if>
+		<where>
+		  r.id = ru.role_id
+		  <if test="appId != null">
+		    and 
+		    r.id = rr.role_id
+		    and 
+		    rr.resource_id = #{appId,jdbcType=INTEGER}
+		  </if>
+		  and
+		  <foreach collection="userIds" item="item" open="(" close=")" separator="OR">
+		    ru.user_id = #{item.id,jdbcType=INTEGER} and ru.user_type = #{item.type,jdbcType=INTEGER}
+		  </foreach>
+		</where>
+	</select>
 </mapper>

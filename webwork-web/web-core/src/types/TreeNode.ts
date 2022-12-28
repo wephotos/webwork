@@ -2,10 +2,12 @@
  * 树节点类型定义
  */
 export declare class TreeNode {
-    id: number;
+    id: string;
+    rawId: number; // 原始的数据ID
     name: string;
     code: string;
     type: number;
-    parentId?: number;
+    sort?: number;
+    parentId?: string;
     children: TreeNode[]
 }

@@ -48,4 +48,14 @@ public class UserOrg {
      * 置顶时间
      */
     private Date topTime;
+    
+    /**
+	 * 创建用户
+	 */
+	private String createUser;
+	
+	/**
+	 * 创建时间
+	 */
+	private Date createTime;
 }

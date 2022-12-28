@@ -66,6 +66,11 @@
         	<artifactId>spring-boot-configuration-processor</artifactId>
         	<optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.github.wephotos</groupId>
+            <artifactId>webwork-user</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-config -->
 		<!-- <dependency>
 		    <groupId>org.springframework.cloud</groupId>

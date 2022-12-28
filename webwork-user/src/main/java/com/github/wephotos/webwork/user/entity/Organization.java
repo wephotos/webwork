@@ -1,5 +1,7 @@
 package com.github.wephotos.webwork.user.entity;
 
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.wephotos.webwork.user.entity.enums.NodeTypeEnum;
 
@@ -56,4 +58,24 @@ public class Organization {
      * 排序
      */
     private Integer sort;
+    
+    /**
+	 * 创建用户
+	 */
+	private String createUser;
+	
+	/**
+	 * 更新用户
+	 */
+	private String updateUser;
+	
+	/**
+	 * 创建时间
+	 */
+	private Date createTime;
+	
+	/**
+	 * 更新时间
+	 */
+	private Date updateTime;
 }

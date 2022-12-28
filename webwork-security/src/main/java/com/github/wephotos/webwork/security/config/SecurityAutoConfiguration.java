@@ -1,6 +1,6 @@
 package com.github.wephotos.webwork.security.config;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.web.servlet.ConditionalOnMissingFilterBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -31,10 +31,10 @@ public class SecurityAutoConfiguration {
 	 * @return 过滤器注册对象
 	 */
 	@Bean
-	@ConditionalOnMissingBean
+	@ConditionalOnMissingFilterBean
 	public FilterRegistrationBean<SecurityAuthFilter> securityAuthFilter() {
 		FilterRegistrationBean<SecurityAuthFilter> registration = new FilterRegistrationBean<>();
-		registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+		registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 100);
 		registration.addUrlPatterns(props.getUrlPatterns());
 		registration.setFilter(new SecurityAuthFilter(props.getLoginUrl(), props.getIgnorePatterns()));
 		return registration;

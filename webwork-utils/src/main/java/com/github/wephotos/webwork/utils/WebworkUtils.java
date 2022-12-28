@@ -1,6 +1,7 @@
 package com.github.wephotos.webwork.utils;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -8,7 +9,7 @@ import java.util.UUID;
  * @author TQ
  *
  */
-public class WebworkUtils {
+public final class WebworkUtils {
 
 	private WebworkUtils() {
 		
@@ -26,7 +27,7 @@ public class WebworkUtils {
 	 * 获取当前时间戳
 	 * @return 当前时间
 	 */
-	public static Timestamp timestamp() {
+	public static Date nowTime() {
 		return new Timestamp(System.currentTimeMillis());
 	}
 }

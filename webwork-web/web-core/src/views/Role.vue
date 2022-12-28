@@ -13,11 +13,11 @@
             <span @contextmenu.prevent>{{ node.title }}</span>
             <template #overlay>
               <a-menu
-                @click="({ key: menuKey }) => onContextMenuClick(node, menuKey)"
+                @click="() => onContextMenuClick(node)"
               >
                 <!-- 应用菜单 -->
-                <template v-if="node.type == 1">
-                  <a-menu-item :key="create_role">新建角色</a-menu-item>
+                <template v-if="node.type == 20">
+                  <a-menu-item key="create_role">新建角色</a-menu-item>
                 </template>
               </a-menu>
             </template>
@@ -142,6 +142,7 @@ import { Role } from '@/types/Role'
 import RoleForm from './RoleForm.vue'
 import RoleUserVue from './RoleUser.vue'
 import RoleResoVue from './RoleReso.vue'
+import { TreeNodeType } from '@/types/TreeNodeType'
 
 // 分页数据类型
 type Pagination = TableState['pagination']
@@ -231,7 +232,7 @@ export default class RoleVue extends Vue {
    */
   async mounted() {
     // 加载组织机构根节点
-    const ret = await request.listNodes()
+    const ret = await request.listNodes({})
     if (ret.code !== 0) {
       message.error(ret.msg)
       return false
@@ -250,7 +251,11 @@ export default class RoleVue extends Vue {
         resolve()
         return false
       }
-      request.listNodes(treeNode.dataRef.key as number).then((ret) => {
+      const params = {
+        parentId: treeNode.dataRef.rawId,
+        parentType: treeNode.dataRef.type
+      }
+      request.listNodes(params).then((ret) => {
         treeNode.dataRef.children = this.toTreeDataItem(ret.data)
         this.treeData = [...this.treeData]
         resolve()
@@ -267,7 +272,7 @@ export default class RoleVue extends Vue {
       content: {
         handle: true,
         props: {
-            parentId: node.key,
+            parentId: node.rawId,
             parentName: node.title
         },
         component: RoleForm
@@ -281,8 +286,9 @@ export default class RoleVue extends Vue {
 
   // 节点点击事件
   onSelect(selectedKeys: string[], info: SelectEvent) {
-    console.log(selectedKeys, info)
-    this.pageable.condition.parentId = info.node.dataRef.key
+    // console.log(selectedKeys, info)
+    this.pageable.condition.parentId = info.node.dataRef.rawId
+    this.pageable.condition.parentType = info.node.dataRef.type
     this.pageQuery()
   }
 
@@ -291,21 +297,23 @@ export default class RoleVue extends Vue {
     return nodes.map((node) => {
       return {
         key: node.id,
-        type: node.type, // 节点类型 0单位 1应用 2角色
+        rawId: node.rawId,
+        type: node.type,
         title: node.name,
         code: node.code,
-        isLeaf: node.type === 1
+        isLeaf: node.type === TreeNodeType.APP
       } as TreeDataItem
     })
   }
 
   toTreeDataItemOne(record: Role) {
     return {
-      key: record.id,
-      type: record.type, // 节点类型 0单位 1应用 2角色
+      key: `${TreeNodeType.ROLE}_${record.id}`,
+      rawId: record.id,
+      type: record.type,
       title: record.name,
       code: record.code,
-      isLeaf: record.type === 1
+      isLeaf: record.type === TreeNodeType.APP
     } as TreeDataItem
   }
 
@@ -343,6 +351,7 @@ export default class RoleVue extends Vue {
     sorter: { field: string; order: string; columnKey: string }
   ) {
     this.pagination.current = pag?.current || 1
+    this.pageable.curr = this.pagination.current
     this.pageable.sortField = sorter.columnKey || ''
     this.pageable.sortOrder = orderMap[sorter.order] || ''
     this.pageable.condition.name =

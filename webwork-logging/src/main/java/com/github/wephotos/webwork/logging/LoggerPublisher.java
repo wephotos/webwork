@@ -70,6 +70,8 @@ public class LoggerPublisher {
     	if(LoggerUtils.isWebEnv()) {
     		loggingEvent.setRequest(LoggerRequestHandler.getLoggerRequest());
     	}
+    	// MDC traceId
+    	loggingEvent.setTraceId(MDCUtils.get());
         //发布
         LoggingEventProducerWithTranslator.getProducer().onData(loggingEvent);
     }

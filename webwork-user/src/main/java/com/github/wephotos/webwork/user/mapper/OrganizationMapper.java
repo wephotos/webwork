@@ -3,8 +3,8 @@ package com.github.wephotos.webwork.user.mapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.github.wephotos.webwork.user.api.entity.po.DropSortPo;
 import com.github.wephotos.webwork.user.entity.Organization;
+import com.github.wephotos.webwork.user.entity.po.DropSortPO;
 
 /**
  * @author chengzi
@@ -12,6 +12,13 @@ import com.github.wephotos.webwork.user.entity.Organization;
  */
 @Mapper
 public interface OrganizationMapper extends BaseMapper<Organization> {
+	
+	/**
+	 * 获取最大的序号，最小返回0
+	 * @param parentId 父ID
+	 * @return 最大序号
+	 */
+	int getMaxSort(Integer parentId);
 	
     /**
      * 获取最大编码
@@ -26,5 +33,6 @@ public interface OrganizationMapper extends BaseMapper<Organization> {
      * @param dropSort 拖动排序参数
      * @return 数据更新行数
      */
-    int dropSort(DropSortPo dropSort);
+    int dropSort(DropSortPO dropSort);
+
 }

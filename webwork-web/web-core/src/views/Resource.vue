@@ -17,13 +17,13 @@
                 @click="({ key: menuKey }) => onContextMenuClick(node, menuKey)"
               >
                 <!-- 单位菜单 -->
-                <template v-if="node.type == 0">
+                <template v-if="node.type == 1">
                   <a-menu-item :key="contextMenuKeys.ADD_APP"
                     >新建应用</a-menu-item
                   >
                 </template>
                 <!-- 应用菜单 -->
-                <template v-if="node.type == 1">
+                <template v-if="node.type == 20">
                   <a-menu-item :key="contextMenuKeys.ADD_MOD"
                     >新建模块</a-menu-item
                   >
@@ -38,7 +38,7 @@
                   >
                 </template>
                 <!-- 模块菜单 -->
-                <template v-if="node.type == 2">
+                <template v-if="node.type == 21">
                   <a-menu-item :key="contextMenuKeys.ADD_FUN"
                     >新建功能</a-menu-item
                   >
@@ -53,7 +53,7 @@
                   >
                 </template>
                 <!-- 功能菜单 -->
-                <template v-if="node.type == 3">
+                <template v-if="node.type == 22">
                   <a-menu-item :key="contextMenuKeys.UPDATE_FUN"
                     >更新功能</a-menu-item
                   >
@@ -81,8 +81,8 @@
       >
         <!-- 操作列模板 -->
         <template #typeRender="{ record }">
-          <template v-if="record.type == 1"> 应用 </template>
-          <template v-else-if="record.type == 2"> 模块 </template>
+          <template v-if="record.type == 20"> 应用 </template>
+          <template v-else-if="record.type == 21"> 模块 </template>
           <template v-else> 功能 </template>
         </template>
         <!-- 自定义筛选菜单 -->
@@ -171,6 +171,7 @@ import request from '@/request/ResRequest'
 import Pageable from '@/types/Pageable'
 import ResourceForm from './ResourceForm.vue'
 import { Resource } from '@/types/Resource'
+import { TreeNodeType } from '@/types/TreeNodeType'
 // 右键菜单键
 enum ContextMenuKeys {
   // 新增应用
@@ -209,6 +210,8 @@ export default class ResourceVue extends Vue {
   treeData: TreeDataItem[] = []
   // 右键菜单KEY定义
   contextMenuKeys = ContextMenuKeys
+  // 节点类型引用
+  // treeNodeType = TreeNodeType
 
   // 权限列定义
   columns = [
@@ -281,7 +284,7 @@ export default class ResourceVue extends Vue {
    */
   async mounted() {
     // 加载组织机构根节点
-    const ret = await request.listNodes()
+    const ret = await request.listNodes({})
     if (ret.code !== 0) {
       message.error(ret.msg)
       return false
@@ -300,7 +303,11 @@ export default class ResourceVue extends Vue {
         resolve()
         return false
       }
-      request.listNodes(treeNode.dataRef.key as number).then((ret) => {
+      const params = {
+        parentId: treeNode.dataRef.rawId,
+        parentType: treeNode.dataRef.type
+      }
+      request.listNodes(params).then((ret) => {
         treeNode.dataRef.children = this.toTreeDataItem(ret.data)
         this.treeData = [...this.treeData]
         resolve()
@@ -310,8 +317,19 @@ export default class ResourceVue extends Vue {
 
   // 节点点击事件
   onSelect(selectedKeys: string[], info: SelectEvent) {
-    console.log(selectedKeys, info)
-    this.pageable.condition.code = info.node.dataRef.code
+    // 点击单位时查询下级应用
+    if (info.node.dataRef.type === TreeNodeType.GROUP) {
+      this.pageable.condition = {
+        parentId: info.node.dataRef.rawId,
+        parentType: info.node.dataRef.type
+      }
+    } else {
+      // 查询下级资源
+      this.pageable.condition = {
+        code: info.node.dataRef.code
+      }
+    }
+
     this.pageQuery()
   }
 
@@ -325,7 +343,7 @@ export default class ResourceVue extends Vue {
         okType: 'danger',
         onOk: () => {
           request
-            .delete(node.key as number)
+            .delete(node.rawId as number)
             .then((res) => {
               if (res.code === 0) {
                 message.success('删除成功')
@@ -356,34 +374,37 @@ export default class ResourceVue extends Vue {
       [ContextMenuKeys.UPDATE_MOD, '更新模块']
     ])
     // 参数
-    const props: {
-      id?: string;
+    const params: {
+      id?: number;
       type?: number;
-      parentId?: string;
+      parentId?: number;
+      parentType?: number;
       parentName?: string;
     } = {
-      id: node.key as string,
-      parentId: node.key as string,
+      id: node.rawId,
+      parentId: node.rawId,
+      parentType: node.type,
       parentName: node.title as string
     }
     switch (menuKey) {
       case ContextMenuKeys.ADD_APP:
-        props.type = 1
-        delete props.id
+        params.type = TreeNodeType.APP
+        delete params.id
         break
       case ContextMenuKeys.ADD_MOD:
-        props.type = 2
-        delete props.id
+        params.type = TreeNodeType.MODULE
+        delete params.id
         break
       case ContextMenuKeys.ADD_FUN:
-        props.type = 3
-        delete props.id
+        params.type = TreeNodeType.FUNCTION
+        delete params.id
         break
       case ContextMenuKeys.UPDATE_APP:
       case ContextMenuKeys.UPDATE_MOD:
       case ContextMenuKeys.UPDATE_FUN:
-        delete props.parentId
-        delete props.parentName
+        delete params.parentId
+        delete params.parentType
+        delete params.parentName
         break
       default:
         console.log(menuKey)
@@ -395,16 +416,19 @@ export default class ResourceVue extends Vue {
       height: 650,
       content: {
         handle: true,
-        props: props,
+        props: params,
         component: ResourceForm
       },
       ok: (args: unknown[]) => {
         const data = args[0] as Resource
+        const key = `${data.type}_${data.id}`
+        const pKey = `${data.parentType}_${data.parentId}`
         // 更新
-        if (node.key === data.id) {
+        if (node.key === key) {
           node.dataRef.title = data.name
-        } else if (node.key === data.parentId) {
+        } else if (node.key === pKey) {
           if (node.dataRef.children) {
+              console.log(data)
               node.dataRef.children.push(this.toTreeDataItemOne(data))
           } else {
               this.onLoadData(node)
@@ -422,21 +446,23 @@ export default class ResourceVue extends Vue {
     return nodes.map((node) => {
       return {
         key: node.id,
-        type: node.type, // 节点类型 0单位 1应用 2模块 3功能
+        rawId: node.rawId,
+        type: node.type,
         title: node.name,
         code: node.code,
-        isLeaf: node.type === 3
+        isLeaf: node.type === TreeNodeType.FUNCTION
       } as TreeDataItem
     })
   }
 
   toTreeDataItemOne(record: Resource) {
     return {
-      key: record.id,
-      type: record.type, // 节点类型 0单位 1应用 2模块 3功能
+      key: `${record.type}_${record.id}`,
+      rawId: record.id,
+      type: record.type,
       title: record.name,
       code: record.code,
-      isLeaf: record.type === 3
+      isLeaf: record.type === TreeNodeType.FUNCTION // 功能节点为叶子节点
     } as TreeDataItem
   }
 
@@ -474,6 +500,7 @@ export default class ResourceVue extends Vue {
     sorter: { field: string; order: string; columnKey: string }
   ) {
     this.pagination.current = pag?.current || 1
+    this.pageable.curr = this.pagination.current
     this.pageable.sortField = sorter.columnKey || ''
     this.pageable.sortOrder = orderMap[sorter.order] || ''
     this.pageable.condition.name =
@@ -492,35 +519,6 @@ export default class ResourceVue extends Vue {
   handleReset(clearFilters: Function) {
     clearFilters()
     this.searchText = ''
-  }
-
-  /** 删除权限 */
-  async onResourceDel(record: Resource) {
-    const ret = await request.delete(record.id as number)
-    if (ret.code === 0) {
-      this.pageQuery()
-    } else {
-      message.error(`删除失败:${ret.msg}`)
-    }
-  }
-
-  // 编辑权限
-  onResourceEdit(resource: Resource) {
-    this.$dialog({
-      title: '权限编辑',
-      width: 550,
-      height: 650,
-      max: false,
-      content: {
-        handle: true,
-        component: ResourceForm,
-        props: { id: resource.id }
-      },
-      ok: () => {
-        this.pageQuery()
-        return true
-      }
-    })
   }
 }
 </script>

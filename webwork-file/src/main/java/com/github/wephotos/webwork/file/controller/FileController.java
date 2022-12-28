@@ -20,6 +20,7 @@ import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,25 +28,28 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.github.wephotos.webwork.file.entity.UploadResult;
 import com.github.wephotos.webwork.file.entity.WebworkFile;
+import com.github.wephotos.webwork.file.entity.po.FileGroupKeyQueryPO;
+import com.github.wephotos.webwork.file.entity.po.UploadImageBase64PO;
 import com.github.wephotos.webwork.file.service.FileService;
 import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.Result;
-import com.github.wephotos.webwork.schema.entity.Results;
+import com.github.wephotos.webwork.schema.utils.Results;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.security.utils.SecurityUtils;
 import com.github.wephotos.webwork.utils.ImageUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
 /**
- * 文件模块HTTP接口
+ * 文件模块接口
  *
  * @author TQ
  */
 @RestController
 @RequestMapping("/file")
 public class FileController {
-	// 日志
+
 	private static final Logger log = LoggerFactory.getLogger(FileController.class);
+	
     @Resource
     private FileService fileService;
 
@@ -68,58 +72,59 @@ public class FileController {
             	workFile.setUserName(user.getName());
             }
             UploadResult upload = fileService.upload(workFile);
-            return Results.newResult(upload);
+            return Results.newSuccessfullyResult(upload);
         }
     }
 
     /**
-     * 删除附件
+     * 物理删除文件
      *
-     * @param id 附件id
-     * @return {@link Result}
-     * @throws IOException IOException
+     * @param id 文件ID
+     * @return {@link Result} 成功返回 true
+     * @throws IOException IO异常
      */
-    @GetMapping("/delete/{id}")
-    public Result<Integer> delete(@PathVariable("id") String id) throws IOException {
-        int rows = fileService.deleteByPrimaryKey(id);
-        return Results.newResult(rows);
+    @GetMapping("/physical-delete/{id}")
+    public Result<Boolean> delete(@PathVariable("id") Integer id) throws IOException {
+    	Boolean bool = fileService.physicalDelete(id);
+        return Results.newSuccessfullyResult(bool);
     }
 
     /**
-     * 逻辑删除
+     * 逻辑删除文件
      *
-     * @param id 附件id
-     * @return {@link Result}
+     * @param id 文件ID
+     * @return {@link Result} 成功返回 true
      */
-    @GetMapping("/delete-soft/{id}")
-    public Result<Integer> deleteSoftById(@PathVariable("id") Integer id) {
-        int rows = fileService.deleteSoftById(id);
-        return Results.newResult(rows);
+    @GetMapping("/logical-delete/{id}")
+    public Result<Boolean> logicalDelete(@PathVariable("id") Integer id) {
+        Boolean bool = fileService.logicalDelete(id);
+        return Results.newSuccessfullyResult(bool);
     }
 
     /**
      * 获取所属附件
      *
-     * @param owner 附件主体
+     * @param fileGroupKeyQueryPO 查询参数
      * @return RestObject
      */
-    @GetMapping("/list/{owner}")
-    public Result<List<WebworkFile>> list(@PathVariable("owner") String owner) {
-        List<WebworkFile> list = fileService.list(owner);
-        return Results.newResult(list);
+    @PostMapping("/list")
+    public Result<List<WebworkFile>> listByFileGroupKey(@RequestBody FileGroupKeyQueryPO fileGroupKeyQueryPO) {
+        List<WebworkFile> list = fileService.listByFileGroupKey(fileGroupKeyQueryPO);
+        return Results.newSuccessfullyResult(list);
     }
 
     /**
      * 上传base64编码图片
      *
-     * @param owner  归属
+     * @param fileGroupKey  文件关联ID
      * @param base64 图片BASE64编码
      * @return {@link Result}
      * @throws IOException IOException
      */
     @PostMapping("/upload/base64-image")
-    public Result<UploadResult> uploadBase64Image(Integer owner, String base64, HttpSession session) throws IOException {
+    public Result<UploadResult> uploadBase64Image(@RequestBody UploadImageBase64PO uploadPO, HttpSession session) throws IOException {
         SecurityUser user = SecurityUtils.getSecurityUser(session);
+        String base64 = uploadPO.getBase64();
         //判断是否存在类似 data:image/png;base64, 的前缀
         String suffix;
         String contentType;
@@ -136,7 +141,8 @@ public class FileController {
         }
         byte[] buf = Base64Utils.decodeFromString(base64);
         WebworkFile file = new WebworkFile();
-        file.setOwner(owner);
+        file.setFileGroup(uploadPO.getFileGroup());
+        file.setFileGroupKey(uploadPO.getFileGroupKey());
         file.setInputStream(new ByteArrayInputStream(buf));
         file.setName(WebworkUtils.uuid().concat(".").concat(suffix));
         file.setUserId(user.getId());
@@ -144,7 +150,7 @@ public class FileController {
         file.setSize(buf.length);
         file.setContentType(contentType);
         UploadResult upload = fileService.upload(file);
-        return Results.newResult(upload);
+        return Results.newSuccessfullyResult(upload);
     }
 
     /**
@@ -156,7 +162,7 @@ public class FileController {
      * @throws IOException IOException
      */
     @GetMapping("/get/{id}")
-    public void get(@PathVariable("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void get(@PathVariable("id") Integer id, HttpServletRequest request, HttpServletResponse response) throws IOException {
         WebworkFile file = fileService.getFile(id);
         output(file, request, response);
     }
@@ -170,7 +176,7 @@ public class FileController {
      * @throws IOException IOException
      */
     @GetMapping("/get/thumb/{id}")
-    public void getThumb(@PathVariable("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void getThumb(@PathVariable("id") Integer id, HttpServletRequest request, HttpServletResponse response) throws IOException {
         WebworkFile file = fileService.getFile(id);
         outputThumb(file, request, response);
     }

@@ -63,6 +63,16 @@ public class User implements Serializable {
      * @see EntityState
      */
     private Integer status;
+    
+    /**
+	 * 创建用户
+	 */
+	private String createUser;
+	
+	/**
+	 * 更新用户
+	 */
+	private String updateUser;
     /**
      * 创建时间
      */

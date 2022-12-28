@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.github.wephotos.webwork.logging.entity.WebworkLog;
+import com.github.wephotos.webwork.logging.entity.po.LogQueryPO;
 import com.github.wephotos.webwork.schema.entity.Pageable;
 
 /**
@@ -26,12 +27,12 @@ public interface WebworkLogMapper {
      * @param pageable 分页条件
      * @return 总数
      */
-	int pageCount(Pageable<WebworkLog> pageable);
+	int pageCount(Pageable<LogQueryPO> pageable);
 
 	/**
 	 * 查询分页列表数据
 	 * @param pageable 列表数据
 	 * @return 列表数据
 	 */
-	List<WebworkLog> pageList(Pageable<WebworkLog> pageable);
+	List<WebworkLog> pageList(Pageable<LogQueryPO> pageable);
 }

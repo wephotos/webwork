@@ -3,6 +3,7 @@ package com.github.wephotos.webwork.user.controller;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.wephotos.webwork.schema.entity.Result;
-import com.github.wephotos.webwork.schema.entity.Results;
+import com.github.wephotos.webwork.schema.utils.Results;
+import com.github.wephotos.webwork.security.entity.SecurityUser;
+import com.github.wephotos.webwork.security.utils.SecurityUtils;
 import com.github.wephotos.webwork.user.entity.RoleUser;
 import com.github.wephotos.webwork.user.service.RoleUserService;
 
@@ -35,9 +38,11 @@ public class RoleUserController {
      * @return {@link Result} 包含数据为新增记录ID
      */
     @PostMapping("/add")
-    public Result<Integer> add(@RequestBody RoleUser record) {
+    public Result<Integer> add(@RequestBody RoleUser record, HttpSession session) {
+    	SecurityUser user = SecurityUtils.getSecurityUser(session);
+    	record.setCreateUser(user.getName());
     	Integer id = roleUserService.add(record);
-    	return Results.newResult(id);
+    	return Results.newSuccessfullyResult(id);
     }
     
     /**
@@ -48,7 +53,7 @@ public class RoleUserController {
     @GetMapping("/delete/{id}")
     public Result<Boolean> delete(@PathVariable("id") String id) {
     	boolean ret = roleUserService.deleteById(id);
-    	return  Results.newResult(ret);
+    	return  Results.newSuccessfullyResult(ret);
     }
     
     /**
@@ -59,6 +64,6 @@ public class RoleUserController {
     @GetMapping("/list-by-role")
     public Result<List<RoleUser>> listByRoleId(String roleId) {
     	List<RoleUser> data = roleUserService.listByRoleId(roleId);
-    	return  Results.newResult(data);
+    	return  Results.newSuccessfullyResult(data);
     }
 }

@@ -219,6 +219,7 @@ export default class VueUser extends Vue {
   // 表格变动监听
   handleTableChange(pag: Pagination, filters: TableStateFilters, sorter: {field: string; order: string; columnKey: string}) {
       this.pagination.current = pag?.current || 1
+      this.pageable.curr = this.pagination.current
       this.pageable.sortField = sorter.columnKey || ''
       this.pageable.sortOrder = orderMap[sorter.order] || ''
       this.pageable.condition.name = (filters.name instanceof Array ? filters.name[0] : '')
@@ -258,7 +259,7 @@ export default class VueUser extends Vue {
       content: {
         handle: true,
         component: UserForm,
-        props: { id: user.id }
+        props: { id: user.id, deptId: user.deptId }
       },
       ok: () => {
         this.pageQueryUser()

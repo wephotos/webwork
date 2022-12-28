@@ -36,6 +36,7 @@ import { UserOutlined, TeamOutlined } from '@ant-design/icons-vue'
 import { SelectEvent, TreeDataItem } from 'ant-design-vue/es/tree/Tree'
 import { TreeNode } from '@/types/TreeNode'
 import BaseRequest from '@/request/BaseRequest'
+import { TreeNodeType } from '@/types/TreeNodeType'
 // 角色用户类型定义
 export type RoleUser = {
   id?: number;
@@ -94,7 +95,7 @@ export default class RoleUserVue extends Vue {
         resolve()
         return false
       }
-      this.requestNodes(treeNode.dataRef.key).then((ret) => {
+      this.requestNodes(treeNode.dataRef.rawId).then((ret) => {
         treeNode.dataRef.children = this.toTreeDataItems(ret.data)
         this.treeData = [...this.treeData]
         resolve()
@@ -105,13 +106,13 @@ export default class RoleUserVue extends Vue {
   // 节点点击事件
   async onSelect(selectedKeys: string[], info: SelectEvent) {
     const dataRef = info.node.dataRef
-    const exists = this.users.some(item => item.userId === dataRef.key)
-    if (exists) {
+    const contains = this.users.some(item => item.userId === dataRef.rawId && dataRef.type === item.userType)
+    if (contains) {
       return false
     }
     const data: RoleUser = {
       roleId: this.roleId,
-      userId: dataRef.key,
+      userId: dataRef.rawId,
       userName: dataRef.title,
       userType: dataRef.type
     }
@@ -129,10 +130,11 @@ export default class RoleUserVue extends Vue {
     return nodes.map((node) => {
       return {
         key: node.id,
-        type: node.type, // 节点类型 0虚拟节点 1组织 2部门 3用户
+        rawId: node.rawId,
+        type: node.type,
         title: node.name,
         code: node.code,
-        isLeaf: node.type === 3
+        isLeaf: node.type === TreeNodeType.USER
       } as TreeDataItem
     })
   }

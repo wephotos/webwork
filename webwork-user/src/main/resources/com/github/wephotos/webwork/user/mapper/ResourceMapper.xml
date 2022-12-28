@@ -158,5 +158,53 @@
 		  a.status > -1
 		  AND
 		  b.role_id = #{roleId, jdbcType=INTEGER}
+		order by 
+		  a.sort ASC
+	</select>
+	
+	<!-- 根据角色集合和应用代码查询关联资源信息 -->
+	<select id="listQueryResource" resultMap="BaseResultMap">
+	  select
+		 a.id,
+		 a.name,
+		 a.type,
+		 a.code,
+		 a.parent_id,
+		 a.parent_type,
+		 a.permission,
+		 a.status,
+		 a.url,
+		 a.icon,
+		 a.sort,
+		 a.remark
+		from
+		  sys_resource a
+		left join
+		  sys_role_resource b
+		on
+		  a.id = b.resource_id		  
+		where
+		  a.status > -1
+		  <if test="appCode != null">
+		    AND
+		    a.code LIKE CONCAT(#{appCode,jdbcType=VARCHAR}, '%')
+		  </if>
+		  <if test="resoType != null">
+		    AND
+		    a.type = #{resoType, jdbcType=INTEGER}
+		  </if>
+		  AND
+		  (
+			a.common = 1
+			<if test="roleIds != null and roleIds.size() > 0 ">
+			  OR
+			  b.role_id in
+			  <foreach collection="roleIds" item="roleId" open="(" close=")" separator=",">
+			   #{roleId, jdbcType=INTEGER}
+			  </foreach>
+			</if>
+		  )
+		order by 
+		  a.sort ASC
 	</select>
 </mapper>

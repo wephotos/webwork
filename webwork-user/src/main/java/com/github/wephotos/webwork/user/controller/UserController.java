@@ -6,7 +6,6 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
-import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,20 +13,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
 import com.github.wephotos.webwork.schema.entity.Result;
-import com.github.wephotos.webwork.schema.entity.Results;
+import com.github.wephotos.webwork.schema.utils.Results;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.security.utils.SecurityUtils;
-import com.github.wephotos.webwork.user.api.entity.po.UserPo;
-import com.github.wephotos.webwork.user.api.entity.po.UserQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
-import com.github.wephotos.webwork.user.api.entity.ro.UserRo;
+import com.github.wephotos.webwork.user.entity.po.UserPO;
+import com.github.wephotos.webwork.user.entity.po.UserQueryPO;
+import com.github.wephotos.webwork.user.entity.vo.NodeVO;
+import com.github.wephotos.webwork.user.entity.vo.UserVO;
 import com.github.wephotos.webwork.user.service.UserService;
-import com.github.wephotos.webwork.user.utils.UserStateCode;
-import com.github.wephotos.webwork.user.utils.ValidationUtil;
 
 /**
  * 用户管理
@@ -38,8 +34,6 @@ import com.github.wephotos.webwork.user.utils.ValidationUtil;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-	
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     
     @Resource
     private UserService userService;
@@ -50,17 +44,11 @@ public class UserController {
      * @return {@link Result}
      */
     @PostMapping("/add")
-    public Result<Integer> add(@RequestBody UserPo user) {
-    	UserQueryPo query = UserQueryPo.builder()
-    			.account(user.getAccount())
-    			.email(user.getEmail())
-    			.phone(user.getPhone()).build();
-        ValidationUtil.isTrue(UserStateCode.USER_NAME_EXIST, userService.checkUniqueProperty(query));
-        ValidationUtil.isTrue(UserStateCode.USER_PHONE_EXIST, userService.checkUniqueProperty(query));
-        ValidationUtil.isTrue(UserStateCode.USER_MAIL_EXIST, userService.checkUniqueProperty(query));
+    public Result<Integer> add(@RequestBody UserPO user, HttpSession session) {
+    	SecurityUser sessionUser = SecurityUtils.getSecurityUser(session);
+    	user.setCreateUser(sessionUser.getName());
         Integer id = userService.create(user);
-        log.info("添加用户");
-        return Results.newResult(id);
+        return Results.newSuccessfullyResult(id);
     }
 
     /**
@@ -69,17 +57,11 @@ public class UserController {
      * @return
      */
     @PostMapping("/update")
-    public Result<Boolean> update(@RequestBody UserPo user) {
-    	UserQueryPo query = UserQueryPo.builder()
-    			.id(user.getId())
-    			.phone(user.getPhone())
-    			.email(user.getEmail())
-    			.account(user.getAccount()).build();
-        ValidationUtil.isTrue(UserStateCode.USER_PHONE_EXIST, userService.checkUniqueProperty(query));
-        ValidationUtil.isTrue(UserStateCode.USER_MAIL_EXIST, userService.checkUniqueProperty(query));
+    public Result<Boolean> update(@RequestBody UserPO user, HttpSession session) {
+    	SecurityUser sessionUser = SecurityUtils.getSecurityUser(session);
+    	user.setCreateUser(sessionUser.getName());
         boolean ret = userService.update(user);
-        log.info("更新用户");
-        return Results.newResult(ret);
+        return Results.newSuccessfullyResult(ret);
     }
     
     /**
@@ -90,7 +72,7 @@ public class UserController {
     @GetMapping("/delete/{id}")
     public Result<Boolean> delete(@PathVariable("id") Integer id) {
     	boolean ret = userService.deleteById(id);
-    	return Results.newResult(ret);
+    	return Results.newSuccessfullyResult(ret);
     }
 
     /**
@@ -100,9 +82,9 @@ public class UserController {
      * @return RestObject
      */
     @GetMapping("/get/{id}")
-    public Result<UserRo> get(@PathVariable("id") Integer id) {
-        UserRo user = userService.findUserDetailsById(id);
-        return Results.newResult(user);
+    public Result<UserVO> get(@PathVariable("id") Integer id) {
+        UserVO user = userService.findUserDetailsById(id);
+        return Results.newSuccessfullyResult(user);
     }
 
 	/**
@@ -115,7 +97,7 @@ public class UserController {
     @GetMapping("/top")
     public Result<Boolean> top(String userId, String deptId) {
         boolean ret = userService.top(userId, deptId);
-        return Results.newResult(ret);
+        return Results.newSuccessfullyResult(ret);
     }
 
     /**
@@ -124,33 +106,36 @@ public class UserController {
      * @return {@link Result}
      */
     @GetMapping("/check-unique-property")
-    public Result<Boolean> checkUniqueProperty(UserQueryPo query) {
+    public Result<Boolean> checkUniqueProperty(UserQueryPO query) {
         boolean ret = userService.checkUniqueProperty(query);
-        return Results.newResult(ret);
+        return Results.newSuccessfullyResult(ret);
     }
     
 
     /**
      * 人员分页查询
      * @param pageable 分页参数
-     * @return 分页数据 {@link Page} {@link UserRo}
+     * @return 分页数据 {@link Page} {@link UserVO}
      */
     @PostMapping("/page")
-    public Result<Page<UserRo>> page(@RequestBody Pageable<UserQueryPo> pageable) {
-    	Page<UserRo> page = userService.page(pageable);
-    	return Results.newResult(page);
+    public Result<Page<UserVO>> page(@RequestBody Pageable<UserQueryPO> pageable) {
+    	Page<UserVO> page = userService.page(pageable);
+    	return Results.newSuccessfullyResult(page);
     }
     
     /**
      * 获取人员树节点接口
-     * @param parentId 父ID
-     * @param session 会话
-     * @return {@link Result} {@link NodeRo} {@link UserNodeType}
+     * @param parentId 父节点ID
+     * @param session 当前会话
+     * @return {@link Result} {@link NodeVO}
      */
     @GetMapping("/list-tree-nodes")
-    public Result<List<NodeRo>> listTreeNodes(Integer parentId, HttpSession session) {
-    	SecurityUser user = SecurityUtils.getSecurityUser(session);
-    	List<NodeRo> nodes = userService.listTreeNodes(parentId, user);
-    	return Results.newResult(nodes);
+    public Result<List<NodeVO>> listTreeNodes(Integer parentId, HttpSession session) {
+    	// 默认使用当前用户单位
+    	if(parentId == null) {
+    		parentId = SecurityUtils.getSecurityUser(session).getGroupId();
+    	}
+    	List<NodeVO> nodes = userService.listUserNodes(parentId);
+    	return Results.newSuccessfullyResult(nodes);
     }
 }

@@ -8,6 +8,8 @@ export declare class Group {
     code?: string;
     /** 父ID */
     parentId?: number;
+    // 父节点类型
+    parentType?: number;
     /** 类型 */
     type?: number;
     /** 状态 */

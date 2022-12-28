@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.wephotos.webwork.logging.mapper.WebworkLogMapper">
-    <sql id="Base_Column_List">
-        id, name, traceId, ip, username, level, client, url, create_time, content, stack_trace
-    </sql>
-
     <resultMap id="BaseResultMap" type="com.github.wephotos.webwork.logging.entity.WebworkLog">
-        <id column="id" property="id" jdbcType="CHAR"/>
-        <result column="ip" property="ip" jdbcType="VARCHAR"/>
+        <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
-        <result column="traceId" property="traceId" jdbcType="VARCHAR"/>
-        <result column="username" property="username" jdbcType="VARCHAR"/>
         <result column="level" property="level" jdbcType="VARCHAR"/>
-        <result column="client" property="client" jdbcType="VARCHAR"/>
-        <result column="url" property="url" jdbcType="VARCHAR"/>
+        <result column="trace_id" property="traceId" jdbcType="VARCHAR"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
         <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="url" property="url" jdbcType="VARCHAR"/>
+        <result column="client_info" property="clientInfo" jdbcType="VARCHAR"/>
+        <result column="client_host" property="clientHost" jdbcType="VARCHAR"/>
         <result column="stack_trace" property="stackTrace" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+	<sql id="Base_Column_List">
+        id, name, level, trace_id, username, url,
+        client_host, client_info, content, stack_trace, create_time
+    </sql>
+    
     <insert id="insert" parameterType="com.github.wephotos.webwork.logging.entity.WebworkLog">
-        insert into webwork_log(name, trace_id, ip, username, level, client, url, create_time, content, stack_trace)
-        values (#{name}, #{traceId}, #{ip}, #{username}, #{level}, #{client}, #{url}, #{createTime}, #{content}, #{stackTrace})
+        insert into webwork_log(name, level, trace_id, username, url, client_host, client_info, 
+        						content, stack_trace, create_time)
+        values (#{name,jdbcType=VARCHAR}, #{level,jdbcType=VARCHAR}, #{traceId,jdbcType=VARCHAR}, 
+        		#{username,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{clientHost,jdbcType=VARCHAR}, 
+        		#{clientInfo,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{stackTrace,jdbcType=VARCHAR}, 
+        		#{createTime,jdbcType=TIMESTAMP})
     </insert>
     
     <select id="pageCount" resultType="int" parameterType="com.github.wephotos.webwork.schema.entity.Pageable">
@@ -33,6 +38,7 @@
     		<include refid="pageCond" />
     	</where>
     </select>
+    
     <select id="pageList" resultMap="BaseResultMap" parameterType="com.github.wephotos.webwork.schema.entity.Pageable">
     	SELECT 
     	  <include refid="Base_Column_List" />
@@ -41,28 +47,49 @@
     	<where>
     		<include refid="pageCond" />
     	</where>
-    	ORDER BY 
-    	  create_time DESC
+    	<include refid="orderBy" />
     	LIMIT 
     	  #{start, jdbcType=INTEGER}, #{size, jdbcType=INTEGER}
     </select>
+    
     <sql id="pageCond">
     	<if test="condition != null">
-    		<if test="condition.level != null">
-    			AND level = #{level, jdbcType=VARCHAR}
+    		<if test="condition.level != null and condition.level != ''">
+    			AND level = #{condition.level, jdbcType=VARCHAR}
     		</if>
-    		<if test="condition.ip != null and condition.ip != ''">
-    			AND ip = #{ip, jdbcType=VARCHAR}
+    		<if test="condition.traceId != null and condition.traceId != ''">
+    			AND trace_id = #{condition.traceId, jdbcType=VARCHAR}
     		</if>
-    		<if test="condition.name != null and condition.name != ''">
-    			AND name LIKE CONCAT('%', #{name, jdbcType=VARCHAR}, '%')
-    		</if>
-    		<if test="condition.url != null and condition.url != ''">
-    			AND url LIKE CONCAT('%', #{url, jdbcType=VARCHAR}, '%')
+    		<if test="condition.username != null and condition.username != ''">
+    			AND username = #{condition.username, jdbcType=VARCHAR}
     		</if>
     		<if test="condition.content != null and condition.content != ''">
-    			AND content LIKE CONCAT('%', #{content, jdbcType=VARCHAR}, '%')
+    			AND content LIKE CONCAT('%', #{condition.content, jdbcType=VARCHAR}, '%')
+    		</if>
+    		<if test="condition.btime != null">
+    			AND create_time >= #{condition.btime, jdbcType=TIMESTAMP}
+    		</if>
+    		<if test="condition.etime != null">
+    			<![CDATA[
+    			AND create_time <= #{condition.etime, jdbcType=TIMESTAMP}
+    			]]>
     		</if>
     	</if>
+    </sql>
+    
+    <!-- 排序 -->
+    <sql id="orderBy">
+        ORDER BY
+        <choose>
+            <when test="sortField != null and sortField !=''">
+                ${sortField}
+                <if test="sortOrder != null  and sortOrder !=''">
+                    ${sortOrder}
+                </if>
+            </when>
+            <otherwise>
+    	  		create_time DESC
+            </otherwise>
+        </choose>
     </sql>
 </mapper>

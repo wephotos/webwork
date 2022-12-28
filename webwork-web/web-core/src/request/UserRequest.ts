@@ -24,6 +24,7 @@ export class UserRequest extends BaseRequest {
     update(user: User) {
         return super.post('/user/update', user)
     }
+
     /**
      * 用户置顶
      * @param userId 用户ID

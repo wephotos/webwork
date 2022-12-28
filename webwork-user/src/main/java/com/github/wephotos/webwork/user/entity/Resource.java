@@ -83,11 +83,22 @@ public class Resource {
      */
     private String remark;
     /**
-     * 创建时间
-     */
-    private Date createTime;
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
+	 * 创建用户
+	 */
+	private String createUser;
+	
+	/**
+	 * 更新用户
+	 */
+	private String updateUser;
+	
+	/**
+	 * 创建时间
+	 */
+	private Date createTime;
+	
+	/**
+	 * 更新时间
+	 */
+	private Date updateTime;
 }

@@ -8,21 +8,22 @@ import java.io.InputStream;
 import java.util.Date;
 
 /**
- * @author chengzi
- * @date 2021-03-08 20:10
+ * 附件实体类
+ * @author TianQi
+ *
  */
 @Getter
 @Setter
 @ToString
-public class WebworkFile {
-    /**
+public class WebworkFile extends FileGroupKey {
+
+	private static final long serialVersionUID = 1L;
+
+	/**
      * 主键
      */
     private Integer id;
-    /**
-     * 附件主体
-     */
-    private Integer owner;
+    
     /**
      * 文件名
      */

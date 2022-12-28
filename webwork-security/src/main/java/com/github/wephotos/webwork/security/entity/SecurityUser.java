@@ -26,6 +26,10 @@ public class SecurityUser {
 	 */
 	private String name;
 	/**
+	 * 登录账号
+	 */
+	private String account;
+	/**
 	 * 部门ID
 	 */
 	private Integer deptId;

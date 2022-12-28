@@ -11,16 +11,14 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class UploadResult {
+public class UploadResult extends FileGroupKey {
 
-    /**
-     * PK
+	private static final long serialVersionUID = 1L;
+	
+	/**
+     * 文件ID
      */
     private Integer id;
-    /**
-     * 关联外键
-     */
-    private Integer owner;
     /**
      * 附件名称
      */
@@ -29,4 +27,5 @@ public class UploadResult {
      * 存储对象名
      */
     private String objectName;
+
 }

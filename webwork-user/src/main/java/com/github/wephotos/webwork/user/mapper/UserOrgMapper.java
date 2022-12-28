@@ -6,10 +6,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.wephotos.webwork.user.entity.UserOrg;
 
 /**
- * @author chengzi
- * @date 2021-01-25 16:43
+ * 基于mybatisplus实现基本的CRUD功能
+ * @author TianQi
+ *
  */
 @Mapper
 public interface UserOrgMapper extends BaseMapper<UserOrg> {
-
+	
 }

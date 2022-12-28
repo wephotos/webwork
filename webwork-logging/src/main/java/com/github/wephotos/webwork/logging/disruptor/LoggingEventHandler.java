@@ -51,6 +51,9 @@ public class LoggingEventHandler implements EventHandler<WebworkLoggingEvent> {
     	log.setName(event.getLoggerName());
     	log.setContent(event.getMessage());
     	log.setCreateTime(new Timestamp(event.getTimeStamp()));
+    	// MDC TraceId
+    	log.setTraceId(event.getTraceId());
+    	
     	// 堆栈信息
     	Throwable throwable = event.getThrowable();
     	if(throwable != null) {
@@ -61,10 +64,10 @@ public class LoggingEventHandler implements EventHandler<WebworkLoggingEvent> {
     	}
     	LoggerRequest request = event.getRequest();
     	if(request != null) {
-    		log.setIp(request.getIp());
     		log.setUrl(request.getRequestURL());
     		log.setUsername(request.getOperator());
-    		log.setClient(request.getUserAgent());
+    		log.setClientInfo(request.getUserAgent());
+    		log.setClientHost(request.getClientHost());
     	}
     	return log;
     }

@@ -88,7 +88,7 @@ export default class Login extends Vue {
   async handleFinish(values: UserAuth) {
     const params = `username=${this.formData.username}&password=${this.formData.password}`
     const result = await axiosUtils.post<R<LoginUser>>(
-      '/user-login/login',
+      '/platform/login',
       params,
       {
         headers: {

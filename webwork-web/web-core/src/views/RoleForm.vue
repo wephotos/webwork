@@ -37,6 +37,7 @@ import {
   PlusOutlined,
   LoadingOutlined
 } from '@ant-design/icons-vue'
+import { TreeNodeType } from '@/types/TreeNodeType'
 
 @Options({
   components: {
@@ -71,7 +72,8 @@ export default class RoleForm extends Vue {
   // 表单数据
   formData: Role = {
     id: this.id,
-    parentId: this.parentId
+    parentId: this.parentId,
+    parentType: TreeNodeType.APP
   }
 
   // 表单引用

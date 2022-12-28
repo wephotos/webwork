@@ -41,7 +41,7 @@ public class SecurityAuthFilter implements Filter {
     
     static {
     	ignorePaths.add("/resources");
-    	ignorePaths.add("/user-login/login");
+    	ignorePaths.add("/platform/login");
     }
 
     /**
@@ -88,7 +88,6 @@ public class SecurityAuthFilter implements Filter {
                 return;
             }
         }
-        log.debug("请求地址:{}", URI);
         HttpSession session = request.getSession();
         SecurityUser user = SecurityUtils.getSecurityUser(session);
         if (user == null) {

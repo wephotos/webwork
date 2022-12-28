@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.wephotos.webwork.user.mapper.UserMapper">
-    <resultMap id="BaseResultMap" type="com.github.wephotos.webwork.user.api.entity.ro.UserRo">
+    <resultMap id="BaseResultMap" type="com.github.wephotos.webwork.user.entity.vo.UserVO">
         <result column="id" property="id" jdbcType="INTEGER"/>
         <result column="account" property="account" jdbcType="VARCHAR"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
@@ -49,6 +49,8 @@
           b.dept_id = c.id
           AND
           b.org_id = d.id
+          AND
+          b.main_dept = 1
           AND
           a.id = #{id, jdbcType=INTEGER}
     </select>
@@ -145,7 +147,7 @@
                 </if>
             </when>
             <otherwise>
-                b.user_sort ASC, a.top_time DESC
+                b.user_sort ASC, b.top_time DESC
             </otherwise>
         </choose>
     </sql>

@@ -1,6 +1,8 @@
 package com.github.wephotos.webwork.file.mapper;
 
 import com.github.wephotos.webwork.file.entity.WebworkFile;
+import com.github.wephotos.webwork.file.entity.po.FileGroupKeyQueryPO;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -12,50 +14,51 @@ import java.util.List;
  */
 @Mapper
 public interface FileMapper {
+	
     /**
-     * 新增
+     * 新增文件
      *
-     * @param file file
-     * @return int
+     * @param file 文件数据
+     * @return 文件ID
      */
     int insert(WebworkFile file);
 
     /**
-     * 删除
+     * 删除文件
      *
-     * @param id id
-     * @return int
+     * @param id 文件ID
+     * @return 影响行数
      */
-    int deleteByPrimaryKey(String id);
+    int deleteByPrimaryKey(Integer id);
 
     /**
-     * 查询
+     * 查询文件记录
      *
-     * @param id id
-     * @return WebworkFile
+     * @param id 文件ID
+     * @return 文件记录
      */
-    WebworkFile selectByPrimaryKey(String id);
+    WebworkFile selectByPrimaryKey(Integer id);
 
     /**
-     * 更新
+     * 更新文件
      *
-     * @param file file
-     * @return int
+     * @param file 文件信息
+     * @return 影响行数
      */
     int updateByPrimaryKeySelective(WebworkFile file);
-
-    /**
-     * 获取所属附件
-     *
-     * @param owner 附件主体
-     * @return 附件集合
-     */
-    List<WebworkFile> list(String owner);
 
     /**
      * 根据文件存储对象名获取存储记录
      * @param objectName 文件对象名
      * @return the {@link WebworkFile}
      */
-	WebworkFile selectByObjectName(String objectName);
+    WebworkFile selectByObjectName(String objectName);
+    
+    /**
+     * 获取文件组下的文件
+     *
+     * @param fileGroupKeyQueryPO 文件组信息
+     * @return 文件列表
+     */
+    List<WebworkFile> listByFileGroupKey(FileGroupKeyQueryPO fileGroupKeyQueryPO);
 }

@@ -7,8 +7,10 @@ import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.wephotos.webwork.schema.entity.Pageable;
-import com.github.wephotos.webwork.user.api.entity.po.RoleQueryPo;
+import com.github.wephotos.webwork.user.client.entity.po.UserRoleQueryPO;
 import com.github.wephotos.webwork.user.entity.Role;
+import com.github.wephotos.webwork.user.entity.po.RoleQueryPO;
+import com.github.wephotos.webwork.user.entity.vo.RoleVO;
 
 /**
  * @author chengzi
@@ -30,14 +32,21 @@ public interface RoleMapper extends BaseMapper<Role> {
 	 * @param pageable 分页条件
 	 * @return 条数
 	 */
-	long pageCount(Pageable<RoleQueryPo> pageable);
+	long pageCount(Pageable<RoleQueryPO> pageable);
 	
 	/**
 	 * 分页查询角色
 	 * @param pageable 分页条件
 	 * @return 角色集合
 	 */
-	List<Role> pageList(Pageable<RoleQueryPo> pageable);
+	List<RoleVO> pageList(Pageable<RoleQueryPO> pageable);
+
+	/**
+	 * 查询用户角色信息
+	 * @param po 查询参数
+	 * @return 角色信息
+	 */
+	List<Role> listRoleByUserId(UserRoleQueryPO po);
 
 
 }

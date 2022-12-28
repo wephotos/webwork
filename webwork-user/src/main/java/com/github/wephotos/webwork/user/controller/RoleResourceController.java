@@ -1,6 +1,7 @@
 package com.github.wephotos.webwork.user.controller;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -8,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.wephotos.webwork.schema.entity.Result;
-import com.github.wephotos.webwork.schema.entity.Results;
-import com.github.wephotos.webwork.user.api.entity.po.RoleResourcesPo;
+import com.github.wephotos.webwork.schema.utils.Results;
+import com.github.wephotos.webwork.security.entity.SecurityUser;
+import com.github.wephotos.webwork.security.utils.SecurityUtils;
+import com.github.wephotos.webwork.user.entity.po.RoleResourcesPO;
 import com.github.wephotos.webwork.user.service.RoleResourceService;
 
 /**
@@ -31,7 +34,9 @@ public class RoleResourceController {
      * @return {@link Result}
      */
     @PostMapping("/save")
-    public Result<Void> save(@RequestBody RoleResourcesPo data) {
+    public Result<Void> save(@RequestBody RoleResourcesPO data, HttpSession session) {
+    	SecurityUser user = SecurityUtils.getSecurityUser(session);
+    	data.setCreateUser(user.getId() + "_" + user.getName());
     	roleResourceService.save(data);
     	return Results.newSuccessfullyResult();
     }

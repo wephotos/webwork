@@ -13,7 +13,7 @@
             <span @contextmenu.prevent>{{ node.title }}</span>
             <template #overlay>
               <a-menu
-                @click="({ key: menuKey }) => onContextMenuClick(node, menuKey)"
+                @click="(e) => onContextMenuClick(node)"
               >
                 <a-menu-item key="create_dict">添加子级</a-menu-item>
               </a-menu>
@@ -157,7 +157,6 @@ import { TreeNode } from '@/types/TreeNode'
 import request from '@/request/DictRequest'
 import Pageable from '@/types/Pageable'
 import { Dictionary } from '@/types/Dictionary'
-import Group from './Group.vue'
 import { R } from '@/types/R'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 
@@ -170,8 +169,7 @@ const orderMap: { [key: string]: string } = {
 }
 @Options({
   components: {
-    SearchOutlined,
-    Group
+    SearchOutlined
   }
 })
 export default class DictionaryVue extends Vue {
@@ -193,7 +191,7 @@ export default class DictionaryVue extends Vue {
     value: [{ max: 50, message: '字典值最多50个字符' }]
   }
 
-  // 权限列定义
+  // 表格列定义
   columns = [
     {
       title: '序号',
@@ -206,6 +204,11 @@ export default class DictionaryVue extends Vue {
       }) => {
         return (this.pageable.curr - 1) * this.pageable.size + info.index + 1
       }
+    },
+    {
+      title: '字典ID',
+      dataIndex: 'id',
+      width: 100
     },
     {
       title: '名称',
@@ -313,7 +316,7 @@ export default class DictionaryVue extends Vue {
 
   // 节点点击事件
   onSelect(selectedKeys: string[], info: SelectEvent) {
-    console.log(selectedKeys, info)
+    // console.log(selectedKeys, info)
     this.pageable.condition.parentId = info.node.dataRef.key
     this.pageQuery()
   }
@@ -372,6 +375,7 @@ export default class DictionaryVue extends Vue {
     sorter: { field: string; order: string; columnKey: string }
   ) {
     this.pagination.current = pag?.current || 1
+    this.pageable.curr = this.pagination.current
     this.pageable.sortField = sorter.columnKey || ''
     this.pageable.sortOrder = orderMap[sorter.order] || ''
     this.pageable.condition.name =

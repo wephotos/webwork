@@ -69,7 +69,7 @@ public class FileStorDisk implements FileStor {
             file.setObjectName(objectName);
         }
         File dest = new File(directory, objectName);
-        log.info("destFile:{}", dest.getCanonicalPath());
+        log.info("保存文件:{}", dest.getCanonicalPath());
         try (InputStream input = file.getInputStream()) {
             try (OutputStream output = FileUtils.openOutputStream(dest)) {
                 IOUtils.copy(input, output);
@@ -80,14 +80,14 @@ public class FileStorDisk implements FileStor {
     @Override
     public void delete(String objectName) throws IOException {
         File file = new File(directory, objectName);
-        log.info("delete:{}", file.getCanonicalPath());
+        log.info("删除文件:{}", file.getCanonicalPath());
         FileUtils.deleteQuietly(file);
     }
 
     @Override
     public InputStream get(String objectName) throws IOException {
         File file = new File(directory, objectName);
-        log.info("get:{}", file.getCanonicalPath());
+        log.info("获取文件:{}", file.getCanonicalPath());
         return FileUtils.openInputStream(file);
     }
 

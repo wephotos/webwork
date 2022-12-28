@@ -13,7 +13,7 @@ import com.github.wephotos.webwork.config.service.ConfigService;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
 import com.github.wephotos.webwork.schema.entity.Result;
-import com.github.wephotos.webwork.schema.entity.Results;
+import com.github.wephotos.webwork.schema.utils.Results;
 
 /**
  * 系统配置服务接口
@@ -35,7 +35,7 @@ public class ConfigController {
 	@PostMapping("/add")
 	public Result<Integer> add(@RequestBody Config config) {
 		int id = configService.add(config);
-		return Results.newResult(id);
+		return Results.newSuccessfullyResult(id);
 	}
 	
 	/**
@@ -46,7 +46,7 @@ public class ConfigController {
 	@PostMapping("/update")
 	public Result<Boolean> update(@RequestBody Config config) {
 		boolean ret = configService.update(config);
-		return Results.newResult(ret);
+		return Results.newSuccessfullyResult(ret);
 	}
 	
 	/**
@@ -57,7 +57,7 @@ public class ConfigController {
 	@PostMapping("/page")
 	public Result<Page<Config>> page(@RequestBody Pageable<Config> pageable) {
 		Page<Config> page = configService.page(pageable);
-		return Results.newResult(page);
+		return Results.newSuccessfullyResult(page);
 	}
 	
 	/**

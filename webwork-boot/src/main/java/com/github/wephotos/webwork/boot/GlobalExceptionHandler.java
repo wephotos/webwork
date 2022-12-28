@@ -49,6 +49,6 @@ public class GlobalExceptionHandler {
             return null;
         }
         log.error("系统错误", e);
-        return new Result<>(e.getMessage(), StateCode.SERVER_ERROR);
+        return new Result<>(e.getMessage(), StateCode.UNKNOW_ERROR);
     }
 }

@@ -17,17 +17,17 @@ public class WebworkRuntimeException extends RuntimeException {
 
     public WebworkRuntimeException(String message) {
         super(message);
-        this.stateCode = StateCode.SERVER_ERROR;
+        this.stateCode = StateCode.UNKNOW_ERROR;
     }
     
     public WebworkRuntimeException(Throwable cause) {
     	super(cause);
-    	this.stateCode = StateCode.SERVER_ERROR;
+    	this.stateCode = StateCode.UNKNOW_ERROR;
     }
 
     public WebworkRuntimeException(String message, Throwable cause) {
         super(message, cause);
-        this.stateCode = StateCode.SERVER_ERROR;
+        this.stateCode = StateCode.UNKNOW_ERROR;
     }
 
     public WebworkRuntimeException(StateCode stateCode, String message) {

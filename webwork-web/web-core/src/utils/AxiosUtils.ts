@@ -5,7 +5,7 @@ import axios, { AxiosRequestConfig } from 'axios'
 class AxiosUtils {
     /** axios instance */
     private instance = axios.create({
-        baseURL: process.env.BASE_URL,
+        baseURL: '/',
         timeout: 5000
     });
 

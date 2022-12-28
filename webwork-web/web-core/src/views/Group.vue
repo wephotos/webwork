@@ -7,16 +7,17 @@
     @select="onSelect"
     style="height: 100%"
     @contextmenu.prevent
+    @drop="onDrop"
   >
     <template #title="node">
       <a-dropdown :trigger="['contextmenu']">
         <span @contextmenu.prevent>{{ node.title }}</span>
         <template #overlay>
           <a-menu
-            @click="({ key: menuKey }) => onContextMenuClick(node, menuKey)"
+            @click="({key: menuKey}) => onContextMenuClick(node, menuKey)"
           >
             <!-- 单位菜单 -->
-            <template v-if="node.type == 1 || node.type == 0">
+            <template v-if="node.type == 0 || node.type == 1">
               <a-menu-item :key="contextMenuKeys.ADD_DEPT"
                 >新增部门</a-menu-item
               >
@@ -26,7 +27,8 @@
               <a-menu-item :key="contextMenuKeys.UPDATE_GROUP"
                 >更新单位</a-menu-item
               >
-              <a-menu-item :key="contextMenuKeys.DELETE_GROUP">
+              <!-- 根节点不可删除 -->
+              <a-menu-item v-if="node.parentId != null" :key="contextMenuKeys.DELETE_GROUP">
                 删除单位
               </a-menu-item>
             </template>
@@ -55,8 +57,10 @@ import { message, Modal } from 'ant-design-vue'
 import request from '@/request/GroupRequest'
 import { R } from '@/types/R'
 import { Group } from '@/types/Group'
+import { TreeNode } from '@/types/TreeNode'
 import UserForm from './UserForm.vue'
 import GroupForm from './GroupForm.vue'
+import { TreeNodeType } from '@/types/TreeNodeType'
 // 右键菜单键
 enum ContextMenuKeys {
   // 新增人员
@@ -74,6 +78,7 @@ enum ContextMenuKeys {
   // 删除单位
   DELETE_GROUP
 }
+
 /**
  * 组织机构管理
  */
@@ -85,7 +90,7 @@ export default class GroupVue extends Vue {
   treeData: TreeDataItem[] = []
   // 展开的KEY
   expandedKeys: string[] = []
-  // 右键菜单
+  // 右键菜单枚举
   contextMenuKeys = ContextMenuKeys
   /**
    * 页面挂载后
@@ -109,7 +114,7 @@ export default class GroupVue extends Vue {
         resolve()
         return false
       }
-      request.children(treeNode.dataRef.key as number).then((ret) => {
+      request.children(treeNode.dataRef.rawId as number).then((ret) => {
         treeNode.dataRef.children = this.toChildren(ret)
         this.treeData = [...this.treeData]
         resolve()
@@ -123,39 +128,42 @@ export default class GroupVue extends Vue {
   }
 
   // 右键菜单
-  onContextMenuClick(node: TreeDataItem & {}, menuKey: ContextMenuKeys) {
+  onContextMenuClick(node: TreeDataItem, menuKey: ContextMenuKeys) {
     let title
-    let props: {
-      id?: string;
-      type?: number;
-      parentId?: string;
-      parentName?: string;
+    let formData: {
+      id?: number; // rawId
+      type: number; // enum NodeType
+      parentId?: number; // 父节点ID
+      parentType?: number; // 父节点类型
+      parentName?: string; // 父节点名称
     }
     if (ContextMenuKeys.ADD_DEPT === menuKey) {
       title = '新增部门'
-      props = {
-        type: 2,
-        parentId: node.key as string,
+      formData = {
+        type: TreeNodeType.DEPT,
+        parentId: node.rawId,
+        parentType: node.type,
         parentName: node.title
       }
     } else if (ContextMenuKeys.ADD_GROUP === menuKey) {
       title = '新增单位'
-      props = {
-        type: 1,
-        parentId: node.key as string,
+      formData = {
+        type: TreeNodeType.GROUP,
+        parentId: node.rawId,
+        parentType: node.type,
         parentName: node.title
       }
     } else if (ContextMenuKeys.UPDATE_DEPT === menuKey) {
       title = '更新部门'
-      props = {
-        type: 2,
-        id: node.key as string
+      formData = {
+        id: node.rawId,
+        type: TreeNodeType.DEPT
       }
     } else if (ContextMenuKeys.UPDATE_GROUP === menuKey) {
       title = '更新单位'
-      props = {
-        type: 1,
-        id: node.key as string
+      formData = {
+        id: node.rawId,
+        type: TreeNodeType.GROUP
       }
     } else if (
       ContextMenuKeys.DELETE_DEPT === menuKey ||
@@ -166,13 +174,13 @@ export default class GroupVue extends Vue {
         okType: 'danger',
         onOk: () => {
           request
-            .delete(node.key as number)
+            .delete(node.rawId)
             .then((res) => {
               if (res.code === 0) {
                 message.success('删除成功')
                 this.loop(
                   this.treeData,
-                  node.key as number,
+                  node.key as string,
                   (item, index, arr) => {
                     arr.splice(index, 1)
                   }
@@ -197,7 +205,7 @@ export default class GroupVue extends Vue {
         content: {
           handle: true,
           component: UserForm,
-          props: { deptId: node.key, deptName: name }
+          props: { deptId: node.rawId, deptName: node.title }
         },
         ok: () => {
             this.$emit('select', [node.key], {
@@ -221,18 +229,27 @@ export default class GroupVue extends Vue {
       height: 400,
       content: {
         handle: true,
-        props: props,
+        props: formData,
         component: GroupForm
       },
       ok: (args: unknown[]) => {
         const data = args[0] as Group
-        if (node.key === data.id) {
-          // 更新
+        const key = `${data.type}_${data.id}`
+        const parentKey = `${formData.parentType}_${formData.parentId}`
+        const treeNode = {
+                            id: key,
+                            rawId: data.id,
+                            type: data.type,
+                            name: data.name,
+                            code: data.code
+                          } as TreeNode
+        if (node.key === key) {
+          // 更新节点名称
           node.dataRef.title = data.name
-        } else if (node.key === data.parentId) {
+        } else if (node.key === parentKey) {
           // 当前节点下新增
           if (node.dataRef.children) {
-            node.dataRef.children.push(this.dataToTreeDataItem(data))
+            node.dataRef.children.push(this.dataToTreeDataItem(treeNode))
           } else {
             this.onLoadData(node)
           }
@@ -240,9 +257,9 @@ export default class GroupVue extends Vue {
           // 非当前节点下新增
           this.loop(
             this.treeData,
-            data.parentId || 0,
+            parentKey,
             (item, index, arr) => {
-              item.children && item.children.push(this.dataToTreeDataItem(data))
+              item.children && item.children.push(this.dataToTreeDataItem(treeNode))
             }
           )
         }
@@ -257,27 +274,29 @@ export default class GroupVue extends Vue {
   }
 
   // 转为树节点类型
-  toChildren(ret: R<Group[]>) {
+  toChildren(ret: R<TreeNode[]>) {
     return ret.data.map((value) => {
       return this.dataToTreeDataItem(value)
     })
   }
 
   // 数据转树节点
-  dataToTreeDataItem(data: Group) {
+  dataToTreeDataItem(data: TreeNode) {
     return {
       key: data.id,
-      type: data.type, // 节点类型 0虚拟节点 1组织 2部门
+      type: data.type,
       title: data.name,
       code: data.code,
-      isLeaf: data.type === 2
+      rawId: data.rawId,
+      sort: data.sort,
+      isLeaf: data.type === TreeNodeType.DEPT
     } as TreeDataItem
   }
 
   // 查询树节点
   loop(
     data: TreeDataItem[],
-    key: number,
+    key: string,
     callback: (item: TreeDataItem, index: number, arr: TreeDataItem[]) => void
   ) {
     data.forEach((item, index, arr) => {
@@ -286,6 +305,87 @@ export default class GroupVue extends Vue {
       }
       if (item.children) {
         return this.loop(item.children, key, callback)
+      }
+    })
+  }
+
+  // 拖拽排序
+  onDrop(info: { node: TreeDataItem; dragNode: TreeDataItem; dropToGap: boolean; dropPosition: number; [key: string]: any }) {
+    // console.log(info)
+    // 忽略拖入节点内的操作
+    if (!info.dropToGap) {
+      return false
+    }
+    // 只能同一层级内拖拽
+    const dragPos = info.dragNode.pos as string
+    if (info.node.pos.substring(0, info.node.pos.length - 1) !== dragPos.substring(0, dragPos.length - 1)) {
+      return false
+    }
+    const dropKey = info.node.dataRef.key as string
+    const dragKey = info.dragNode.dataRef.key as string
+    const dropPos = info.node.pos.split('-')
+    const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1])
+
+    // Find dragObject
+    let dragIndex = 0
+    let dragObj: TreeDataItem = {}
+    this.loop(this.treeData, dragKey, (item: TreeDataItem, index: number, arr: TreeDataItem[]) => {
+      arr.splice(index, 1)
+      dragObj = item
+      dragIndex = index
+    })
+
+    let dropIndex = 0
+    let nodes: TreeDataItem[] = []
+    this.loop(this.treeData, dropKey, (_item: TreeDataItem, index: number, arr: TreeDataItem[]) => {
+      nodes = arr
+      dropIndex = index
+    })
+    // debugger
+    if (dropPosition === -1) {
+      nodes.splice(dropIndex, 0, dragObj)
+    } else {
+      nodes.splice(dropIndex + 1, 0, dragObj)
+    }
+
+    // 重新查找拖拽节点, 向上拖拽取下节点，向下拖拽取上节点
+    let targetNode: TreeDataItem = {}
+    this.loop(this.treeData, dragKey, (item: TreeDataItem, index: number, arr: TreeDataItem[]) => {
+      if (index < dragIndex) {
+        targetNode = arr[index + 1]
+      } else if (index > dragIndex) {
+        targetNode = arr[index - 1]
+      }
+    })
+    if (!targetNode.key) {
+      return false
+    }
+    // 获取父节点ID
+    let parentId
+    this.loopParentNode(dragKey, {}, this.treeData, (pNode: TreeDataItem) => {
+      parentId = pNode.rawId
+    })
+    // console.log('targetNode', targetNode)
+    const dropSort = {
+      parent: parentId,
+      sort: dragObj.sort,
+      targetSort: targetNode.sort
+    }
+    // console.log('dropSort', dropSort)
+    request.dropSort(dropSort).then(ret => {
+      console.log(ret.code, ret.msg, ret.data)
+    })
+    return false
+  }
+
+  // 查询父节点
+  loopParentNode(key: string, pNode: TreeDataItem, children: TreeDataItem[], callback: (pNode: TreeDataItem) => void) {
+    children.forEach((item, index, arr) => {
+      if (key === item.key) {
+        return callback(pNode)
+      }
+      if (item.children) {
+        this.loopParentNode(key, item, item.children, callback)
       }
     })
   }

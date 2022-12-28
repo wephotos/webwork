@@ -30,7 +30,10 @@ public class RoleResource {
      * 菜单id
      */
     private Integer resourceId;
-    
+    /**
+	 * 创建用户
+	 */
+	private String createUser;
     /**
      * 创建时间
      */

@@ -20,7 +20,7 @@
         @change="handleUploadChange"
         :before-upload="beforeUpload"
       >
-        <img :key="iconKey" v-if="formData.icon" :src="iconUrl" alt="图标" />
+        <img v-if="formData.icon" :src="iconUrl" alt="图标" />
         <div v-else>
           <loading-outlined v-if="iconLoading"></loading-outlined>
           <plus-outlined v-else></plus-outlined>
@@ -66,6 +66,7 @@ import {
   PlusOutlined,
   LoadingOutlined
 } from '@ant-design/icons-vue'
+
 interface FileItem {
   uid: string;
   name?: string;
@@ -100,6 +101,9 @@ interface FileInfo {
     parentId: {
       type: Number
     },
+    parentType: {
+      type: Number
+    },
     parentName: {
       type: String
     },
@@ -113,6 +117,7 @@ export default class ResourceForm extends Vue {
   type!: number
   // 父级节点
   parentId!: number
+  parentType!: number
   parentName!: string
   // 当前弹框
   dialog!: Dialog
@@ -120,7 +125,8 @@ export default class ResourceForm extends Vue {
   formData: Resource = {
     id: this.id,
     type: this.type,
-    parentId: this.parentId
+    parentId: this.parentId,
+    parentType: this.parentType
   }
 
   // 表单引用
@@ -133,13 +139,15 @@ export default class ResourceForm extends Vue {
     remark: [{ max: 50, message: '备注信息最多50个字符' }]
   }
 
-  // 图标相关
-  iconKey = Math.random()
   // 头像上传标志
   iconLoading = false
   // 用户头像地址
   get iconUrl() {
-    return `/file/download/thumb/${this.formData.icon}`
+    if (this.formData.reicon) {
+      return `/file/download/thumb/${this.formData.reicon}`
+    } else {
+      return `/file/download/thumb/${this.formData.icon}`
+    }
   }
 
   // 上传头像数据
@@ -170,7 +178,7 @@ export default class ResourceForm extends Vue {
     if (info.file.status === 'done') {
       if (info.file.response?.code === 0) {
         this.formData.icon = info.file.response.data.objectName
-        this.iconKey = Math.random()
+        this.formData.reicon = this.formData.icon + '?random=' + Math.random()
       } else {
         message.error(info.file.response?.msg as string)
       }
@@ -206,7 +214,8 @@ export default class ResourceForm extends Vue {
           let ret
           if (!this.id) {
             ret = await request.add(data)
-            data.id = ret.data
+            data.id = ret.data.id
+            data.code = ret.data.code
           } else {
             ret = await request.update(data)
           }

@@ -140,7 +140,7 @@ export default class Client extends Vue {
 
   // 请求实例
   private instance = axios.create({
-    baseURL: process.env.BASE_URL,
+    baseURL: '/',
     timeout: 5000
   })
 

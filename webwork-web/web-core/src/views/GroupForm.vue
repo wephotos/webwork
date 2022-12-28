@@ -16,11 +16,11 @@
       name="parentId"
     >
       <a-tree-select
-        v-model:value="formData.parentId"
-        :defaultValue="formData.parentName"
         :disabled="!!id"
         :tree-data="treeData"
         :load-data="onLoadData"
+        v-model:value="formData.parentName"
+        @change="onSelectChange"
         @treeExpand="onSelectTreeExpand"
         tree-default-expand-all
         style="width: 100%"
@@ -54,6 +54,7 @@ import { message } from 'ant-design-vue'
 import { Options, Vue } from 'vue-class-component'
 import { TreeDataItem } from 'ant-design-vue/es/tree/Tree'
 import { TreeNode } from '@/types/TreeNode'
+import { TreeNodeType } from '@/types/TreeNodeType'
 /**
  * 组织机构表单
  */
@@ -66,6 +67,9 @@ import { TreeNode } from '@/types/TreeNode'
       type: Number
     },
     parentId: {
+      type: Number
+    },
+    parentType: {
       type: Number
     },
     parentName: {
@@ -81,6 +85,7 @@ export default class GroupForm extends Vue {
   type!: number
   // 父级节点
   parentId!: number
+  parentType!: number
   parentName!: string
   // 当前弹框
   dialog!: Dialog
@@ -93,9 +98,11 @@ export default class GroupForm extends Vue {
     parentName?: string;
   } = {
     id: this.id,
+    type: this.type,
     enabled: true, // 默认启用
     virtual: false, // 默认非虚拟节点
     parentId: this.parentId,
+    parentType: this.parentType,
     parentName: this.parentName
   }
 
@@ -118,7 +125,7 @@ export default class GroupForm extends Vue {
   // 加载数据
   async mounted() {
     // 加载组织机构根节点
-    const ret = await request.deepTreeNodes()
+    const ret = await request.loadGroupNodes()
     if (ret.code !== 0) {
       message.error(ret.msg)
       return false
@@ -134,7 +141,8 @@ export default class GroupForm extends Vue {
       }
       this.formData = {
         ...this.formData,
-        ...ret.data
+        ...ret.data,
+        parentName: ret.data.parentType + '_' + ret.data.parentId
       }
     }
   }
@@ -148,7 +156,7 @@ export default class GroupForm extends Vue {
         resolve()
         return false
       }
-      request.children(treeNode.dataRef.key as number).then((ret) => {
+      request.children(treeNode.dataRef.rawId as number).then((ret) => {
         treeNode.dataRef.children = this.toChildren(ret)
         this.treeData = [...this.treeData]
         resolve()
@@ -160,6 +168,13 @@ export default class GroupForm extends Vue {
     console.log(expandedKeys)
   }
 
+  // 切换上级单位
+  onSelectChange(value: any, label: any, extra: any) {
+    // console.log(value, label, extra)
+    this.formData.parentId = extra.triggerNode.dataRef.rawId
+    this.formData.parentType = extra.triggerNode.dataRef.type
+  }
+
   // 保存
   onSubmit() {
     const formUnref = unref(this.formRef)
@@ -167,26 +182,28 @@ export default class GroupForm extends Vue {
       formUnref
         .validate()
         .then(async () => {
-          const data = { ...toRaw(this.formData) }
-          data.type = data.virtual ? 0 : this.type
-          data.status = data.enabled ? 1 : 0
-          delete data.virtual
-          delete data.enabled
+          // 节点类型
+          if (this.formData.virtual) {
+            this.formData.type = 0
+          }
+          // 节点状态
+          this.formData.status = this.formData.enabled ? 1 : 0
+
+          let { enabled, virtual, parentName, ...data } = toRaw(this.formData)
 
           let ret
-          if (this.id) {
-            ret = await request.update(data)
-          } else {
+          if (!this.id) {
             ret = await request.add(data)
-            data.id = ret.data
-          }
-          if (ret.code !== 0) {
-            message.error(`错误:${ret.msg}`)
+            data = (await request.find(ret.data)).data
           } else {
-            this.dialog._ok(data)
+            ret = await request.update(data)
           }
-        })
-        .catch((error: ValidateErrorEntity<Group>) => {
+          if (ret.code === 0) {
+            this.dialog._ok(data)
+          } else {
+            message.error(`错误:${ret.msg}`)
+          }
+        }).catch((error: ValidateErrorEntity<Group>) => {
           console.log('error', error)
         })
   }
@@ -197,17 +214,18 @@ export default class GroupForm extends Vue {
   }
 
   // 转为树节点类型
-  toChildren(ret: R<Group[]>) {
-    return ret.data.map((value) => {
+  toChildren(ret: R<TreeNode[]>) {
+    return ret.data.map((node) => {
       return {
-        key: value.id,
-        type: value.type, // 节点类型 0虚拟节点 1组织 2部门
-        value: value.id,
-        title: value.name,
-        code: value.code,
-        isLeaf: value.type === 2,
-        // disabled: value.type === 2
-        selectable: value.type === 1
+        key: node.id,
+        rawId: node.rawId,
+        type: node.type,
+        value: node.id,
+        title: node.name,
+        code: node.code,
+        isLeaf: node.type === TreeNodeType.DEPT,
+        // disabled: value.type === TreeNodeType.DEPT
+        selectable: node.type === TreeNodeType.GROUP
       } as TreeDataItem
     })
   }
@@ -217,13 +235,14 @@ export default class GroupForm extends Vue {
     return nodes.map((node) => {
       return {
         key: node.id,
-        type: node.type, // 节点类型 0虚拟节点 1组织 2部门
+        rawId: node.rawId,
+        type: node.type, // 节点类型 0虚拟节点 1单位 2部门
         value: node.id,
         title: node.name,
         code: node.code,
-        isLeaf: node.type === 2,
-        // disabled: value.type === 2
-        selectable: node.type === 1,
+        isLeaf: node.type === TreeNodeType.DEPT,
+        // disabled: node.type === TreeNodeType.DEPT
+        selectable: node.type === TreeNodeType.GROUP,
         children: this.toAntTreeNodes(node.children)
       } as TreeDataItem
     })

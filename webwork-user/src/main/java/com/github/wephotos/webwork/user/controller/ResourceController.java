@@ -15,18 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
 import com.github.wephotos.webwork.schema.entity.Result;
-import com.github.wephotos.webwork.schema.entity.Results;
+import com.github.wephotos.webwork.schema.utils.Results;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.security.utils.SecurityUtils;
-import com.github.wephotos.webwork.user.api.entity.po.ResourceQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
 import com.github.wephotos.webwork.user.entity.Resource;
+import com.github.wephotos.webwork.user.entity.po.NodeQueryPO;
+import com.github.wephotos.webwork.user.entity.po.ResourceQueryPO;
+import com.github.wephotos.webwork.user.entity.vo.NodeVO;
+import com.github.wephotos.webwork.user.entity.vo.ResoVO;
 import com.github.wephotos.webwork.user.service.ResourceService;
-import com.github.wephotos.webwork.user.utils.UserStateCode;
-import com.github.wephotos.webwork.user.utils.ValidationUtil;
 
 /**
- * 资源菜单
+ * 资源管理接口
  *
  * @author chengzi
  * @date 2021-01-25 16:55
@@ -47,7 +47,7 @@ public class ResourceController {
     @GetMapping("/get/{id}")
     public Result<Resource> get(@PathVariable("id") Integer id) {
         Resource resource = resourceService.selectById(id);
-        return Results.newResult(resource);
+        return Results.newSuccessfullyResult(resource);
     }
     
     /**
@@ -57,10 +57,12 @@ public class ResourceController {
      * @return {@link Result}
      */
     @PostMapping("/add")
-    public Result<Integer> add(@RequestBody Resource resource) {
-        ValidationUtil.isFalse(UserStateCode.RESOURCE_CODE_EXIST, resourceService.isExistsPermission(resource));
-        Integer id = resourceService.add(resource);
-        return Results.newResult(id);
+    public Result<ResoVO> add(@RequestBody Resource resource, HttpSession session) {
+    	SecurityUser user = SecurityUtils.getSecurityUser(session);
+    	resource.setCreateUser(user.getName());
+    	resource.setUpdateUser(user.getName());
+        ResoVO data = resourceService.add(resource);
+        return Results.newSuccessfullyResult(data);
     }
 
     /**
@@ -70,10 +72,11 @@ public class ResourceController {
      * @return {@link Result}
      */
     @PostMapping("/update")
-    public Result<Boolean> update(@RequestBody Resource resource) {
-        ValidationUtil.isFalse(UserStateCode.RESOURCE_CODE_EXIST, resourceService.isExistsPermission(resource));
+    public Result<Boolean> update(@RequestBody Resource resource, HttpSession session) {
+    	SecurityUser user = SecurityUtils.getSecurityUser(session);
+    	resource.setUpdateUser(user.getName());
         boolean ret = resourceService.update(resource);
-        return Results.newResult(ret);
+        return Results.newSuccessfullyResult(ret);
     }
     
     /**
@@ -84,7 +87,7 @@ public class ResourceController {
     @GetMapping("/delete/{id}")
     public Result<Boolean> delete(@PathVariable("id") Integer id) {
     	boolean ret = resourceService.deleteById(id);
-    	return Results.newResult(ret);
+    	return Results.newSuccessfullyResult(ret);
     }
     
     /**
@@ -93,33 +96,34 @@ public class ResourceController {
      * @return 分页数据 {@link Page} {@link Resource}
      */
     @PostMapping("/page")
-    public Result<Page<Resource>> page(@RequestBody Pageable<ResourceQueryPo> pageable) {
+    public Result<Page<Resource>> page(@RequestBody Pageable<ResourceQueryPO> pageable) {
     	Page<Resource> page = resourceService.page(pageable);
-    	return Results.newResult(page);
+    	return Results.newSuccessfullyResult(page);
     }
     
     /**
      * 获取下级资源节点
-     * @param parentId 父 节点
+     * @param query 父 节点
      * @param session 会话对象
-     * @return {@link NodeRo}
+     * @return {@link NodeVO}
      */
-    @GetMapping("/list-nodes")
-    public Result<List<NodeRo>> listNodes(Integer parentId, HttpSession session) {
+    @PostMapping("/list-nodes")
+    public Result<List<NodeVO>> listNodes(@RequestBody NodeQueryPO query, HttpSession session) {
     	SecurityUser user = SecurityUtils.getSecurityUser(session);
-    	List<NodeRo> nodes = resourceService.listTreeNodes(parentId, user);
-    	return Results.newResult(nodes);
+    	query.setUserGroupId(user.getGroupId());
+    	List<NodeVO> nodes = resourceService.listNodes(query);
+    	return Results.newSuccessfullyResult(nodes);
     }
     
     /**
      * 获取资源树结构全部树节点
-     * @param parentId 父节点ID
-     * @return {@link NodeRo}
+     * @param query 父节点ID
+     * @return {@link NodeVO}
      */
-    @GetMapping("/deep-tree-nodes")
-    public Result<List<NodeRo>> deepTreeNodes(Integer parentId) {
-    	List<NodeRo> nodes = resourceService.deepTreeNodes(parentId);
-    	return Results.newResult(nodes);
+    @PostMapping("/load-all-nodes")
+    public Result<List<NodeVO>> loadAllNodes(@RequestBody NodeQueryPO query) {
+    	List<NodeVO> nodes = resourceService.loadAllNodes(query);
+    	return Results.newSuccessfullyResult(nodes);
     }
     
     /**
@@ -130,7 +134,7 @@ public class ResourceController {
     @GetMapping("/list-by-role")
     public Result<List<Resource>> listByRoleId(Integer roleId) {
     	List<Resource> resources = resourceService.listByRoleId(roleId);
-    	return Results.newResult(resources);
+    	return Results.newSuccessfullyResult(resources);
     }
 
 }

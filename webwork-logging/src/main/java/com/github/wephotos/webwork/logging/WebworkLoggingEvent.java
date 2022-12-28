@@ -28,6 +28,11 @@ public class WebworkLoggingEvent implements LoggingEvent {
     private long timeStamp;
     private Throwable throwable;
     private LoggerRequest request;
+    
+    /**
+     * MDC 全局追踪ID
+     */
+    private String traceId;
 
     /**
      * 当前请求相关信息
@@ -39,15 +44,15 @@ public class WebworkLoggingEvent implements LoggingEvent {
     @ToString
     public static class LoggerRequest {
         /**
-         * 请求者的ip
-         */
-        private String ip;
-        /**
          * 操作者
          */
         private String operator;
         /**
-         * 浏览器
+         * 客户端主机
+         */
+        private String clientHost;
+        /**
+         * 客户端(浏览器)信息
          */
         private String userAgent;
         /**

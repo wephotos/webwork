@@ -1,6 +1,6 @@
 // vue.config.js
 module.exports = {
-    publicPath: '/',
+    publicPath: '/web-core',
     assetsDir: 'resources',
     lintOnSave: true,
     devServer: {

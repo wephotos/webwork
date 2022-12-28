@@ -24,13 +24,19 @@ export class GroupRequest extends BaseRequest {
         return super.post('/organization/update', data)
     }
 
-    /** 查询子级  */
-    children(parentId?: number) {
-        return super.get<Group[]>('/organization/children' + (parentId ? `?parentId=${parentId}` : ''))
+    /** 加载当前用户的单位树数据 */
+    loadGroupNodes() {
+        return super.get<TreeNode[]>('/organization/load-nodes')
     }
-    /** 当前组织节点树 */
-    deepTreeNodes() {
-        return super.get<TreeNode[]>('/organization/deep-tree-nodes')
+
+    /** 查询组织机构子节点  */
+    children(parentId?: number) {
+        return super.get<TreeNode[]>('/organization/children' + (parentId ? `?parentId=${parentId}` : ''))
+    }
+
+    /** 拖动排序 */
+    dropSort(params: {parent: any; sort: number; targetSort: number}) {
+        return super.post<boolean>('/organization/drop-sort', params)
     }
 }
 

@@ -54,6 +54,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/Login.vue')
   },
   {
+    path: '/log-query',
+    name: 'LogQuery',
+    component: () => import('../views/LogQuery.vue')
+  },
+  {
     path: '/:catchAll(.*)',
     name: '404',
     component: () => import('../views/NotFound.vue')

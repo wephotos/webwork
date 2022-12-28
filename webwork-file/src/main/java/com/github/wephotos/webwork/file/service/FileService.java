@@ -3,25 +3,35 @@ package com.github.wephotos.webwork.file.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.github.wephotos.webwork.file.entity.FileGroup;
 import com.github.wephotos.webwork.file.entity.UploadResult;
 import com.github.wephotos.webwork.file.entity.WebworkFile;
+import com.github.wephotos.webwork.file.entity.po.FileGroupKeyQueryPO;
 import com.github.wephotos.webwork.file.mapper.FileMapper;
 import com.github.wephotos.webwork.file.stor.FileStor;
+import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
+import com.github.wephotos.webwork.schema.exception.StateCode;
+import com.github.wephotos.webwork.schema.exception.WebworkRuntimeException;
 import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
 /**
- * @author chengzi
- * @date 2021-03-08 19:59
+ * 文件服务
+ * @author TianQi
+ *
  */
 @Service
 public class FileService {
+	
+	private static final Logger log = LoggerFactory.getLogger(FileService.class);
 
     public FileService() {
     }
@@ -47,6 +57,7 @@ public class FileService {
      * @throws IOException IO异常
      */
     public UploadResult upload(WebworkFile file) throws IOException {
+    	log.info("上传文件: {}", file);
         // 是否覆盖原文件
         boolean isOverwrite = false;
         String objectName = file.getObjectName();
@@ -62,8 +73,18 @@ public class FileService {
         	}
         }
         if(!isOverwrite) {
+        	// 默认文件组
+        	if(StringUtils.isBlank(file.getFileGroup())) {
+        		file.setFileGroup(FileGroup.DEFAULT_GROUP.getName());
+        	}else if(FileGroup.containsGroup(file.getFileGroup())) {
+        		throw new WebworkRuntimeException(StateCode.PARAMETER_ILLEGAL, "文件组未注册:" + file.getFileGroup());
+        	}
+        	// 文件组的key为空时使用32位UUID作为key
+        	if(StringUtils.isBlank(file.getFileGroupKey())) {
+        		file.setFileGroupKey(UUID.randomUUID().toString().replace("-", ""));
+        	}
         	file.setStatus(EntityState.ENABLED.getValue());
-        	file.setCreateTime(WebworkUtils.timestamp());
+        	file.setCreateTime(WebworkUtils.nowTime());
         	fileMapper.insert(file);
         }
         //存储文件
@@ -72,21 +93,38 @@ public class FileService {
         return UploadResult.builder()
                            .id(file.getId())
                            .name(file.getName())
-                           .owner(file.getOwner())
+                           //.fileGroup(file.getFileGroup())
+                           //.fileGroupKey(file.getFileGroupKey())
                            .objectName(file.getObjectName()).build();
     }
 
     /**
-     * 删除
+     * 逻辑删除
      *
-     * @param id 附件id
-     * @return {@link java.lang.Integer} 大于0表示删除成功
+     * @param id 文件ID
+     * 
+     * @return 删除成功返回 true
+     */
+    public boolean logicalDelete(Integer id) {
+    	log.info("逻辑删除文件, id = {}", id);
+        WebworkFile file = new WebworkFile();
+        file.setId(id);
+        file.setStatus(EntityState.DELETED.getValue());
+        return fileMapper.updateByPrimaryKeySelective(file) == 1;
+    }
+    
+    /**
+     * 物理删除文件
+     *
+     * @param id 文件ID
+     * @return 删除成功返回 true
      * @throws IOException IO异常
      */
-    public int deleteByPrimaryKey(String id) throws IOException {
+    public boolean physicalDelete(Integer id) throws IOException {
+    	log.info("物理删除文件, id = {}", id);
         WebworkFile file = fileMapper.selectByPrimaryKey(id);
         fileStor.delete(file.getObjectName());
-        return fileMapper.deleteByPrimaryKey(id);
+        return fileMapper.deleteByPrimaryKey(id) == 1;
     }
 
     /**
@@ -96,7 +134,8 @@ public class FileService {
      * @return {@link WebworkFile}
      * @throws IOException IO异常
      */
-    public WebworkFile getFile(String id) throws IOException {
+    public WebworkFile getFile(Integer id) throws IOException {
+    	log.info("获取文件, id = {}", id);
         WebworkFile file = fileMapper.selectByPrimaryKey(id);
         file.setInputStream(fileStor.get(file.getObjectName()));
         return file;
@@ -110,30 +149,20 @@ public class FileService {
      * @throws IOException IO异常
      */
     public WebworkFile getFileByObjectName(String objectName) throws IOException {
+    	log.info("获取文件, objectName = {}", objectName);
         WebworkFile file = fileMapper.selectByObjectName(objectName);
         file.setInputStream(fileStor.get(file.getObjectName()));
         return file;
     }
 
     /**
-     * 获取文件
+     * 获取文件组下的文件
      *
-     * @param owner 附件归属者
+     * @param fileGroupKeyQueryPO 文件组信息
      * @return {@link List<WebworkFile>}
      */
-    public List<WebworkFile> list(String owner) {
-        return fileMapper.list(owner);
-    }
-
-    /**
-     * 逻辑删除
-     *
-     * @param id id
-     */
-    public int deleteSoftById(Integer id) {
-        WebworkFile file = new WebworkFile();
-        file.setId(id);
-        file.setStatus(EntityState.DELETED.getValue());
-        return fileMapper.updateByPrimaryKeySelective(file);
+    public List<WebworkFile> listByFileGroupKey(FileGroupKeyQueryPO fileGroupKeyQueryPO) {
+    	log.info("查询文件组下文件: {}", fileGroupKeyQueryPO);
+        return fileMapper.listByFileGroupKey(fileGroupKeyQueryPO);
     }
 }

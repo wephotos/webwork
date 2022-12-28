@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.github.wephotos.webwork.logging.disruptor.LoggingEventHandler;
 import com.github.wephotos.webwork.logging.entity.WebworkLog;
+import com.github.wephotos.webwork.logging.entity.po.LogQueryPO;
 import com.github.wephotos.webwork.logging.mapper.WebworkLogMapper;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
@@ -54,7 +55,7 @@ public class WebworkLogServiceDb implements WebworkLogService {
 	 * @param pageable 分页条件
 	 * @return 分页数据
 	 */
-	public Page<WebworkLog> pageQuery(Pageable<WebworkLog> pageable){
+	public Page<WebworkLog> pageQuery(Pageable<LogQueryPO> pageable){
 		int count = this.webworkLogMapper.pageCount(pageable);
 		List<WebworkLog> data = this.webworkLogMapper.pageList(pageable);
 		return new Page<>(count, data);

@@ -1,32 +1,41 @@
 package com.github.wephotos.webwork.user.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
+import com.github.wephotos.webwork.schema.entity.Result;
 import com.github.wephotos.webwork.schema.exception.StateCode;
 import com.github.wephotos.webwork.schema.exception.WebworkRuntimeException;
-import com.github.wephotos.webwork.user.api.entity.po.UserPo;
-import com.github.wephotos.webwork.user.api.entity.po.UserQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
-import com.github.wephotos.webwork.user.api.entity.ro.UserRo;
+import com.github.wephotos.webwork.schema.utils.Results;
+import com.github.wephotos.webwork.user.client.entity.po.UserLoginPO;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.entity.User;
 import com.github.wephotos.webwork.user.entity.UserOrg;
 import com.github.wephotos.webwork.user.entity.enums.NodeTypeEnum;
+import com.github.wephotos.webwork.user.entity.po.UserPO;
+import com.github.wephotos.webwork.user.entity.po.UserQueryPO;
+import com.github.wephotos.webwork.user.entity.vo.NodeVO;
+import com.github.wephotos.webwork.user.entity.vo.UserVO;
 import com.github.wephotos.webwork.user.mapper.UserMapper;
-import com.github.wephotos.webwork.user.mapper.UserOrgMapper;
-import com.github.wephotos.webwork.user.utils.TreeNodeConverter;
+import com.github.wephotos.webwork.user.utils.NodeConverter;
+import com.github.wephotos.webwork.user.utils.UserStateCode;
+import com.github.wephotos.webwork.user.utils.ValidationUtils;
 import com.github.wephotos.webwork.utils.BeanUtils;
 import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
@@ -38,20 +47,61 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class UserService extends ServiceImpl<UserMapper, User> {
+	
+	private static final Logger log = LoggerFactory.getLogger(UserService.class);
+	
     @Resource
     private UserMapper userMapper;
+    
     @Resource
-    private UserOrgMapper userOrgMapper;
+    private UserOrgService userOrgService;
+    
     @Resource
     private OrganizationService organizationService;
     
     /**
-     * 根据用户ID，查询用户详细信息，包含部门单位角色等
-     * @param id 用户ID
-     * @return {@link UserRo}
+     * 创建用户
+     * @param userPO 用户信息
+     * @return 用户ID
      */
-    public UserRo findUserDetailsById(Integer id) {
-    	return userMapper.findById(id);
+    public Integer create(UserPO userPO) {
+    	Integer deptId = userPO.getDeptId();
+    	if(deptId == null) {
+    		throw new IllegalArgumentException("部门ID不能为空");
+    	}
+    	UserQueryPO query = UserQueryPO.builder()
+    			.account(userPO.getAccount())
+    			.email(userPO.getEmail())
+    			.phone(userPO.getPhone()).build();
+        ValidationUtils.isTrue(checkUniqueProperty(query), UserStateCode.USER_ACCOUNT_EXIST);
+        ValidationUtils.isTrue(checkUniqueProperty(query), UserStateCode.USER_PHONE_EXIST);
+        ValidationUtils.isTrue(checkUniqueProperty(query), UserStateCode.USER_MAIL_EXIST);
+        log.info("创建用户: {}", userPO);
+        
+    	User user = BeanUtils.toBean(userPO, User.class);
+    	if(user.getStatus() == null) {
+    		user.setStatus(EntityState.ENABLED.getValue());
+    	}
+    	user.setUpdateUser(user.getCreateUser());
+        Date time = WebworkUtils.nowTime();
+        user.setCreateTime(time);
+        user.setUpdateTime(time);
+        userMapper.insert(user);
+        
+        // 获取部门单位
+        int sort = userMapper.maxSortByDeptId(deptId);
+        Organization org = organizationService.findDeptGroup(deptId);
+        UserOrg userOrg = new UserOrg();
+        userOrg.setUserId(user.getId());
+        userOrg.setDeptId(deptId);
+        userOrg.setOrgId(org.getId());
+        userOrg.setUserSort(sort);
+        userOrg.setMainDept(true);
+        userOrg.setTopTime(time);
+        userOrg.setCreateUser(user.getCreateUser());
+        userOrg.setCreateTime(user.getCreateTime());
+        userOrgService.save(userOrg);
+        return user.getId();
     }
 
     /**
@@ -60,18 +110,29 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * @return
      */
 	public boolean deleteById(Integer id) {
+		log.info("删除用户, id = {}", id);
 		User user = new User();
 		user.setId(id);
 		user.setStatus(EntityState.DELETED.getValue());
 		return userMapper.updateById(user) == 1;
 	}
+	
+    /**
+     * 根据用户ID，查询用户详细信息，包含部门单位角色等
+     * @param id 用户ID
+     * @return {@link UserVO}
+     */
+    public UserVO findUserDetailsById(Integer id) {
+    	return userMapper.findById(id);
+    }
+    
     /**
      * 查询唯一用户记录
      * @param query 查询条件
      * @param password 是否包含密码
      * @return {@link User}
      */
-	public User selectOne(UserQueryPo query) {
+	public User selectOne(UserQueryPO query) {
     	LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.select(User::getId, User::getName, User::getAccount, User::getPassword, 
         		User::getEmail, User::getPhone, User::getStatus);
@@ -90,11 +151,12 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     }
     
     /**
-     * 根据条件查询用户数量
-     * @param query 查询条件
-     * @return 用户数量
+     * 检测用户的唯一属性是否已经存在
+     * 按照账号、手机、邮箱的顺序进行检测
+     * @param query 用户信息
+     * @return 不存在返回 true
      */
-    public boolean checkUniqueProperty(UserQueryPo query) {
+    public boolean checkUniqueProperty(UserQueryPO query) {
     	LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
     	if(query != null) {
     		// 不包含当前用户
@@ -118,7 +180,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * @return {@link User}
      */
     public User getByAccount(String account) {
-    	UserQueryPo query = UserQueryPo.builder().account(account).build();
+    	UserQueryPO query = UserQueryPO.builder().account(account).build();
         return selectOne(query);
     }
 
@@ -129,57 +191,51 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * @return 是否成功
      */
     public boolean top(String userId, String deptId) {
+    	log.info("置顶用户, userId = {}, deptId = {}", userId, deptId);
     	UserOrg entity = new UserOrg();
     	entity.setUserSort(0);
-    	entity.setTopTime(WebworkUtils.timestamp());
+    	entity.setTopTime(WebworkUtils.nowTime());
     	LambdaQueryWrapper<UserOrg> wrapper = new LambdaQueryWrapper<>();
     	wrapper.eq(UserOrg::getUserId, userId);
     	wrapper.eq(UserOrg::getDeptId, deptId);
-        return userOrgMapper.update(entity, wrapper) == 1;
-    }
-    
-    /**
-     * 创建用户
-     * @param source
-     * @return
-     */
-    public Integer create(UserPo source) {
-    	Integer deptId = source.getDeptId();
-    	if(deptId == null) {
-    		throw new IllegalArgumentException("部门ID不能为空");
-    	}
-    	User user = BeanUtils.toBean(source, User.class);
-    	if(user.getStatus() == null) {
-    		user.setStatus(EntityState.ENABLED.getValue());
-    	}
-        Date time = WebworkUtils.timestamp();
-        user.setCreateTime(time);
-        user.setUpdateTime(time);
-        userMapper.insert(user);
-        // 获取部门单位
-        int sort = userMapper.maxSortByDeptId(deptId);
-        Organization org = organizationService.findDepartGroup(deptId);
-        UserOrg userOrg = new UserOrg();
-        userOrg.setUserId(user.getId());
-        userOrg.setDeptId(deptId);
-        userOrg.setOrgId(org.getId());
-        userOrg.setUserSort(sort);
-        userOrg.setMainDept(true);
-        userOrg.setTopTime(time);
-        userOrgMapper.insert(userOrg);
-        return user.getId();
+        return userOrgService.update(entity, wrapper);
     }
 
     /**
      * 更新用户
-     * @param source
-     * @return
+     * @param po 用户信息
+     * @return 成功返回 true
      */
-    public boolean update(UserPo source) {
-    	User user = BeanUtils.toBean(source, User.class);
-    	if(user.getId() == null) {
+    public boolean update(UserPO po) {
+    	if(po.getId() == null) {
     		throw new WebworkRuntimeException(StateCode.PARAMETER_MISSING, "用户ID不能为空");
     	}
+    	UserQueryPO query = UserQueryPO.builder()
+    			.id(po.getId())
+    			.phone(po.getPhone())
+    			.email(po.getEmail()).build();
+        ValidationUtils.isTrue(checkUniqueProperty(query), UserStateCode.USER_PHONE_EXIST);
+        ValidationUtils.isTrue(checkUniqueProperty(query), UserStateCode.USER_MAIL_EXIST);
+        
+        log.info("更新用户: {}", po);
+    	User user = BeanUtils.toBean(po, User.class);
+    	user.setUpdateUser(user.getCreateUser());
+    	user.setUpdateTime(WebworkUtils.nowTime());
+    	
+    	// 更新用户机构信息
+    	Integer deptId = po.getDeptId();
+    	if(deptId != null) {
+	    	List<UserOrg> orgs = userOrgService.listOrgByUserId(po.getId());
+	    	UserOrg userOrg = orgs.stream().filter(UserOrg::getMainDept)
+	    			.findAny().orElseGet(UserOrg::new);
+    		if(!deptId.equals(userOrg.getDeptId())) {
+    			Organization deptGroup = organizationService.findDeptGroup(deptId);
+    			userOrg.setDeptId(deptId);
+    			userOrg.setOrgId(deptGroup.getId());
+    			userOrgService.updateById(userOrg);
+    		}
+    	}
+    	
     	return userMapper.updateById(user) == 1;
     }
 
@@ -188,11 +244,21 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * @param pageable 分页参数
      * @return 分页数据 {@link Page}
      */
-    public Page<UserRo> page(Pageable<UserQueryPo> pageable) {
-        Page<UserRo> page = new Page<>();
+    public Page<UserVO> page(Pageable<UserQueryPO> pageable) {
+        Page<UserVO> page = new Page<>();
         page.setData(userMapper.pageList(pageable));
         page.setCount(userMapper.pageCount(pageable));
         return page;
+    }
+    
+    /**
+     * 查询部门下用户信息
+     * @param deptId 部门ID
+     * @return 部门下用户集合
+     */
+    public List<UserVO> listUserByDeptId(Integer deptId){
+    	Objects.requireNonNull(deptId, "部门ID不能为空");
+    	return userMapper.listUserByDeptId(deptId);
     }
 
     /**
@@ -201,17 +267,59 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * @param user 会话用户
      * @return 节点数据
      */
-    public List<NodeRo> listTreeNodes(Integer parentId, com.github.wephotos.webwork.security.entity.SecurityUser user){
-    	List<NodeRo> nodes = organizationService.children(parentId, user);
-    	if(parentId != null) {
-	    	Organization org = organizationService.selectById(parentId);
-	    	if(org != null && NodeTypeEnum.DEPT.is(org.getType())) {
-	    		List<User> users = userMapper.listUserByDeptId(parentId);
-	    		List<NodeRo> userNodes = users.stream().map(TreeNodeConverter::from).collect(Collectors.toList());
-	    		nodes.addAll(userNodes);
-	    	}
+    public List<NodeVO> listUserNodes(Integer parentId){
+    	// 加载子节点
+    	List<NodeVO> nodes = organizationService.children(parentId);
+    	// 当前非部门节点时，不再继续加载用户
+    	Organization orga = organizationService.selectById(parentId);
+    	if(orga == null || !NodeTypeEnum.DEPT.is(orga.getType())) {
+    		return nodes;
     	}
+    	// 加载部门下用户
+		List<UserVO> users = userMapper.listUserByDeptId(parentId);
+		if(!users.isEmpty()) {
+    		List<NodeVO> userNodes = users.stream().map(NodeConverter::from).collect(Collectors.toList());
+    		// 检查集合信息
+    		if(nodes == null || nodes == Collections.EMPTY_LIST) {
+    			nodes = new ArrayList<>(users.size());
+    		}
+    		nodes.addAll(userNodes);
+		}
     	return nodes;
     }
+    
+    /**
+     * 用户登录
+     * @param po 用户名密码等登录参数
+     * @return 登录反馈信息，登录成功时包含当前用户信息
+     */
+    public Result<UserVO> login(UserLoginPO po) {
+		if(StringUtils.isAnyBlank(po.getUsername(), po.getPassword())) {
+			return Results.newResult(StateCode.PARAMETER_MISSING, "用户名或密码不能为空");
+		}
+		log.info("用户登录: {}", po);
+		User user = this.getByAccount(po.getUsername());
+        if (user == null) {
+            return Results.newResult(UserStateCode.USER_NOT_EXISTS);
+        }
+        Integer status = user.getStatus();
+        // 账号被删除，返回不存在
+        if (EntityState.DELETED.is(status)) {
+            return Results.newResult(UserStateCode.USER_NOT_EXISTS);
+        }
+        // 账号禁用
+        if (EntityState.DISABLED.is(status)) {
+            return Results.newResult(UserStateCode.USER_DISABLED);
+        }
+        // 登录
+        boolean isEq = po.getPassword().equals(user.getPassword());
+        if (isEq) {
+            // 获取部门与组织信息
+            UserVO vo = this.findUserDetailsById(user.getId());
+            return Results.newSuccessfullyResult(vo);
+        } else {
+        	return Results.newResult(UserStateCode.USER_PASSWORD_ERROR);
+        }
+	}
 
 }

@@ -2,26 +2,31 @@ package com.github.wephotos.webwork.user.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
+import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
-import com.github.wephotos.webwork.security.entity.SecurityUser;
-import com.github.wephotos.webwork.user.api.entity.po.DropSortPo;
-import com.github.wephotos.webwork.user.api.entity.po.OrganizationQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
 import com.github.wephotos.webwork.user.entity.Organization;
+import com.github.wephotos.webwork.user.entity.UserOrg;
 import com.github.wephotos.webwork.user.entity.enums.NodeTypeEnum;
+import com.github.wephotos.webwork.user.entity.po.DropSortPO;
+import com.github.wephotos.webwork.user.entity.po.OrganizationQueryPO;
+import com.github.wephotos.webwork.user.entity.vo.NodeVO;
+import com.github.wephotos.webwork.user.entity.vo.SimpleNodeVO;
 import com.github.wephotos.webwork.user.mapper.OrganizationMapper;
-import com.github.wephotos.webwork.user.utils.TreeNodeConverter;
+import com.github.wephotos.webwork.user.utils.NodeConverter;
 import com.github.wephotos.webwork.utils.StringUtils;
+import com.github.wephotos.webwork.utils.WebworkUtils;
 
 /**
  * @author chengzi
@@ -30,9 +35,14 @@ import com.github.wephotos.webwork.utils.StringUtils;
 @Service
 public class OrganizationService {
 	
+	private static final Logger log = LoggerFactory.getLogger(OrganizationService.class);
+	
+	@Resource
+	private UserOrgService userOrgService;
+	
     @Resource
     private OrganizationMapper organizationMapper;
-
+    
     /**
      * 获取节点对象
      * @param id 节点ID
@@ -48,28 +58,32 @@ public class OrganizationService {
      * @return 主键
      */
     public synchronized int add(Organization data) {
+    	log.info("新增组织机构:{}", data);
         Integer parentId = data.getParentId();
+        // 生成层级代码
         String maxCode = organizationMapper.getMaxCode(parentId);
-        if(parentId == null) {
-        	data.setCode(maxCode);
-        }else {
-        	Organization parent = organizationMapper.selectById(parentId);
-        	if(parent == null) {
-        		throw new IllegalArgumentException(String.format("上级节点不存在:%s", parentId));
-        	}
-        	data.setCode(parent.getCode().concat(maxCode));
-        }
+        Organization parent = organizationMapper.selectById(parentId);
+        data.setCode(parent.getCode().concat(maxCode));
+        // 设置排序号
+        int maxSort = organizationMapper.getMaxSort(parentId);
+        data.setSort(maxSort + 1);
+        Date createTime = WebworkUtils.nowTime();
+        data.setCreateTime(createTime);
+        data.setUpdateTime(createTime);
         organizationMapper.insert(data);
         return data.getId();
     }
 
     /**
-     * 更新
-     * @param organization
+     * 更新组织机构信息
+     * @param organ
      * @return
      */
-    public boolean update(Organization organization) {
-        return SqlHelper.retBool(organizationMapper.updateById(organization));
+    public boolean update(Organization organ) {
+    	Objects.requireNonNull(organ.getId(), "机构ID不能为空");
+    	log.info("更新组织机构:{}", organ);
+    	organ.setUpdateTime(WebworkUtils.nowTime());
+        return SqlHelper.retBool(organizationMapper.updateById(organ));
     }
 
     /**
@@ -78,6 +92,7 @@ public class OrganizationService {
      * @return 是否成功
      */
     public boolean delete(int id) {
+    	log.info("删除组织机构: id = {}", id);
         Organization org = new Organization();
         org.setId(id);
         org.setStatus(EntityState.DELETED.getValue());
@@ -89,11 +104,11 @@ public class OrganizationService {
      * @param query 查询条件
      * @return 组织架构列表
      */
-    public List<Organization> listQuery(OrganizationQueryPo query){
+    public List<Organization> listQuery(OrganizationQueryPO query){
     	LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
     	wrapper.select(Organization::getId, Organization::getName,
-                Organization::getCode, Organization::getStatus,
-                Organization::getType, Organization::getParentId);
+                Organization::getCode, Organization::getStatus, Organization::getSort,
+                Organization::getType, Organization::getParentId, Organization::getParentType);
     	wrapper.gt(Organization::getStatus, EntityState.DELETED.getValue());
     	if(query.getType() != null) {
     		wrapper.eq(Organization::getType, query.getType());
@@ -110,15 +125,17 @@ public class OrganizationService {
     	if(query.getParentId() != null) {
     		wrapper.eq(Organization::getParentId, query.getParentId());
     	}
+    	// 正序排列
+    	wrapper.orderByAsc(Organization::getSort);
     	return organizationMapper.selectList(wrapper);
     }
     
     /**
      * 获取部门所在单位
      * @param deptId 部门ID
-     * @return 单位对象
+     * @return 单位信息
      */
-    public Organization findDepartGroup(Integer deptId) {
+    public Organization findDeptGroup(Integer deptId) {
     	Organization dept = selectById(deptId);
     	Organization node = selectById(dept.getParentId());
     	while(node.getType() != NodeTypeEnum.GROUP.getCode()) {
@@ -126,43 +143,53 @@ public class OrganizationService {
     	}
     	return node;
     }
+    
+    /**
+     * 加载子节点，如果父节点ID为空，返回当前用户单位节点
+     * @param parentId 单位ID
+     * @param userGroupId 用户单位ID
+     * @return
+     */
+    public List<NodeVO> children(Integer parentId, Integer userGroupId) {
+    	if(parentId == null) {
+    		Organization root = selectById(userGroupId);
+            return Arrays.asList(NodeConverter.from(root));
+    	}else {
+    		return children(parentId);
+    	}
+    }
 
     /**
      * 查询下级组织机构
      *
      * @param parentId 父ID
-     * @param user     当前用户
      * @return {@link Organization}
      */
-    public List<NodeRo> children(Integer parentId, SecurityUser user) {
-        // 父节点为空，返回当前单位节点
-        if (parentId == null) {
-            Organization root = selectById(user.getGroupId());
-            return Arrays.asList(TreeNodeConverter.from(root));
-        }
-        OrganizationQueryPo query = OrganizationQueryPo.builder().parentId(parentId).build();
-        return listQuery(query).stream().map(TreeNodeConverter::from).collect(Collectors.toList());
+    public List<NodeVO> children(Integer parentId) {
+    	// 父节点为空，需要返回根节点
+        OrganizationQueryPO query = OrganizationQueryPO.builder().parentId(parentId).build();
+        return listQuery(query).stream().map(NodeConverter::from).collect(Collectors.toList());
     }
     
     /**
-     * 获取当前节点及其所有子节点的树结构
-     * @param id 当前节点标识
-     * @return {@link NodeRo}
+     * 获取当前单位的所有子单位树结构
+     * @param parentId 单位ID
+     * @return {@link NodeVO}
      */
-    public List<NodeRo> deepTreeNodes(Integer id){
-    	Objects.requireNonNull(id, "组织机构id不能为空");
-    	Organization org = selectById(id);
-    	OrganizationQueryPo query = OrganizationQueryPo.builder()
+    public List<NodeVO> loadGroupNodes(Integer parentId) {
+    	Objects.requireNonNull(parentId, "组织机构ID不能为空");
+    	Organization org = selectById(parentId);
+    	OrganizationQueryPO query = OrganizationQueryPO.builder()
     			.code(org.getCode())
     			.neType(NodeTypeEnum.DEPT.getCode()).build();
     	List<Organization> orgList = listQuery(query);
-    	List<NodeRo> flatNodes = orgList.stream().map(TreeNodeConverter::from).collect(Collectors.toList());
-    	List<NodeRo> treeNodes = new ArrayList<>();
-    	for(NodeRo node : flatNodes) {
+    	List<NodeVO> flatNodes = orgList.stream().map(NodeConverter::from).collect(Collectors.toList());
+    	List<NodeVO> treeNodes = new ArrayList<>();
+    	for(NodeVO node : flatNodes) {
     		if(node.getParentId() == null) {
     			treeNodes.add(node);
     		}
-    		for(NodeRo child : flatNodes) {
+    		for(NodeVO child : flatNodes) {
     			if(node.getId().equals(child.getParentId())) {
     				node.addChild(child);
     			}
@@ -190,7 +217,40 @@ public class OrganizationService {
      * @param dropSort 拖动参数
      * @return 影响行数
      */
-    public int dropSort(DropSortPo dropSort) {
-        return organizationMapper.dropSort(dropSort);
+    public boolean dropSort(DropSortPO dropSort) {
+    	log.info("拖动排序组织机构:{}", dropSort);
+        return organizationMapper.dropSort(dropSort) > 0;
+    }
+    
+    /**
+     * 获取用户所有的部门/单位节点（包含上级单位）
+     * @param userId 用户ID
+     * @return 组织节点信息
+     */
+    public List<SimpleNodeVO> listAllNodesByUserId(Integer userId){
+    	List<SimpleNodeVO> simpleNodeVOs = new ArrayList<>();
+    	List<UserOrg> orgs = userOrgService.listOrgByUserId(userId);
+    	orgs.forEach(record -> {
+    		// 部门
+    		SimpleNodeVO dept = new SimpleNodeVO();
+    		dept.setId(record.getDeptId());
+    		dept.setType(NodeTypeEnum.DEPT.getCode());
+    		simpleNodeVOs.add(dept);
+    		// 单位
+    		SimpleNodeVO group = new SimpleNodeVO();
+    		group.setId(record.getOrgId());
+    		group.setType(NodeTypeEnum.GROUP.getCode());
+    		simpleNodeVOs.add(group);
+    		// 上级单位
+    		Organization orga = selectById(record.getOrgId());
+    		while(orga.getParentId() != null) {
+    			orga = selectById(orga.getParentId());
+    			group = new SimpleNodeVO();
+        		group.setId(orga.getId());
+        		group.setType(NodeTypeEnum.GROUP.getCode());
+        		simpleNodeVOs.add(group);
+    		}
+    	});
+    	return simpleNodeVOs;
     }
 }

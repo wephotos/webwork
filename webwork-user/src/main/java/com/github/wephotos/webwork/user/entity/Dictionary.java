@@ -3,6 +3,7 @@ package com.github.wephotos.webwork.user.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Getter;
@@ -56,9 +57,26 @@ public class Dictionary implements Serializable {
 	/**
 	 * 父级名称
 	 */
-	private transient String parentName;
+	@TableField(exist = false)
+	private String parentName;
+	
+	/**
+	 * 创建用户
+	 */
+	private String createUser;
+	
+	/**
+	 * 更新用户
+	 */
+	private String updateUser;
+	
 	/**
 	 * 创建时间
 	 */
 	private Date createTime;
+	
+	/**
+	 * 更新时间
+	 */
+	private Date updateTime;
 }

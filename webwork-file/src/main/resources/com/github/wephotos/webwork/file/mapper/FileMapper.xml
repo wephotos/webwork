@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.wephotos.webwork.file.mapper.FileMapper">
-    <sql id="Base_Column_List">
-        id
-        ,owner, name, size, object_name, content_type, user_id, user_name, create_time
-    </sql>
 
     <resultMap id="BaseResultMap" type="com.github.wephotos.webwork.file.entity.WebworkFile">
         <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="owner" property="owner" jdbcType="INTEGER"/>
+        <result column="file_group" property="fileGroup" jdbcType="VARCHAR"/>
+        <result column="file_group_key" property="fileGroupKey" jdbcType="VARCHAR"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="size" property="size" jdbcType="INTEGER"/>
         <result column="object_name" property="objectName" jdbcType="VARCHAR"/>
@@ -17,20 +14,23 @@
         <result column="user_name" property="userName" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     </resultMap>
-
-    <insert id="insert">
-        insert into webwork_file(owner, name, size, object_name, content_type, user_id, user_name, create_time)
-        values (#{owner,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{size,jdbcType=INTEGER},
-                #{objectName,jdbcType=VARCHAR}, #{contentType,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER},
-                #{userName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+    
+    <sql id="Base_Column_List">
+        id, file_group, file_group_key, name, size, 
+        object_name, content_type, user_id, user_name, create_time
+    </sql>
+    
+    <insert id="insert" parameterType="com.github.wephotos.webwork.file.entity.WebworkFile">
+        insert into webwork_file(file_group, file_group_key, name, size, object_name, 
+        		content_type, user_id, user_name, create_time)
+        values (#{fileGroup,jdbcType=VARCHAR},#{fileGroupKey,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR}, 
+        		#{size,jdbcType=INTEGER},#{objectName,jdbcType=VARCHAR}, #{contentType,jdbcType=VARCHAR}, 
+        		#{userId,jdbcType=INTEGER},#{userName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
     </insert>
 
-    <update id="updateByPrimaryKeySelective">
+    <update id="updateByPrimaryKeySelective" parameterType="com.github.wephotos.webwork.file.entity.WebworkFile">
         update webwork_file
         <set>
-            <if test="owner != null">
-                owner = #{owner,jdbcType=INTEGER},
-            </if>
             <if test="name != null">
                 name = #{name,jdbcType=VARCHAR},
             </if>
@@ -53,28 +53,30 @@
         where id = #{id,jdbcType=INTEGER}
     </update>
 
-    <delete id="deleteByPrimaryKey">
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete
         from webwork_file
         where 
         id = #{id,jdbcType=INTEGER}
     </delete>
 
-    <select id="list" resultMap="BaseResultMap" parameterType="java.lang.String">
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from webwork_file
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="listByFileGroupKey" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from webwork_file
         where 
          status = 1
          and
-         owner = #{owner,jdbcType=INTEGER}
-    </select>
-
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from webwork_file
-        where id = #{id,jdbcType=INTEGER}
+         file_group = #{fileGroup,jdbcType=VARCHAR}
+         and
+         file_group_key = #{fileGroupKey,jdbcType=VARCHAR}
     </select>
     
     <select id="selectByObjectName" resultMap="BaseResultMap">

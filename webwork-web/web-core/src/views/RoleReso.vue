@@ -27,6 +27,8 @@ import { SelectEvent, TreeDataItem } from 'ant-design-vue/es/tree/Tree'
 import request from '@/request/ResRequest'
 import { TreeNode } from '@/types/TreeNode'
 import BaseRequest from '@/request/BaseRequest'
+import { TreeNodeType } from '@/types/TreeNodeType'
+
 // 角色资源数据定义
 export type RoleReso = {
   roleId: number;
@@ -45,6 +47,9 @@ export type CheckStrictly = {
     parentId: {
       type: Number
     },
+    parentType: {
+      type: Number
+    },
     dialog: Object as PropType<Dialog>
   }
 })
@@ -53,6 +58,7 @@ export default class RoleResoVue extends Vue {
   roleId!: number
   // 角色上级
   parentId!: number
+  parentType!: number
   // 当前弹框
   dialog!: Dialog
   // 权限树数据源
@@ -71,7 +77,11 @@ export default class RoleResoVue extends Vue {
       message.error(resret.msg)
     }
     // 加载组织机构根节点
-    const ret = await request.deepListNodes(this.parentId)
+    const params = {
+      parentId: (this.parentId as any),
+      parentType: this.parentType
+    }
+    const ret = await request.deepListNodes(params)
     if (ret.code !== 0) {
       message.error(ret.msg)
       return false
@@ -88,7 +98,11 @@ export default class RoleResoVue extends Vue {
         resolve()
         return false
       }
-      request.listNodes(treeNode.dataRef.key as number).then((ret) => {
+      const params = {
+        parentId: treeNode.dataRef.rawId,
+        parentType: treeNode.dataRef.type
+      }
+      request.listNodes(params).then((ret) => {
         treeNode.dataRef.children = this.toTreeDataItem(ret.data)
         this.treeData = [...this.treeData]
         resolve()
@@ -129,11 +143,12 @@ export default class RoleResoVue extends Vue {
   toTreeDataItem(nodes: TreeNode[]) {
     return nodes.map((node) => {
       return {
-        key: node.id,
-        type: node.type, // 节点类型 0单位 1应用 2模块 3功能
+        key: node.rawId,
+        rawId: node.rawId,
+        type: node.type,
         title: node.name,
         code: node.code,
-        isLeaf: node.type === 3
+        isLeaf: node.type === TreeNodeType.FUNCTION
       } as TreeDataItem
     })
   }

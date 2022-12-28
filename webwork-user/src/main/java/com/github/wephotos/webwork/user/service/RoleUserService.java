@@ -4,9 +4,11 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.user.entity.RoleUser;
 import com.github.wephotos.webwork.user.mapper.RoleUserMapper;
 import com.github.wephotos.webwork.utils.WebworkUtils;
@@ -18,6 +20,8 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
 @Service
 public class RoleUserService {
 	
+	private static final Logger log = LoggerFactory.getLogger(RoleUserService.class);
+	
     @Resource
     private RoleUserMapper roleUserMapper;
 
@@ -27,7 +31,8 @@ public class RoleUserService {
      * @return 添加数据主键
      */
     public Integer add(RoleUser record) {
-    	record.setCreateTime(WebworkUtils.timestamp());
+    	log.info("添加角色用户: {}", record);
+    	record.setCreateTime(WebworkUtils.nowTime());
     	roleUserMapper.insert(record);
     	return record.getId();
     }
@@ -38,11 +43,12 @@ public class RoleUserService {
      * @return 删除成功返回true
      */
     public boolean deleteById(String id) {
+    	log.info("删除角色用户, id = {}", id);
         return roleUserMapper.deleteById(id) == 1;
     }
 
     /**
-     * 查询角色成员
+     * 查询角色关联的用户信息
      * @param roleId 角色ID
      * @return 角色成员集合
      */

@@ -55,6 +55,7 @@ public class LoggingEventProducerWithTranslator {
             event.setThrowable(source.getThrowable());
             event.setTimeStamp(source.getTimeStamp());
             event.setRequest(source.getRequest());
+            event.setTraceId(source.getTraceId());
         }
     };
 

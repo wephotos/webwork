@@ -2,6 +2,7 @@ import Page from '@/types/Page'
 import Pageable from '@/types/Pageable'
 import { Role } from '@/types/Role'
 import { TreeNode } from '@/types/TreeNode'
+import { TreeNodeQuery } from '@/types/TreeNodeQuery'
 import BaseRequest from './BaseRequest'
 
 /** 资源请求 */
@@ -27,8 +28,8 @@ export class RoleRequest extends BaseRequest {
     }
 
     /** 获取权限子节点 */
-    listNodes(parentId?: number) {
-        return super.get<TreeNode[]>('/role/list-nodes' + (parentId ? `?parentId=${parentId}` : ''))
+    listNodes(params: TreeNodeQuery) {
+        return super.post<TreeNode[]>('/role/list-nodes', params)
     }
 
     /** 分页查询 */

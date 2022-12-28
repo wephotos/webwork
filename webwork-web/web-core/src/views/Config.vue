@@ -230,6 +230,7 @@ export default class ConfigVue extends Vue {
     sorter: { field: string; order: string; columnKey: string }
   ) {
     this.pagination.current = pag?.current || 1
+    this.pageable.curr = this.pagination.current
     this.pageable.sortField = sorter.columnKey || ''
     this.pageable.sortOrder = orderMap[sorter.order] || ''
     this.pageable.condition.name =

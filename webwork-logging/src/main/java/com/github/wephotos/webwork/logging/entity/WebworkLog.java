@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.slf4j.event.Level;
@@ -15,11 +16,20 @@ import org.slf4j.event.Level;
 @Getter
 @Setter
 @ToString
-public class WebworkLog {
+public class WebworkLog implements Serializable {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	/**
      * 主键
      */
     private Integer id;
+    /**
+     * 日志级别
+     */
+    private Level level;
     /**
      * 日志名称
      */
@@ -29,29 +39,21 @@ public class WebworkLog {
      */
     private String traceId;
     /**
-     * 请求者的ip
-     */
-    private String ip;
-    /**
      * 操作者
      */
     private String username;
     /**
-     * 日志级别
-     */
-    private Level level;
-    /**
-     * 客户端信息
-     */
-    private String client;
-    /**
-     * 请求路径
+     * 请求路径(HTTP接口)
      */
     private String url;
     /**
-     * 操作时间
+     * 客户端信息
      */
-    private Date createTime;
+    private String clientInfo;
+    /**
+     * 客户端主机
+     */
+    private String clientHost;
     /**
      * 日志详情
      */
@@ -61,4 +63,9 @@ public class WebworkLog {
      * 堆栈信息
      */
     private String stackTrace;
+    
+    /**
+     * 操作时间
+     */
+    private Date createTime;
 }

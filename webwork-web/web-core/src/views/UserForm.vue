@@ -21,7 +21,7 @@
           @change="handleUploadChange"
           :before-upload="beforeUpload"
         >
-          <img :key="avatarKey" v-if="user.avatar" :src="avatarUrl" alt="头像" />
+          <img v-if="user.avatar" :src="avatarUrl" alt="头像" />
           <div v-else>
             <loading-outlined v-if="avatarLoading"></loading-outlined>
             <plus-outlined v-else></plus-outlined>
@@ -81,10 +81,10 @@
     </a-form-item>
     <a-form-item label="部门">
       <a-tree-select
-        v-if="treeData.length"
         :tree-data="treeData"
         :load-data="onLoadData"
-        v-model:value="user.deptId"
+        @change="handleDeptChange"
+        v-model:value="user.deptName"
         tree-default-expand-all
         style="width: 100%"
         placeholder="请选择用户部门"
@@ -118,8 +118,8 @@ import request from '@/request/UserRequest'
 import GroupRequest from '@/request/GroupRequest'
 import { message } from 'ant-design-vue'
 import { TreeDataItem } from 'ant-design-vue/es/tree/Tree'
-import { Group } from '@/types/Group'
 import { R } from '@/types/R'
+import { TreeNode } from '@/types/TreeNode'
 
 interface FileItem {
   uid: string;
@@ -153,23 +153,27 @@ interface FileInfo {
     deptId: {
       type: Number
     },
+    deptName: {
+      type: String
+    },
     dialog: Object as PropType<Dialog>
   }
 })
 export default class UserForm extends Vue {
   // 当前弹框
   dialog!: Dialog
-  // 用户ID，传入参数
+  // 用户ID
   id!: number
-  // 部门ID
+  // 部门
   deptId!: number
+  deptName!: string
   // 用户对象数据
   user: User = {
     status: 1,
-    deptId: this.deptId
+    deptId: this.deptId,
+    deptName: this.deptName
   }
 
-  avatarKey = Math.random()
   // 头像上传标志
   avatarLoading = false
   // 组织树数据源
@@ -186,6 +190,7 @@ export default class UserForm extends Vue {
       { min: 6, max: 15, message: '密码为6-15位字符串', trigger: 'blur' }
     ],
     phone: [
+      { max: 11, message: '手机号最多为11个数字', trigger: 'blur' },
       { pattern: /^1[0-9]{10}$/, message: '手机号码错误', trigger: 'blur' }
     ],
     email: [
@@ -200,7 +205,12 @@ export default class UserForm extends Vue {
 
   // 用户头像地址
   get avatarUrl() {
-    return `/file/download/thumb/${this.user.avatar}`
+    // 更换头像
+    if (this.user.reavatar) {
+      return `/file/download/thumb/${this.user.reavatar}`
+    } else {
+      return `/file/download/thumb/${this.user.avatar}`
+    }
   }
 
   // 上传头像数据
@@ -231,7 +241,7 @@ export default class UserForm extends Vue {
     if (info.file.status === 'done') {
       if (info.file.response?.code === 0) {
         this.user.avatar = info.file.response.data.objectName
-        this.avatarKey = Math.random()
+        this.user.reavatar = this.user.avatar + '?random=' + Math.random()
       } else {
         message.error(info.file.response?.msg as string)
       }
@@ -247,18 +257,19 @@ export default class UserForm extends Vue {
     const ret = await GroupRequest.children()
     if (ret.code === 0) {
       this.treeData = this.toChildren(ret)
+      console.log(this.treeData)
     } else {
       message.error(ret.msg)
     }
     // 加载用户信息
-    this.id &&
-      request.find(this.id).then((ret) => {
-        if (ret.code === 0) {
+    if (this.id) {
+      const ret = await request.find(this.id)
+      if (ret.code === 0) {
           this.user = ret.data
         } else {
           message.error(ret.msg)
         }
-      })
+    }
   }
 
   /**
@@ -270,7 +281,7 @@ export default class UserForm extends Vue {
         resolve()
         return false
       }
-      GroupRequest.children(treeNode.dataRef.key as number).then((ret) => {
+      GroupRequest.children(treeNode.dataRef.rawId as number).then((ret) => {
         treeNode.dataRef.children = this.toChildren(ret)
         this.treeData = [...this.treeData]
         resolve()
@@ -287,10 +298,11 @@ export default class UserForm extends Vue {
         .validate()
         .then(async () => {
           let ret
+          const formData = toRaw(this.user)
           if (!this.user.id) {
-            ret = await request.add(toRaw(this.user))
+            ret = await request.add(formData)
           } else {
-            ret = await request.update(toRaw(this.user))
+            ret = await request.update(formData)
           }
           if (ret.code === 0) {
             this.dialog._ok()
@@ -313,11 +325,18 @@ export default class UserForm extends Vue {
     this.user.status = this.user.status === 1 ? 0 : 1
   }
 
+  // 切换用户部门
+  handleDeptChange(value: any, label: any, extra: any) {
+    // console.log('选择部门', extra.triggerNode.dataRef)
+    this.user.deptId = extra.triggerNode.dataRef.rawId
+  }
+
   // 转为树节点类型
-  toChildren(ret: R<Group[]>) {
+  toChildren(ret: R<TreeNode[]>) {
     return ret.data.map((value) => {
       return {
         key: value.id,
+        rawId: value.rawId,
         type: value.type, // 节点类型 0虚拟节点 1组织 2部门
         value: value.id,
         title: value.name,

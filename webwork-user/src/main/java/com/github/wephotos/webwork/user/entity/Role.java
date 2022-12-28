@@ -43,7 +43,9 @@ public class Role {
     
     /**
      * 父节点类型
-     * @see {@link NodeTypeEnum}
+     * @see 
+     * {@link NodeTypeEnum#APP} 
+     * {@link NodeTypeEnum#GROUP}
      */
     private Integer parentType;
     /**
@@ -55,7 +57,22 @@ public class Role {
      */
     private String remark;
     /**
-     * 创建时间
-     */
-    private Date createTime;
+	 * 创建用户
+	 */
+	private String createUser;
+	
+	/**
+	 * 更新用户
+	 */
+	private String updateUser;
+	
+	/**
+	 * 创建时间
+	 */
+	private Date createTime;
+	
+	/**
+	 * 更新时间
+	 */
+	private Date updateTime;
 }

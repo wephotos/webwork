@@ -11,20 +11,20 @@ public final class UserStateCode {
     /**
      * USER相关
      */
-    public static final StateCode USER_NAME_EXIST = new StateCode(100101, "登录名重复");
-    public static final StateCode USER_PHONE_EXIST = new StateCode(100102, "手机号重复");
-    public static final StateCode USER_MAIL_EXIST = new StateCode(100103, "邮箱重复");
+    public static final StateCode USER_ACCOUNT_EXIST = new StateCode(100101, "用户账号已存在");
+    public static final StateCode USER_PHONE_EXIST = new StateCode(100102, "用户手机号已存在");
+    public static final StateCode USER_MAIL_EXIST = new StateCode(100103, "用户邮箱已存在");
 
     /**
      * ROLE相关
      */
-    public static final StateCode ROLE_NAME_EXIST = new StateCode(100201, "角色名重复");
-    public static final StateCode ROLE_CODE_EXIST = new StateCode(100202, "角色编码重复");
+    public static final StateCode ROLE_NAME_EXIST = new StateCode(100201, "角色名称已存在");
+    public static final StateCode ROLE_CODE_EXIST = new StateCode(100202, "角色编码已存在");
     /**
      * RESOURCE相关
      */
-    public static final StateCode RESOURCE_NAME_EXIST = new StateCode(100301, "资源名重复");
-    public static final StateCode RESOURCE_CODE_EXIST = new StateCode(100302, "资源编码重复");
+    public static final StateCode RESOURCE_NAME_EXIST = new StateCode(100301, "资源名称已存在");
+    public static final StateCode RESOURCE_CODE_EXIST = new StateCode(100302, "资源编码已存在");
     
     /**
      * 登录相关

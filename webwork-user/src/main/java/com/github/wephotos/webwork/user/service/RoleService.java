@@ -2,25 +2,38 @@ package com.github.wephotos.webwork.user.service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
-import com.github.wephotos.webwork.security.entity.SecurityUser;
-import com.github.wephotos.webwork.user.api.entity.po.RoleQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
+import com.github.wephotos.webwork.schema.exception.StateCode;
+import com.github.wephotos.webwork.schema.exception.WebworkRuntimeException;
+import com.github.wephotos.webwork.user.client.entity.po.UserRoleQueryPO;
+import com.github.wephotos.webwork.user.client.entity.po.UserRoleQueryPO.RoleUserIdTypeQueryPO;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.entity.Role;
+import com.github.wephotos.webwork.user.entity.RoleResource;
 import com.github.wephotos.webwork.user.entity.enums.NodeTypeEnum;
+import com.github.wephotos.webwork.user.entity.po.NodeQueryPO;
+import com.github.wephotos.webwork.user.entity.po.ResourceQueryPO;
+import com.github.wephotos.webwork.user.entity.po.RoleQueryPO;
+import com.github.wephotos.webwork.user.entity.vo.NodeVO;
+import com.github.wephotos.webwork.user.entity.vo.RoleVO;
+import com.github.wephotos.webwork.user.entity.vo.SimpleNodeVO;
 import com.github.wephotos.webwork.user.mapper.RoleMapper;
-import com.github.wephotos.webwork.user.mapper.RoleResourceMapper;
-import com.github.wephotos.webwork.user.utils.TreeNodeConverter;
+import com.github.wephotos.webwork.user.utils.NodeConverter;
+import com.github.wephotos.webwork.user.utils.UserStateCode;
+import com.github.wephotos.webwork.user.utils.ValidationUtils;
+import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
 /**
@@ -30,14 +43,16 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
 @Service
 public class RoleService {
 	
+	private static final Logger log = LoggerFactory.getLogger(RoleService.class);
+	
     @Resource
     private RoleMapper roleMapper;
     
     @Resource
-    private RoleResourceMapper roleResourceMapper;
+    private ResourceService resourceService;
     
     @Resource
-    private ResourceService resourceService;
+    private RoleResourceService roleResourceService;
     
     @Resource
     private OrganizationService organizationService;
@@ -56,6 +71,7 @@ public class RoleService {
      * @return 删除是否成功
      */
 	public boolean deleteById(Integer id) {
+		log.info("删除角色, id = {}", id);
 		Role role = new Role();
 		role.setId(id);
 		role.setStatus(EntityState.DELETED.getValue());
@@ -68,11 +84,26 @@ public class RoleService {
      * @return 角色ID
      */
     public Integer add(Role role) {
+    	// 判断角色名称是否存在
+    	ValidationUtils.isFalse(isExistsName(role), UserStateCode.ROLE_NAME_EXIST);
+    	
+    	log.info("新增角色: {}", role);
         role.setStatus(EntityState.ENABLED.getValue());
-        role.setCreateTime(WebworkUtils.timestamp());
+        role.setCreateTime(WebworkUtils.nowTime());
+        role.setUpdateTime(role.getCreateTime());
         int sort = roleMapper.getMaxSort(role.getParentId(), role.getParentType());
         role.setSort(sort);
         roleMapper.insert(role);
+        
+        // 新建应用角色时自动关联应用
+        if(NodeTypeEnum.APP.is(role.getParentType())) {
+	        RoleResource roleResource = new RoleResource();
+	        roleResource.setRoleId(role.getId());
+	        roleResource.setResourceId(role.getParentId());
+	        roleResource.setCreateUser(role.getCreateUser());
+	        roleResource.setCreateTime(role.getCreateTime());
+	        roleResourceService.add(roleResource);
+        }
         return role.getId();
     }
 
@@ -82,6 +113,11 @@ public class RoleService {
      * @return 更新成功返回true
      */
     public boolean update(Role role) {
+    	// 判断角色名称是否存在
+    	ValidationUtils.isFalse(isExistsName(role), UserStateCode.ROLE_NAME_EXIST);
+    	
+    	log.info("更新角色: {}", role);
+    	role.setUpdateTime(WebworkUtils.nowTime());
         return roleMapper.updateById(role) == 1;
     }
     
@@ -104,7 +140,7 @@ public class RoleService {
      * @param query 查询条件
      * @return 角色集合 {@link Role}
      */
-	public List<Role> listQuery(RoleQueryPo query) {
+	public List<Role> listQuery(RoleQueryPO query) {
 		LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
     	wrapper.gt(Role::getStatus, EntityState.DELETED.getValue());
     	if(query.getParentId() != null) {
@@ -118,44 +154,91 @@ public class RoleService {
      * @param pageable 分页参数
      * @return 分页数据 {@link Page} {@link Role}
      */
-    public Page<Role> page(Pageable<RoleQueryPo> pageable) {
-        Page<Role> page = new Page<>();
+    public Page<RoleVO> page(Pageable<RoleQueryPO> pageable) {
+        Page<RoleVO> page = new Page<>();
         page.setData(roleMapper.pageList(pageable));
         page.setCount(roleMapper.pageCount(pageable));
         return page;
     }
     
     /**
+     * 判断节点是否为角色树节点
+     * @param node 节点对象
+     * @return 角色树节点返回 true
+     */
+    private boolean isRoleNode(NodeVO node) {
+    	return NodeTypeEnum.GROUP.is(node.getType()) || NodeTypeEnum.APP.is(node.getType());
+    }
+    
+    /**
      * 获取应用树节点数据
-     * @param parentId 父ID
-     * @param user 会话用户
+     * @param po 查询参数
      * @return 子节点
      */
-	public List<NodeRo> listNodes(Integer parentId, SecurityUser user) {
+	public List<NodeVO> listNodes(NodeQueryPO po) {
 		Organization org;
-		if(parentId == null) {
-			org = organizationService.selectById(user.getGroupId());
-			return Arrays.asList(TreeNodeConverter.from(org));
+		if(po.getParentId() == null) {
+			org = organizationService.selectById(po.getUserGroupId());
+			return Arrays.asList(NodeConverter.from(org));
 		}
-		List<NodeRo> nodes;
+		List<NodeVO> nodes;
+		Integer parentId = Integer.parseInt(po.getParentId());
 		org = organizationService.selectById(parentId);
 		// 获取不到单位则节点为应用节点
 		if(org == null) {
 			// 加载应用下的角色
-			RoleQueryPo query = RoleQueryPo.builder().parentId(parentId).build();
-			nodes = listQuery(query).stream().filter(x -> {
-				x.setParentType(NodeTypeEnum.APP.getCode());
-				return true;
-			}).map(TreeNodeConverter::from).collect(Collectors.toList());
+			RoleQueryPO query = RoleQueryPO.builder()
+					.parentId(parentId)
+					.parentType(po.getParentType()).build();
+			// 转换角色节点
+			nodes = listQuery(query).stream().map(NodeConverter::from).collect(Collectors.toList());
 		}else {
 			// 加载子单位和应用
-			nodes = resourceService.listTreeNodes(parentId, user);
+			nodes = resourceService.listNodes(po);
 			// 过滤出单位和应用节点
-			nodes = nodes.stream().filter(node -> {
-				return NodeTypeEnum.GROUP.is(node.getType()) || NodeTypeEnum.APP.is(node.getType());
-			}).collect(Collectors.toList());
+			nodes = nodes.stream().filter(this::isRoleNode).collect(Collectors.toList());
 		}
 		return nodes;
 	}
 
+	/**
+	 * 查询用户角色，包含用户所在部门和单位关联的角色
+	 * @param po {@link UserRoleQueryPO} 查询参数
+	 * @return 用户角色信息
+	 */
+	public List<Role> listRoleByUserId(UserRoleQueryPO po){
+		Objects.requireNonNull(po.getUserId(), "参数【userId】不能为空");
+		
+		// 应用代码转换为应用ID
+		String appCode = po.getAppCode();
+		if(po.getAppId() == null && StringUtils.isNotBlank(appCode)) {
+			ResourceQueryPO query = new ResourceQueryPO();
+			query.setPermission(appCode);
+			List<com.github.wephotos.webwork.user.entity.Resource> ress = resourceService.listQuery(query);
+			if(ress.size() != 1 || NodeTypeEnum.APP.is(ress.get(0).getType()) ==  false) {
+				throw new WebworkRuntimeException(StateCode.PARAMETER_ILLEGAL, "错误的应用代码");
+			}
+			po.setAppId(ress.get(0).getId());
+		}
+		
+		// 查询用户所有的部门和单位（包含父单位）
+		Integer userId = po.getUserId();
+		List<SimpleNodeVO> userNodes = organizationService.listAllNodesByUserId(userId);
+		// 根据过滤条件和用户、部门、单位关联查询出角色
+		List<RoleUserIdTypeQueryPO> roleUserIds = userNodes.stream().map(node -> {
+			RoleUserIdTypeQueryPO record = new RoleUserIdTypeQueryPO();
+			record.setId(node.getId());
+			record.setType(node.getType());
+			return record;
+		}).collect(Collectors.toList());
+		
+		// 添加当前用户
+		RoleUserIdTypeQueryPO myself = new RoleUserIdTypeQueryPO();
+		myself.setId(userId);
+		myself.setType(NodeTypeEnum.USER.getCode());
+		roleUserIds.add(myself);
+		po.setUserIds(roleUserIds);
+		
+		return roleMapper.listRoleByUserId(po);
+	}
 }

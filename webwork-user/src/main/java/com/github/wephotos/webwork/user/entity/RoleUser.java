@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.github.wephotos.webwork.user.entity.enums.NodeTypeEnum;
+
 import lombok.*;
 
 /**
@@ -42,49 +44,20 @@ public class RoleUser implements Serializable {
     private String userName;
     
     /**
-     * 用户类型
+     * 用户类型, 用户，部门，单位
+     * @see 
+     * {@link NodeTypeEnum#USER} 
+     * {@link NodeTypeEnum#DEPT} 
+     * {@link NodeTypeEnum#GROUP}
      */
     private Integer userType;
-    
+    /**
+	 * 创建用户
+	 */
+	private String createUser;
     /**
      * 创建时间
      */
     private Date createTime;
     
-    /**
-     * 角色用户类型
-     * @author TQ
-     *
-     */
-    public static enum RoleUserType {
-    	USER(1, "用户"),
-    	DEPT(2, "部门"),
-    	GROUP(3, "单位");
-    	
-    	/**
-    	 * 构造方法
-    	 * @param type 类型
-    	 * @param name 名称
-    	 */
-    	RoleUserType(int type, String name){
-    		this.type = type;
-    		this.name = name;
-    	}
-    	/***
-    	 * 类型
-    	 */
-    	private int type;
-    	/**
-    	 * 名称
-    	 */
-    	private String name;
-    	
-    	public int getType() {
-			return type;
-		}
-    	
-    	public String getName() {
-			return name;
-		}
-    }
 }

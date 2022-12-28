@@ -50,6 +50,12 @@
             <version>${project.parent.version}</version>
         </dependency>
         
+        <dependency>
+            <groupId>com.github.wephotos</groupId>
+            <artifactId>webwork-platform</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        
     </dependencies>
 
     <build>

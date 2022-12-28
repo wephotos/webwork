@@ -1,7 +1,7 @@
 package com.github.wephotos.webwork.schema.exception;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.Getter;
 
@@ -20,12 +20,16 @@ public final class StateCode {
 	/**
 	 * 状态码映射表
 	 */
-	private static final Map<Integer, StateCode> lookup = new HashMap<>();
+	private static final Map<Integer, StateCode> lookup = new ConcurrentHashMap<>();
 	
 	/**
 	 * 成功，code = 0
 	 */
 	public static final StateCode SUCCESS = new StateCode(0, "成功");
+	/**
+	 * 服务器未知错误
+	 */
+	public static final StateCode UNKNOW_ERROR = new StateCode(-1, "未知错误");
 	
 	/**
 	 * 缺失参数
@@ -35,13 +39,7 @@ public final class StateCode {
 	/**
 	 * 非法参数
 	 */
-	public static final StateCode PARAMETER_ILLEGAL = new StateCode(101, "非法参数");
-	
-	/**
-	 * 服务器未知错误
-	 */
-	public static final StateCode SERVER_ERROR = new StateCode(200, "服务器内部错误");
-	
+	public static final StateCode PARAMETER_ILLEGAL = new StateCode(101, "非法参数");	
 	
 	/**
 	 * 错误码
@@ -66,4 +64,12 @@ public final class StateCode {
         lookup.put(code, this);
     }
     
+    /**
+     * 获取错误码对象
+     * @param code 错误码
+     * @return 错误码定义对象
+     */
+    public static StateCode get(int code) {
+    	return lookup.get(code);
+    }
 }

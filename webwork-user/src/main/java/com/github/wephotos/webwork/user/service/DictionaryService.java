@@ -5,16 +5,18 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
-import com.github.wephotos.webwork.user.api.entity.ro.NodeRo;
 import com.github.wephotos.webwork.user.entity.Dictionary;
+import com.github.wephotos.webwork.user.entity.vo.NodeVO;
 import com.github.wephotos.webwork.user.mapper.DictionaryMapper;
-import com.github.wephotos.webwork.user.utils.TreeNodeConverter;
+import com.github.wephotos.webwork.user.utils.NodeConverter;
 import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
@@ -25,6 +27,8 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
  */
 @Service
 public class DictionaryService {
+	
+	private static final Logger log = LoggerFactory.getLogger(DictionaryService.class);
 
 	@Resource
 	private DictionaryMapper dictionaryMapper;
@@ -44,6 +48,7 @@ public class DictionaryService {
 	 * @return 成功返回true
 	 */
 	public boolean delete(int id) {
+		log.info("删除数据字典, id = {}", id);
 		Dictionary entity = new Dictionary();
 		entity.setId(id);
 		entity.setStatus(EntityState.DELETED.getValue());
@@ -56,9 +61,12 @@ public class DictionaryService {
 	 * @return 数据主键
 	 */
 	public int add(Dictionary dictionary) {
-		dictionary.setCreateTime(WebworkUtils.timestamp());
+		log.info("新增数据字典:{}", dictionary);
+		int sort = dictionaryMapper.getMaxSort(dictionary.getParentId());
+		dictionary.setSort(sort);
+		dictionary.setCreateTime(WebworkUtils.nowTime());
+		dictionary.setUpdateTime(dictionary.getCreateTime());
 		dictionary.setStatus(EntityState.ENABLED.getValue());
-		dictionary.setSort(dictionaryMapper.getMaxSort(dictionary.getParentId()));
 		dictionaryMapper.insert(dictionary);
 		return dictionary.getId();
 	}
@@ -69,6 +77,11 @@ public class DictionaryService {
 	 * @return 更新成功返回true
 	 */
 	public boolean update(Dictionary dictionary) {
+		if(dictionary.getId() == null) {
+			throw new IllegalArgumentException("数据字典ID不能为空");
+		}
+		log.info("更新数据字典:{}", dictionary);
+		dictionary.setUpdateTime(WebworkUtils.nowTime());
 		return dictionaryMapper.updateById(dictionary) == 1;
 	}
 
@@ -89,7 +102,7 @@ public class DictionaryService {
 	 * @param parentId 父ID
 	 * @return 子节点集合
 	 */
-	public List<NodeRo> listNodes(String parentId){
+	public List<NodeVO> listNodes(String parentId){
 		LambdaQueryWrapper<Dictionary> wrapper = new LambdaQueryWrapper<>();
 		if(StringUtils.isBlank(parentId)) {
 			wrapper.isNull(Dictionary::getParentId);
@@ -98,7 +111,7 @@ public class DictionaryService {
 		}
 		wrapper.gt(Dictionary::getStatus, EntityState.DELETED.getValue());
 		List<Dictionary> dataList = dictionaryMapper.selectList(wrapper);
-		return dataList.stream().map(TreeNodeConverter::from).collect(Collectors.toList());
+		return dataList.stream().map(NodeConverter::from).collect(Collectors.toList());
 	}
 	
 }

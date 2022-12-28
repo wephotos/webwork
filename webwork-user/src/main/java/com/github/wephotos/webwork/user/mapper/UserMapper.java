@@ -6,9 +6,9 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.wephotos.webwork.schema.entity.Pageable;
-import com.github.wephotos.webwork.user.api.entity.po.UserQueryPo;
-import com.github.wephotos.webwork.user.api.entity.ro.UserRo;
 import com.github.wephotos.webwork.user.entity.User;
+import com.github.wephotos.webwork.user.entity.po.UserQueryPO;
+import com.github.wephotos.webwork.user.entity.vo.UserVO;
 
 /**
  * @author chengzi
@@ -20,9 +20,9 @@ public interface UserMapper extends BaseMapper<User> {
 	/**
 	 * 根据用户ID查询用户详细信息
 	 * @param id 用户ID
-	 * @return {@link UserRo}
+	 * @return {@link UserVO}
 	 */
-	UserRo findById(Integer id);
+	UserVO findById(Integer id);
 	/**
 	 * 获取部门下最大人员排序
 	 * @param deptId 部门ID
@@ -35,20 +35,20 @@ public interface UserMapper extends BaseMapper<User> {
      * @param page 参数
      * @return 总记录数
      */
-    long pageCount(Pageable<UserQueryPo> page);
+    long pageCount(Pageable<UserQueryPO> page);
     /**
      * 用户分页
      *
      * @param page 分页参数
      * @return Page<User>
      */
-    List<UserRo> pageList(Pageable<UserQueryPo> page);
+    List<UserVO> pageList(Pageable<UserQueryPO> page);
     
     /**
      * 查询部门下的用户
      * @param deptId 部门ID
      * @return 用户集合
      */
-	List<User> listUserByDeptId(Integer deptId);
+	List<UserVO> listUserByDeptId(Integer deptId);
 
 }
