@@ -164,7 +164,8 @@
 	
 	<!-- 根据角色集合和应用代码查询关联资源信息 -->
 	<select id="listQueryResource" resultMap="BaseResultMap">
-	  select
+	  select 
+	    DISTINCT
 		 a.id,
 		 a.name,
 		 a.type,

@@ -20,7 +20,7 @@
         @change="handleUploadChange"
         :before-upload="beforeUpload"
       >
-        <img v-if="formData.icon" :src="iconUrl" alt="图标" />
+        <img v-if="formData.icon" :src="iconUrl" style="width: 80px; height: 80px;" alt="图标" />
         <div v-else>
           <loading-outlined v-if="iconLoading"></loading-outlined>
           <plus-outlined v-else></plus-outlined>
@@ -144,9 +144,9 @@ export default class ResourceForm extends Vue {
   // 用户头像地址
   get iconUrl() {
     if (this.formData.reicon) {
-      return `/file/download/thumb/${this.formData.reicon}`
+      return `/file/download/${this.formData.reicon}`
     } else {
-      return `/file/download/thumb/${this.formData.icon}`
+      return `/file/download/${this.formData.icon}`
     }
   }
 

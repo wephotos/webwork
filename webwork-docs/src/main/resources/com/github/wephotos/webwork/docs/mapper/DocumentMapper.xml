@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.wephotos.webwork.docs.mapper.DocumentMapper">
+
+	<resultMap id="BaseResultMap" type="com.github.wephotos.webwork.docs.entity.Document">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="subtitle" property="subtitle" jdbcType="VARCHAR" />
+		<result column="state" property="state" jdbcType="INTEGER"/>
+		<result column="open" property="open" jdbcType="TINYINT" />
+		<result column="create_user" property="createUser" jdbcType="VARCHAR" />
+		<result column="update_user" property="updateUser" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<!--分页 -->
+	<select id="pageList" resultMap="BaseResultMap">
+		SELECT
+		  a.id,
+		  a.title,
+		  a.subtitle,
+		  a.state,
+		  a.open,
+		  a.create_user,
+		  a.update_user,
+		  a.create_time,
+		  a.update_time
+		FROM
+		  webwork_document a
+		LEFT JOIN
+		  webwork_document_user b
+		ON
+		  a.id = b.doc_id
+		<where>
+			<include refid="pageCond" />
+		</where>
+		<include refid="orderBy" />
+		LIMIT #{start}, #{size}
+	</select>
+
+	<!--分页总数 -->
+	<select id="pageCount" resultType="java.lang.Long">
+		SELECT
+		  count(1)
+		FROM
+		  webwork_document a
+		LEFT JOIN
+		  webwork_document_user b
+		ON
+		  a.id = b.doc_id
+		<where>
+			<include refid="pageCond" />
+		</where>
+	</select>
+
+	<!--查询条件 -->
+	<sql id="pageCond">
+	    AND a.state > -1
+		<choose>
+			<when test="condition.userId == null">
+				AND a.open = 1
+			</when>
+			<otherwise>
+				AND (a.open = 1 OR b.user_id = #{condition.userId, jdbcType=INTEGER})
+			</otherwise>
+		</choose>
+		<if test="condition.keyword != null and condition.keyword != ''">
+			AND (
+			  a.title LIKE CONCAT('%', #{condition.keyword,jdbcType=VARCHAR}, '%')
+			  OR
+			  a.subtitle LIKE CONCAT('%', #{condition.keyword,jdbcType=VARCHAR}, '%')
+			)
+		</if>
+	</sql>
+
+	<!-- 排序 -->
+	<sql id="orderBy">
+		ORDER BY
+		<choose>
+			<when test="sortField != null and sortField !=''">
+				${sortField}
+				<if test="sortOrder != null and sortOrder !=''">
+					${sortOrder}
+				</if>
+			</when>
+			<otherwise>
+				a.create_time DESC
+			</otherwise>
+		</choose>
+	</sql>
+</mapper>

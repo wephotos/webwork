@@ -95,11 +95,11 @@ export default class Home extends Vue {
   width: 100%;
   height: 100%;
   padding: 15px;
-  background-color: azure;
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
   align-content: flex-start;
+  background-color: rgb(129, 216, 207);
 }
 .ant-badge {
   margin: 20px;
@@ -110,5 +110,10 @@ export default class Home extends Vue {
   font-size: 12px;
   margin-top: 5px;
   font-family: Arial,sans-serif;
+}
+::v-deep(.ant-avatar-lg) {
+  width: 48px;
+  height: 48px;
+  line-height: 48px;
 }
 </style>

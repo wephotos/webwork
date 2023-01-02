@@ -182,7 +182,7 @@ export default class Client extends Vue {
   contentTypeChange(value: string) {
     if (value === HttpContentType.MULTIPART) {
       this.url = '/file/upload'
-      this.body = 'owner=123456'
+      this.body = ''
     } else {
       this.url = ''
       this.body = ''

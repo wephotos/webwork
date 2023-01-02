@@ -12,6 +12,8 @@ import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.Result;
 import com.github.wephotos.webwork.schema.exception.StateCode;
 import com.github.wephotos.webwork.schema.exception.WebworkException;
+import com.github.wephotos.webwork.schema.exception.WebworkRuntimeException;
+import com.github.wephotos.webwork.schema.utils.Results;
 
 /**
  * @author chengzi
@@ -23,15 +25,6 @@ public class GlobalExceptionHandler {
 	private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 	
     static final String CLIENT_ABORT_EXCEPTION_NAME = "ClientAbortException";
-
-    /**
-     * 处理自定义异常
-     */
-    @ExceptionHandler(WebworkException.class)
-    public Result<Void> handleWebworkException(WebworkException e) {
-        log.error("系统异常", e);
-        return new Result<>(e.getStateCode());
-    }
 
     /**
      * 异常处理
@@ -49,6 +42,14 @@ public class GlobalExceptionHandler {
             return null;
         }
         log.error("系统错误", e);
-        return new Result<>(e.getMessage(), StateCode.UNKNOW_ERROR);
+        StateCode stateCode;
+        if(e instanceof WebworkException) {
+        	stateCode = ((WebworkException) e).getStateCode();
+        }else if(e instanceof WebworkRuntimeException) {
+        	stateCode = ((WebworkRuntimeException) e).getStateCode();
+        }else {
+        	stateCode = StateCode.UNKNOW_ERROR;
+        }
+        return Results.newResult(stateCode, e.getMessage());
     }
 }

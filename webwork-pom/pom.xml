@@ -39,6 +39,7 @@
         <module>../webwork-sso-server</module>
         <module>../webwork-sso-client</module>
         <module>../webwork-platform</module>
+        <module>../webwork-docs</module>
     </modules>
 
     <repositories>
