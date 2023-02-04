@@ -16,7 +16,7 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
 	 * @param targetClass 目标对象类型信息
 	 * @return 目标对象
 	 */
-	public static <T> T toBean(Object source, Class<T> targetClass){
+	public static <T> T toObject(Object source, Class<T> targetClass){
 		try {
 			T target = targetClass.newInstance();
 			BeanUtils.copyProperties(source, target);
@@ -32,7 +32,7 @@ public class BeanUtils extends org.springframework.beans.BeanUtils {
 	 * @param targetClass 目标对象类型信息
 	 * @return 目标对象
 	 */
-	public static <T> List<T> toBeanList(List<?> sources, Class<T> targetClass){
+	public static <T> List<T> toList(List<?> sources, Class<T> targetClass){
 		try {
 			List<T> targets = new ArrayList<>(sources.size());
 			for(Object source : sources) {

@@ -36,9 +36,10 @@
         <module>../webwork-file</module>
         <module>../webwork-utils</module>
         <module>../webwork-user</module>
-        <module>../webwork-sso-server</module>
-        <module>../webwork-sso-client</module>
+        <!-- <module>../webwork-sso-server</module>
+        <module>../webwork-sso-client</module> -->
         <module>../webwork-platform</module>
+        <module>../webwork-photos</module>
         <module>../webwork-docs</module>
     </modules>
 

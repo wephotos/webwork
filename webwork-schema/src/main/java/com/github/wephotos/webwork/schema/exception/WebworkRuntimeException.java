@@ -29,6 +29,10 @@ public class WebworkRuntimeException extends RuntimeException {
         super(message, cause);
         this.stateCode = StateCode.UNKNOW_ERROR;
     }
+    
+    public WebworkRuntimeException(StateCode stateCode) {
+        this.stateCode = stateCode;
+    }
 
     public WebworkRuntimeException(StateCode stateCode, String message) {
         super(message);

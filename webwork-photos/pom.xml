@@ -9,39 +9,52 @@
         <relativePath>../webwork-pom/pom.xml</relativePath>
     </parent>
 
-    <artifactId>webwork-boot</artifactId>
+    <artifactId>webwork-photos</artifactId>
     <packaging>jar</packaging>
 
-    <name>webwork-boot</name>
-    <description>webwork boot</description>
+    <name>webwork-photos</name>
+    <description>webwork photos</description>
 
     <dependencies>
-        <!-- <dependency>
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency> -->
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        
+        <!--mybatis-plus -->
         <dependency>
-            <groupId>com.github.wephotos</groupId>
-            <artifactId>webwork-config</artifactId>
-            <version>${project.parent.version}</version>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
-        
         <dependency>
             <groupId>com.github.wephotos</groupId>
             <artifactId>webwork-logging</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-        
         <dependency>
             <groupId>com.github.wephotos</groupId>
             <artifactId>webwork-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.wephotos</groupId>
+            <artifactId>webwork-security-spring-boot-starter</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
         
         <dependency>
@@ -51,30 +64,29 @@
         </dependency>
         
         <dependency>
-            <groupId>com.github.wephotos</groupId>
-            <artifactId>webwork-platform</artifactId>
-            <version>${project.parent.version}</version>
+        	<groupId>org.springframework.boot</groupId>
+        	<artifactId>spring-boot-configuration-processor</artifactId>
+        	<optional>true</optional>
         </dependency>
-        
+        <!-- 处理缩略图 -->
         <dependency>
-            <groupId>com.github.wephotos</groupId>
-            <artifactId>webwork-photos</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>com.github.wephotos</groupId>
-            <artifactId>webwork-docs</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        
+		    <groupId>net.coobird</groupId>
+		    <artifactId>thumbnailator</artifactId>
+		    <version>0.4.19</version>
+		</dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${encoding}</encoding>
+                    <showWarnings>true</showWarnings>
+                </configuration>
             </plugin>
         </plugins>
     </build>

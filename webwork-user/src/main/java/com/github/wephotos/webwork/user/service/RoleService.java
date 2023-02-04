@@ -88,7 +88,7 @@ public class RoleService {
     	ValidationUtils.isFalse(isExistsName(role), UserStateCode.ROLE_NAME_EXIST);
     	
     	log.info("新增角色: {}", role);
-        role.setStatus(EntityState.ENABLED.getValue());
+        role.setStatus(EntityState.NORMAL.getValue());
         role.setCreateTime(WebworkUtils.nowTime());
         role.setUpdateTime(role.getCreateTime());
         int sort = roleMapper.getMaxSort(role.getParentId(), role.getParentType());

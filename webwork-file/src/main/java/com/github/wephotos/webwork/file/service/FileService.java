@@ -76,14 +76,14 @@ public class FileService {
         	// 默认文件组
         	if(StringUtils.isBlank(file.getFileGroup())) {
         		file.setFileGroup(FileGroup.DEFAULT_GROUP.getName());
-        	}else if(FileGroup.containsGroup(file.getFileGroup())) {
+        	}else if(!FileGroup.containsGroup(file.getFileGroup())) {
         		throw new WebworkRuntimeException(StateCode.PARAMETER_ILLEGAL, "文件组未注册:" + file.getFileGroup());
         	}
         	// 文件组的key为空时使用32位UUID作为key
         	if(StringUtils.isBlank(file.getFileGroupKey())) {
         		file.setFileGroupKey(UUID.randomUUID().toString().replace("-", ""));
         	}
-        	file.setStatus(EntityState.ENABLED.getValue());
+        	file.setStatus(EntityState.NORMAL.getValue());
         	file.setCreateTime(WebworkUtils.nowTime());
         	fileMapper.insert(file);
         }

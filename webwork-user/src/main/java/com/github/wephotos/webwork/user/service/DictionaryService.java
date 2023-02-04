@@ -66,7 +66,7 @@ public class DictionaryService {
 		dictionary.setSort(sort);
 		dictionary.setCreateTime(WebworkUtils.nowTime());
 		dictionary.setUpdateTime(dictionary.getCreateTime());
-		dictionary.setStatus(EntityState.ENABLED.getValue());
+		dictionary.setStatus(EntityState.NORMAL.getValue());
 		dictionaryMapper.insert(dictionary);
 		return dictionary.getId();
 	}

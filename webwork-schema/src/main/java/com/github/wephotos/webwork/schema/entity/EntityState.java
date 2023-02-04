@@ -3,8 +3,9 @@ package com.github.wephotos.webwork.schema.entity;
 import lombok.Getter;
 
 /**
- * @author xc
- * @date 2021-03-20 11:34
+ * 定义数据状态枚举
+ * @author TianQi
+ *
  */
 @Getter
 public enum EntityState {
@@ -13,9 +14,9 @@ public enum EntityState {
 	 */
 	DELETED("删除", -1),
     /**
-     * 启用
+     * 正常
      */
-    ENABLED("启用", 1),
+    NORMAL("启用", 1),
     /**
      * 禁用
      */
@@ -23,11 +24,11 @@ public enum EntityState {
 
 
     /**
-     * 状态名
+     * 名称
      */
     private final String name;
     /**
-     * 状态 启用：1，0：禁用，2：删除
+     * 状态
      */
     private final Integer value;
 

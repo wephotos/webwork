@@ -149,12 +149,12 @@ public class ResourceService {
     	
     	int sort = getMaxSort(parentId, parentType);
     	record.setSort(sort);
-    	record.setStatus(EntityState.ENABLED.getValue());
+    	record.setStatus(EntityState.NORMAL.getValue());
     	Date nowTime = WebworkUtils.nowTime();
     	record.setCreateTime(nowTime);
     	record.setUpdateTime(nowTime);
         resourceMapper.insert(record);
-        return BeanUtils.toBean(record, ResoVO.class);
+        return BeanUtils.toObject(record, ResoVO.class);
     }
 
     /**

@@ -78,9 +78,9 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         ValidationUtils.isTrue(checkUniqueProperty(query), UserStateCode.USER_MAIL_EXIST);
         log.info("创建用户: {}", userPO);
         
-    	User user = BeanUtils.toBean(userPO, User.class);
+    	User user = BeanUtils.toObject(userPO, User.class);
     	if(user.getStatus() == null) {
-    		user.setStatus(EntityState.ENABLED.getValue());
+    		user.setStatus(EntityState.NORMAL.getValue());
     	}
     	user.setUpdateUser(user.getCreateUser());
         Date time = WebworkUtils.nowTime();
@@ -218,7 +218,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         ValidationUtils.isTrue(checkUniqueProperty(query), UserStateCode.USER_MAIL_EXIST);
         
         log.info("更新用户: {}", po);
-    	User user = BeanUtils.toBean(po, User.class);
+    	User user = BeanUtils.toObject(po, User.class);
     	user.setUpdateUser(user.getCreateUser());
     	user.setUpdateTime(WebworkUtils.nowTime());
     	

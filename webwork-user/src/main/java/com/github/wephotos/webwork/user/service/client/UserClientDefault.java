@@ -58,7 +58,7 @@ public class UserClientDefault implements UserClient {
 		Result<UserVO> result = userService.login(po);
 		if(result.isSuccess()) {
 			UserVO vo = result.getData();
-			UserRO ro = BeanUtils.toBean(vo, UserRO.class);
+			UserRO ro = BeanUtils.toObject(vo, UserRO.class);
 			return Results.newSuccessfullyResult(ro);
 		}else {
 			return Results.newResult(StateCode.get(result.getCode()));
@@ -68,35 +68,35 @@ public class UserClientDefault implements UserClient {
 	@Override
 	public Result<UserRO> selectByUsername(String username) {
 		User user = this.userService.getByAccount(username);
-		UserRO ro = BeanUtils.toBean(user, UserRO.class);
+		UserRO ro = BeanUtils.toObject(user, UserRO.class);
 		return Results.newSuccessfullyResult(ro);
 	}
 
 	@Override
 	public Result<UserRO> findUserDetailsById(Integer userId) {
 		UserVO vo = userService.findUserDetailsById(userId);
-		UserRO ro = BeanUtils.toBean(vo, UserRO.class);
+		UserRO ro = BeanUtils.toObject(vo, UserRO.class);
 		return Results.newSuccessfullyResult(ro);
 	}
 
 	@Override
 	public Result<List<NodeRO>> listOrgaNodes(Integer parentId) {
 		List<NodeVO> nodes = organizationService.children(parentId);
-		List<NodeRO> data = BeanUtils.toBeanList(nodes, NodeRO.class);
+		List<NodeRO> data = BeanUtils.toList(nodes, NodeRO.class);
 		return Results.newSuccessfullyResult(data);
 	}
 
 	@Override
 	public Result<List<UserRO>> listUserByDeptId(Integer deptId) {
 		List<UserVO> users = userService.listUserByDeptId(deptId);
-		List<UserRO> data = BeanUtils.toBeanList(users, UserRO.class);
+		List<UserRO> data = BeanUtils.toList(users, UserRO.class);
 		return Results.newSuccessfullyResult(data);
 	}
 
 	@Override
 	public Result<List<RoleRO>> listRoleByUserId(UserRoleQueryPO po) {
 		List<Role> roles = roleService.listRoleByUserId(po);
-		List<RoleRO> data = BeanUtils.toBeanList(roles, RoleRO.class);
+		List<RoleRO> data = BeanUtils.toList(roles, RoleRO.class);
 		return Results.newSuccessfullyResult(data);
 	}
 	
@@ -108,7 +108,7 @@ public class UserClientDefault implements UserClient {
 		po.setUserId(userId);
 		po.setResoType(NodeTypeEnum.APP.getCode());
 		List<ResoVO> apps = resourceService.listResourceByUserId(po);
-		List<ResoRO> data = BeanUtils.toBeanList(apps, ResoRO.class);
+		List<ResoRO> data = BeanUtils.toList(apps, ResoRO.class);
 		return Results.newSuccessfullyResult(data);
 	}
 	
@@ -121,7 +121,7 @@ public class UserClientDefault implements UserClient {
 		}
 		
 		List<ResoVO> data = resourceService.listResourceByUserId(po);
-		List<ResoRO> roList = BeanUtils.toBeanList(data, ResoRO.class);
+		List<ResoRO> roList = BeanUtils.toList(data, ResoRO.class);
 		return Results.newSuccessfullyResult(roList);
 	}
 	

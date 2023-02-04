@@ -99,7 +99,7 @@ public class ConfigService implements EnvironmentAware {
 	 */
 	public int add(Config record) {
 		record.setSort(configMapper.getMaxSort());
-		record.setStatus(EntityState.ENABLED.getValue());
+		record.setStatus(EntityState.NORMAL.getValue());
 		configMapper.insert(record);
 		CACHE.put(record.getName(), record.getValue());
 		return record.getId();

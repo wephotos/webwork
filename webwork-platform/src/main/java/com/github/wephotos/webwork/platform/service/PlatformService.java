@@ -31,7 +31,7 @@ public class PlatformService {
 		Result<UserRO> result = userClient.login(po);
 		if(result.isSuccess()) {
 			UserRO vo = result.getData();
-			SecurityUser user = BeanUtils.toBean(vo, SecurityUser.class);
+			SecurityUser user = BeanUtils.toObject(vo, SecurityUser.class);
 			user.setGroupId(vo.getOrgId());
 			user.setGroupName(vo.getOrgName());
 			return Results.newSuccessfullyResult(user);

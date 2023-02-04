@@ -17,15 +17,16 @@
     
     <sql id="Base_Column_List">
         id, file_group, file_group_key, name, size, 
-        object_name, content_type, user_id, user_name, create_time
+        object_name, content_type, status, user_id, user_name, create_time
     </sql>
     
     <insert id="insert" parameterType="com.github.wephotos.webwork.file.entity.WebworkFile">
         insert into webwork_file(file_group, file_group_key, name, size, object_name, 
-        		content_type, user_id, user_name, create_time)
+        		content_type, status, user_id, user_name, create_time)
         values (#{fileGroup,jdbcType=VARCHAR},#{fileGroupKey,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR}, 
         		#{size,jdbcType=INTEGER},#{objectName,jdbcType=VARCHAR}, #{contentType,jdbcType=VARCHAR}, 
-        		#{userId,jdbcType=INTEGER},#{userName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+        		#{status,jdbcType=INTEGER},#{userId,jdbcType=INTEGER},#{userName,jdbcType=VARCHAR}, 
+        		#{createTime,jdbcType=TIMESTAMP})
     </insert>
 
     <update id="updateByPrimaryKeySelective" parameterType="com.github.wephotos.webwork.file.entity.WebworkFile">

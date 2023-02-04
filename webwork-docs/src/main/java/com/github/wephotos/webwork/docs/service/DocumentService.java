@@ -109,7 +109,7 @@ public class DocumentService {
 		}
 		log.info("新建文档:{}", po);
 		
-		Document doc = BeanUtils.toBean(po, Document.class);
+		Document doc = BeanUtils.toObject(po, Document.class);
 		// 抽取文本
 		doc.setSubtitle(getSubtitle(doc.getContent(), contentType));
 		// 默认非公开
@@ -117,7 +117,7 @@ public class DocumentService {
 			doc.setOpen(false);
 		}
 		doc.setVersionNo(1);
-		doc.setState(EntityState.ENABLED.getValue());
+		doc.setState(EntityState.NORMAL.getValue());
 		doc.setCreateUser(po.getUserName());
 		doc.setUpdateUser(po.getUserName());
 		doc.setCreateTime(WebworkUtils.nowTime());
@@ -159,7 +159,7 @@ public class DocumentService {
 		if(origin.getVersionNo() > po.getVersionNo()) {
 			throw new WebworkRuntimeException(DocStateCode.VERSION_EXPIRED, "文档已经被修改过，请重新打开");
 		}
-		Document doc = BeanUtils.toBean(po, Document.class);
+		Document doc = BeanUtils.toObject(po, Document.class);
 		// 抽取文本
 		ContentType contentType = ContentType.valueOf(origin.getContentType());
 		doc.setSubtitle(getSubtitle(doc.getContent(), contentType));
@@ -193,7 +193,7 @@ public class DocumentService {
 	 */
 	public DocVO get(Integer docId, Integer userId) {
 		Document doc = documentMapper.selectById(docId);
-		DocVO vo = BeanUtils.toBean(doc, DocVO.class);
+		DocVO vo = BeanUtils.toObject(doc, DocVO.class);
 		vo.setCanEdit(canEdit(docId, userId));
 		vo.setCanDelete(canDelete(docId, userId));
 		return vo;
@@ -233,7 +233,7 @@ public class DocumentService {
     public Page<ListDocVO> page(Pageable<DocQueryPO> pageable) {
         Page<ListDocVO> page = new Page<>();
         List<Document> docs = documentMapper.pageList(pageable);
-        List<ListDocVO> data = BeanUtils.toBeanList(docs, ListDocVO.class);
+        List<ListDocVO> data = BeanUtils.toList(docs, ListDocVO.class);
         page.setData(data);
         page.setCount(documentMapper.pageCount(pageable));
         return page;
