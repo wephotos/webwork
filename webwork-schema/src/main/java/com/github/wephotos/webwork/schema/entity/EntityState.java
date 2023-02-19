@@ -3,7 +3,7 @@ package com.github.wephotos.webwork.schema.entity;
 import lombok.Getter;
 
 /**
- * 定义数据状态枚举
+ * 数据状态枚举
  * @author TianQi
  *
  */
@@ -28,28 +28,25 @@ public enum EntityState {
      */
     private final String name;
     /**
-     * 状态
+     * 编码
      */
-    private final Integer value;
+    private final Integer code;
 
-    EntityState(String name, Integer value) {
+    EntityState(String name, Integer code) {
         this.name = name;
-        this.value = value;
+        this.code = code;
     }
 
-    public static EntityState resolve(int value) {
+    public static EntityState resolve(int code) {
         for (EntityState state : EntityState.values()) {
-            if (state.value == value) {
+            if (state.code == code) {
                 return state;
             }
         }
         return null;
     }
     
-    public boolean is(Integer value) {
-    	if(value == null) {
-    		return false;
-    	}
-    	return this.value.equals(value);
+    public boolean is(Integer code) {
+    	return this.code.equals(code);
     }
 }

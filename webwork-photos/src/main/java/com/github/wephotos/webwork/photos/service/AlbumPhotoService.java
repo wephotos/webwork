@@ -1,7 +1,5 @@
 package com.github.wephotos.webwork.photos.service;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,6 +10,7 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -47,12 +46,20 @@ public class AlbumPhotoService extends ServiceImpl<AlbumPhotoMapper, AlbumPhoto>
 	 * 注册我的照片照片文件组
 	 */
 	public static final FileGroup PHOTOS_FILE_GROUP = new FileGroup("WEBWORK-PHOTOS", "我的照片");
+	
+	/**
+	 * 缩略图最大为 512KB
+	 */
+	private static final int THUMBNAIL_MAX_SIZE = 512 * 1024;
 
 	@Resource
 	private AlbumService albumService;
 	
 	@Resource
 	private FileFacade fileFacade;
+	
+	@Resource
+	private TransactionManager transactionManager;
 	
 	/**
 	 * 保存照片为本地临时文件
@@ -91,7 +98,22 @@ public class AlbumPhotoService extends ServiceImpl<AlbumPhotoMapper, AlbumPhoto>
 	}
 	
 	/**
+	 * 生成缩略图
+	 * @param image
+	 * @return
+	 * @throws IOException 
+	 */
+	private File thumbnails(File image) throws IOException {
+		if (image.length() <= THUMBNAIL_MAX_SIZE) {
+			return image;
+		}
+		Thumbnails.of(image).scale(0.95).outputQuality(0.8).allowOverwrite(true).toFile(image);
+		return thumbnails(image);
+	}
+	
+	/**
 	 * 上传照片
+	 * TransactionSynchronizationManager
 	 * @param uploadPO 上传参数
 	 * @return 上传照片相关信息
 	 * @throws IOException 
@@ -99,7 +121,7 @@ public class AlbumPhotoService extends ServiceImpl<AlbumPhotoMapper, AlbumPhoto>
 	@Transactional
 	public AlbumPhotoVO upload(UploadPhotoPO uploadPO) throws IOException {
 		Validate.notNull(uploadPO, "上传参数不能为空");
-		
+
 		// 上传照片后，更新相册信息
 		PlusPhotoCountPO plusPhotoCountPO = PlusPhotoCountPO.builder()
 				.id(uploadPO.getAlbumId()).count(1).build();
@@ -119,18 +141,17 @@ public class AlbumPhotoService extends ServiceImpl<AlbumPhotoMapper, AlbumPhoto>
 			uploadPO.setInputStream(new FileInputStream(tempFile));
 			String objectName = upload2FileServer(uploadPO);
 			
-			// 生成缩略图后，上传文件服务
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			Thumbnails.of(tempFile).scale(1).outputQuality(0.65).allowOverwrite(true).toOutputStream(os);
-			uploadPO.setPhotoSize(os.size());
+			// 压缩原图片到指定大小
+			File thumbnail = thumbnails(tempFile);
+			uploadPO.setPhotoSize((int)thumbnail.length());
 			uploadPO.setName(String.format("thumb-%s", uploadPO.getName()));
-			uploadPO.setInputStream(new ByteArrayInputStream(os.toByteArray()));
+			uploadPO.setInputStream(FileUtils.openInputStream(thumbnail));
 			String thumbObjectName = upload2FileServer(uploadPO);
 			
 			// 保存照片记录
 			albumPhoto.setObjectName(objectName);
 			albumPhoto.setThumbObjectName(thumbObjectName);
-			albumPhoto.setState(EntityState.NORMAL.getValue());
+			albumPhoto.setState(EntityState.NORMAL.getCode());
 			albumPhoto.setCreateTime(WebworkUtils.nowTime());
 			albumPhoto.setUpdateTime(albumPhoto.getCreateTime());
 			save(albumPhoto);
@@ -175,7 +196,7 @@ public class AlbumPhotoService extends ServiceImpl<AlbumPhotoMapper, AlbumPhoto>
 		albumService.plusUsageSpace(plusUsageSpacePO);
 		
 		// 删除照片
-		photo.setState(EntityState.DELETED.getValue());
+		photo.setState(EntityState.DELETED.getCode());
 		photo.setUpdateTime(WebworkUtils.nowTime());
 		photo.setUserId(deletePhotoPO.getUserId());
 		photo.setUserName(deletePhotoPO.getUserName());
@@ -188,7 +209,9 @@ public class AlbumPhotoService extends ServiceImpl<AlbumPhotoMapper, AlbumPhoto>
 	 * @return 照片集合
 	 */
 	public List<AlbumPhotoVO> listQuery(ListQueryPhotoPO queryPO) {
-		List<AlbumPhoto> list = lambdaQuery().eq(AlbumPhoto::getAlbumId, queryPO.getAlbumId()).list();
+		List<AlbumPhoto> list = lambdaQuery()
+				.eq(AlbumPhoto::getAlbumId, queryPO.getAlbumId())
+				.eq(AlbumPhoto::getState, EntityState.NORMAL.getCode()).list();
 		return BeanUtils.toList(list, AlbumPhotoVO.class);
 	}
 }

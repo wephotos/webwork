@@ -56,7 +56,7 @@ public class Album implements Serializable {
 	/**
 	 * 相册封面
 	 */
-	private String coverPhoto;
+	private String cover;
 	
 	/**
 	 * 相册使用空间

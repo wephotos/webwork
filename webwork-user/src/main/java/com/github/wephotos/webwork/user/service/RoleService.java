@@ -74,7 +74,7 @@ public class RoleService {
 		log.info("删除角色, id = {}", id);
 		Role role = new Role();
 		role.setId(id);
-		role.setStatus(EntityState.DELETED.getValue());
+		role.setStatus(EntityState.DELETED.getCode());
 		return roleMapper.updateById(role) == 1;
 	}
 	
@@ -88,7 +88,7 @@ public class RoleService {
     	ValidationUtils.isFalse(isExistsName(role), UserStateCode.ROLE_NAME_EXIST);
     	
     	log.info("新增角色: {}", role);
-        role.setStatus(EntityState.NORMAL.getValue());
+        role.setStatus(EntityState.NORMAL.getCode());
         role.setCreateTime(WebworkUtils.nowTime());
         role.setUpdateTime(role.getCreateTime());
         int sort = roleMapper.getMaxSort(role.getParentId(), role.getParentType());
@@ -142,7 +142,7 @@ public class RoleService {
      */
 	public List<Role> listQuery(RoleQueryPO query) {
 		LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
-    	wrapper.gt(Role::getStatus, EntityState.DELETED.getValue());
+    	wrapper.gt(Role::getStatus, EntityState.DELETED.getCode());
     	if(query.getParentId() != null) {
     		wrapper.eq(Role::getParentId, query.getParentId());
     	}

@@ -149,7 +149,7 @@ public class ResourceService {
     	
     	int sort = getMaxSort(parentId, parentType);
     	record.setSort(sort);
-    	record.setStatus(EntityState.NORMAL.getValue());
+    	record.setStatus(EntityState.NORMAL.getCode());
     	Date nowTime = WebworkUtils.nowTime();
     	record.setCreateTime(nowTime);
     	record.setUpdateTime(nowTime);
@@ -179,7 +179,7 @@ public class ResourceService {
 		log.info("删除资源: id = {}", id);
 		Resource entity = new Resource()
 				.setId(id)
-				.setStatus(EntityState.DELETED.getValue());
+				.setStatus(EntityState.DELETED.getCode());
 		return resourceMapper.updateById(entity) == 1;
 	}
     
@@ -204,7 +204,7 @@ public class ResourceService {
      */
     public List<Resource> listQuery(ResourceQueryPO query){
     	LambdaQueryWrapper<Resource> wrapper = new LambdaQueryWrapper<>();
-    	wrapper.gt(Resource::getStatus, EntityState.DELETED.getValue());
+    	wrapper.gt(Resource::getStatus, EntityState.DELETED.getCode());
     	if(query.getParentId() != null) {
     		wrapper.eq(Resource::getParentId, query.getParentId());
     	}

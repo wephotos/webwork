@@ -51,7 +51,7 @@ public class DictionaryService {
 		log.info("删除数据字典, id = {}", id);
 		Dictionary entity = new Dictionary();
 		entity.setId(id);
-		entity.setStatus(EntityState.DELETED.getValue());
+		entity.setStatus(EntityState.DELETED.getCode());
 		return dictionaryMapper.updateById(entity) == 1;
 	}
 	
@@ -66,7 +66,7 @@ public class DictionaryService {
 		dictionary.setSort(sort);
 		dictionary.setCreateTime(WebworkUtils.nowTime());
 		dictionary.setUpdateTime(dictionary.getCreateTime());
-		dictionary.setStatus(EntityState.NORMAL.getValue());
+		dictionary.setStatus(EntityState.NORMAL.getCode());
 		dictionaryMapper.insert(dictionary);
 		return dictionary.getId();
 	}
@@ -109,7 +109,7 @@ public class DictionaryService {
 		}else {
 			wrapper.eq(Dictionary::getParentId, parentId);
 		}
-		wrapper.gt(Dictionary::getStatus, EntityState.DELETED.getValue());
+		wrapper.gt(Dictionary::getStatus, EntityState.DELETED.getCode());
 		List<Dictionary> dataList = dictionaryMapper.selectList(wrapper);
 		return dataList.stream().map(NodeConverter::from).collect(Collectors.toList());
 	}

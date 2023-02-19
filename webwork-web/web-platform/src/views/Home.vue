@@ -99,7 +99,7 @@ export default class Home extends Vue {
   flex-wrap: wrap;
   flex-direction: column;
   align-content: flex-start;
-  background-color: rgb(129, 216, 207);
+  background-color: #f1fafa;
 }
 .ant-badge {
   margin: 20px;

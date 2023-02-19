@@ -88,7 +88,7 @@ public class DocumentService {
 		
 		Document doc = new Document();
 		doc.setId(po.getId());
-		doc.setState(EntityState.DELETED.getValue());
+		doc.setState(EntityState.DELETED.getCode());
 		
 		return documentMapper.updateById(doc) == 1;
 	}
@@ -117,7 +117,7 @@ public class DocumentService {
 			doc.setOpen(false);
 		}
 		doc.setVersionNo(1);
-		doc.setState(EntityState.NORMAL.getValue());
+		doc.setState(EntityState.NORMAL.getCode());
 		doc.setCreateUser(po.getUserName());
 		doc.setUpdateUser(po.getUserName());
 		doc.setCreateTime(WebworkUtils.nowTime());

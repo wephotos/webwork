@@ -95,7 +95,7 @@ public class OrganizationService {
     	log.info("删除组织机构: id = {}", id);
         Organization org = new Organization();
         org.setId(id);
-        org.setStatus(EntityState.DELETED.getValue());
+        org.setStatus(EntityState.DELETED.getCode());
         return SqlHelper.retBool(organizationMapper.updateById(org));
     }
     
@@ -109,7 +109,7 @@ public class OrganizationService {
     	wrapper.select(Organization::getId, Organization::getName,
                 Organization::getCode, Organization::getStatus, Organization::getSort,
                 Organization::getType, Organization::getParentId, Organization::getParentType);
-    	wrapper.gt(Organization::getStatus, EntityState.DELETED.getValue());
+    	wrapper.gt(Organization::getStatus, EntityState.DELETED.getCode());
     	if(query.getType() != null) {
     		wrapper.eq(Organization::getType, query.getType());
     	}

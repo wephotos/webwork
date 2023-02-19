@@ -83,7 +83,7 @@ public class FileService {
         	if(StringUtils.isBlank(file.getFileGroupKey())) {
         		file.setFileGroupKey(UUID.randomUUID().toString().replace("-", ""));
         	}
-        	file.setStatus(EntityState.NORMAL.getValue());
+        	file.setStatus(EntityState.NORMAL.getCode());
         	file.setCreateTime(WebworkUtils.nowTime());
         	fileMapper.insert(file);
         }
@@ -109,7 +109,7 @@ public class FileService {
     	log.info("逻辑删除文件, id = {}", id);
         WebworkFile file = new WebworkFile();
         file.setId(id);
-        file.setStatus(EntityState.DELETED.getValue());
+        file.setStatus(EntityState.DELETED.getCode());
         return fileMapper.updateByPrimaryKeySelective(file) == 1;
     }
     

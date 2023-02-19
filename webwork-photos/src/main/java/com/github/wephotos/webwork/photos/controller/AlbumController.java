@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.wephotos.webwork.photos.entity.Album;
 import com.github.wephotos.webwork.photos.entity.po.AlbumPO;
+import com.github.wephotos.webwork.photos.entity.po.CoverPO;
 import com.github.wephotos.webwork.photos.entity.po.DeleteAlbumPO;
 import com.github.wephotos.webwork.photos.entity.po.ListQueryAlbumPO;
 import com.github.wephotos.webwork.photos.service.AlbumService;
@@ -77,5 +78,16 @@ public class AlbumController {
 		ListQueryAlbumPO listQueryAlbumPO = ListQueryAlbumPO.builder().userId(user.getId()).build();
 		List<Album> albums = albumService.listQuery(listQueryAlbumPO);
 		return Results.newSuccessfullyResult(albums);
+	}
+	
+	/**
+	 * 设置相册封面
+	 * @param cover 入参
+	 * @return 成功返回 true
+	 */
+	@PostMapping("/cover")
+	public Result<Boolean> cover(@RequestBody CoverPO cover) {
+		boolean isSuccess = albumService.cover(cover);
+		return Results.newSuccessfullyResult(isSuccess);
 	}
 }

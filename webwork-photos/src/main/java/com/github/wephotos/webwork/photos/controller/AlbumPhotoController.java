@@ -52,13 +52,16 @@ public class AlbumPhotoController {
 		SecurityUser user = SecurityUtils.getSecurityUser(session);
 		uploadPhotoPO.setUserId(user.getId());
 		uploadPhotoPO.setUserName(user.getName());
-		try (InputStream input = file.getInputStream()) {
-			uploadPhotoPO.setInputStream(input);
-			uploadPhotoPO.setPhotoSize((int)file.getSize());
-			uploadPhotoPO.setName(file.getOriginalFilename());
-			uploadPhotoPO.setContentType(file.getContentType());
-			AlbumPhotoVO uploadResult = albumPhotoService.upload(uploadPhotoPO);
-			return Results.newSuccessfullyResult(uploadResult);
+		String lock = user.getId().toString().intern();
+		synchronized (lock) {
+			try (InputStream input = file.getInputStream()) {
+				uploadPhotoPO.setInputStream(input);
+				uploadPhotoPO.setPhotoSize((int)file.getSize());
+				uploadPhotoPO.setName(file.getOriginalFilename());
+				uploadPhotoPO.setContentType(file.getContentType());
+				AlbumPhotoVO uploadResult = albumPhotoService.upload(uploadPhotoPO);
+				return Results.newSuccessfullyResult(uploadResult);
+			}
 		}
 	}
 	

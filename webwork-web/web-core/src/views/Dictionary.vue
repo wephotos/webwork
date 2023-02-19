@@ -186,7 +186,7 @@ export default class DictionaryVue extends Vue {
   rules = {
     name: [
       { required: true, message: '请输入字典名称', trigger: 'blur' },
-      { max: 50, message: '角色名称最多50个字符' }
+      { max: 50, message: '字典名称最多50个字符' }
     ],
     value: [{ max: 50, message: '字典值最多50个字符' }]
   }

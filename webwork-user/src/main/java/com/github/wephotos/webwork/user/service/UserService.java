@@ -80,7 +80,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         
     	User user = BeanUtils.toObject(userPO, User.class);
     	if(user.getStatus() == null) {
-    		user.setStatus(EntityState.NORMAL.getValue());
+    		user.setStatus(EntityState.NORMAL.getCode());
     	}
     	user.setUpdateUser(user.getCreateUser());
         Date time = WebworkUtils.nowTime();
@@ -113,7 +113,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 		log.info("删除用户, id = {}", id);
 		User user = new User();
 		user.setId(id);
-		user.setStatus(EntityState.DELETED.getValue());
+		user.setStatus(EntityState.DELETED.getCode());
 		return userMapper.updateById(user) == 1;
 	}
 	

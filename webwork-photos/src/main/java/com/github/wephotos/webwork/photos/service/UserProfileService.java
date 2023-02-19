@@ -117,7 +117,7 @@ public class UserProfileService extends ServiceImpl<UserProfileMapper, UserProfi
      * 增加用户使用空间，负数进行减操作
      * @param size 本次变更空间大小
      */
-    public void plusUsageSpace(Integer userId, int size) {
+    public void plusUsageSpace(Integer userId, long size) {
     	UserProfile profile = getProfile(userId);
     	Long usageSpace = Optional.ofNullable(profile.getUsageSpace()).orElse(0L);
     	profile.setUsageSpace(usageSpace + size);

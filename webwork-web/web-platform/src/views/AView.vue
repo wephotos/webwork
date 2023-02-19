@@ -50,7 +50,7 @@ import { Options, Vue } from 'vue-class-component'
       },
       width: {
         type: [Number, String],
-        default: 800
+        default: '80%'
       },
       height: {
         type: [Number, String],

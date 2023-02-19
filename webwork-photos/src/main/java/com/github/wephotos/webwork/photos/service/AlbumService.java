@@ -10,12 +10,15 @@ import javax.annotation.Resource;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.wephotos.webwork.photos.entity.Album;
 import com.github.wephotos.webwork.photos.entity.po.AlbumPO;
+import com.github.wephotos.webwork.photos.entity.po.CoverPO;
 import com.github.wephotos.webwork.photos.entity.po.DeleteAlbumPO;
 import com.github.wephotos.webwork.photos.entity.po.ListQueryAlbumPO;
+import com.github.wephotos.webwork.photos.entity.po.ListQueryPhotoPO;
 import com.github.wephotos.webwork.photos.entity.po.PlusPhotoCountPO;
 import com.github.wephotos.webwork.photos.entity.po.PlusUsageSpacePO;
 import com.github.wephotos.webwork.photos.entity.vo.AlbumPhotoVO;
@@ -54,7 +57,8 @@ public class AlbumService extends ServiceImpl<AlbumMapper, Album> {
 	public List<Album> listQuery(ListQueryAlbumPO po) {
 		Validate.notNull(po, "参数不能为空");
 		Validate.notNull(po.getUserId(), "用户ID不能为空");
-		return lambdaQuery().eq(Album::getUserId, po.getUserId()).list();
+		return lambdaQuery().eq(Album::getUserId, po.getUserId())
+				.eq(Album::getState, EntityState.NORMAL.getCode()).list();
 	}
 	
 	/**
@@ -62,6 +66,7 @@ public class AlbumService extends ServiceImpl<AlbumMapper, Album> {
 	 * @param albumPO 相册参数
 	 * @return 相册ID
 	 */
+	@Transactional
 	public Integer saveAlbum(AlbumPO albumPO) {
 		Validate.notNull(albumPO, "参数不能为空");
 		Validate.notNull(albumPO.getUserId(), "用户ID不能为空");
@@ -74,7 +79,7 @@ public class AlbumService extends ServiceImpl<AlbumMapper, Album> {
 			album.setUsageSpace(0L);
 			album.setPhotoCount(0);
 			album.setMaxPhotoCount(maxPhotoCount);
-			album.setState(EntityState.NORMAL.getValue());
+			album.setState(EntityState.NORMAL.getCode());
 			album.setCreateTime(nowTime);
 			
 			// 更新用户描述信息
@@ -89,24 +94,28 @@ public class AlbumService extends ServiceImpl<AlbumMapper, Album> {
 	
 	/**
 	 * 删除相册
-	 * @param deleteAlbumPO 删除相册参数
+	 * @param po 删除相册参数
 	 * @return
 	 */
-	public boolean deleteAlbum(DeleteAlbumPO deleteAlbumPO) {
-		Objects.requireNonNull(deleteAlbumPO, "删除相册参数不能为空");
-		Objects.requireNonNull(deleteAlbumPO.getId(), "未指定要删除相册的ID");
+	@Transactional
+	public boolean deleteAlbum(DeleteAlbumPO po) {
+		Objects.requireNonNull(po, "删除相册参数不能为空");
+		Objects.requireNonNull(po.getId(), "未指定要删除相册的ID");
 		// 有照片不允许删除
-		List<AlbumPhotoVO> photos = albumPhotoService.listQuery(null);
+		ListQueryPhotoPO listQueryPhotoPO = ListQueryPhotoPO.builder()
+				.albumId(po.getId()).build();
+		List<AlbumPhotoVO> photos = albumPhotoService.listQuery(listQueryPhotoPO);
 		if(photos.size() > 0) {
 			throw new WebworkRuntimeException(PhotosStateCode.NOT_DELETE_ALBUM_HAS_PHOTO, "相册中存在照片，不能删除");
 		}
-		Album album = getById(deleteAlbumPO.getId());
-		album.setUserId(deleteAlbumPO.getUserId());
-		album.setUserName(deleteAlbumPO.getUserName());
-		album.setState(EntityState.DELETED.getValue());
+		Album album = getById(po.getId());
+		album.setUserId(po.getUserId());
+		album.setUserName(po.getUserName());
+		album.setState(EntityState.DELETED.getCode());
 		album.setUpdateTime(WebworkUtils.nowTime());
 		// 修改用户描述信息
 		userProfileService.plusAlbumCount(album.getUserId(), -1);
+		userProfileService.plusUsageSpace(po.getUserId(), -album.getUsageSpace());
 		return updateById(album);
 	}
 	
@@ -150,6 +159,23 @@ public class AlbumService extends ServiceImpl<AlbumMapper, Album> {
 		album.setUserName(po.getUserName());
 		album.setUpdateTime(WebworkUtils.nowTime());
 		updateById(album);
+	}
+
+	/**
+	 * 设置相册封面照片
+	 * @param po 入参
+	 * @return 成功返回 true
+	 */
+	public boolean cover(CoverPO po) {
+		Objects.requireNonNull(po.getCover(), "封面照片不能为空");
+		Objects.requireNonNull(po.getAlbumId(), "相册ID不能为空");
+		Album album = getById(po.getAlbumId());
+		if(album == null) {
+			throw new IllegalArgumentException("相册ID不存在: " + po.getAlbumId());
+		}
+		album.setCover(po.getCover());
+		album.setUpdateTime(WebworkUtils.nowTime());
+		return updateById(album);
 	}
 	
 }
