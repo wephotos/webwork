@@ -294,7 +294,7 @@ export default class VueUser extends Vue {
 
   // 节点选择
   onSelectGroup(selectedKeys: string[], info: SelectEvent) {
-    console.log(selectedKeys, info)
+    // console.log(selectedKeys, info)
     this.pageable.condition.orgcode = info.node.dataRef.code
     this.pageQueryUser()
   }

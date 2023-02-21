@@ -80,8 +80,8 @@ interface LoginUser {
 export default class Login extends Vue {
   // 表单数据
   formData: UserAuth = {
-    username: 'admin',
-    password: '123456'
+    username: '',
+    password: ''
   }
 
   // 认证通过登录

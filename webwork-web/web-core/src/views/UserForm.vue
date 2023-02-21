@@ -186,7 +186,7 @@ export default class UserForm extends Vue {
     account: [{ required: true, message: '请输入账号', trigger: 'blur' }, { max: 20, message: '最多输入20个字符' }],
     post: [{ max: 20, message: '最多输入20个字符' }],
     password: [
-      { required: true, message: '请输入密码', trigger: 'blur' },
+      { required: false, message: '请输入密码', trigger: 'blur' },
       { min: 6, max: 15, message: '密码为6-15位字符串', trigger: 'blur' }
     ],
     phone: [
@@ -257,7 +257,6 @@ export default class UserForm extends Vue {
     const ret = await GroupRequest.children()
     if (ret.code === 0) {
       this.treeData = this.toChildren(ret)
-      console.log(this.treeData)
     } else {
       message.error(ret.msg)
     }
@@ -269,6 +268,9 @@ export default class UserForm extends Vue {
         } else {
           message.error(ret.msg)
         }
+    } else {
+      // 新增用户需要校验密码
+      this.rules.password[0].required = true
     }
   }
 

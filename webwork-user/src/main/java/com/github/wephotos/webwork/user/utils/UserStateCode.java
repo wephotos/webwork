@@ -14,7 +14,8 @@ public final class UserStateCode {
     public static final StateCode USER_ACCOUNT_EXIST = new StateCode(100101, "用户账号已存在");
     public static final StateCode USER_PHONE_EXIST = new StateCode(100102, "用户手机号已存在");
     public static final StateCode USER_MAIL_EXIST = new StateCode(100103, "用户邮箱已存在");
-
+    public static final StateCode USER_PROPS_NOT_NULL = new StateCode(100104, "用户账号、姓名、密码不能为空");
+    
     /**
      * ROLE相关
      */

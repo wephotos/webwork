@@ -9,11 +9,13 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
@@ -61,24 +63,25 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     
     /**
      * 创建用户
-     * @param userPO 用户信息
+     * @param po 用户信息
      * @return 用户ID
      */
-    public Integer create(UserPO userPO) {
-    	Integer deptId = userPO.getDeptId();
+    public Integer create(UserPO po) {
+    	Integer deptId = po.getDeptId();
     	if(deptId == null) {
     		throw new IllegalArgumentException("部门ID不能为空");
     	}
-    	UserQueryPO query = UserQueryPO.builder()
-    			.account(userPO.getAccount())
-    			.email(userPO.getEmail())
-    			.phone(userPO.getPhone()).build();
-        ValidationUtils.isTrue(checkUniqueProperty(query), UserStateCode.USER_ACCOUNT_EXIST);
-        ValidationUtils.isTrue(checkUniqueProperty(query), UserStateCode.USER_PHONE_EXIST);
-        ValidationUtils.isTrue(checkUniqueProperty(query), UserStateCode.USER_MAIL_EXIST);
-        log.info("创建用户: {}", userPO);
+    	// 新增用户时，用户账号，姓名，密码不能为空
+    	if(StringUtils.isAnyBlank(po.getAccount(), po.getName(), po.getPassword())) {
+    		ValidationUtils.isTrue(false, UserStateCode.USER_PROPS_NOT_NULL);
+    	}
+
+        ValidationUtils.isTrue(checkUniqueProperty(User::getAccount, po.getAccount()), UserStateCode.USER_ACCOUNT_EXIST);
+        ValidationUtils.isTrue(checkUniqueProperty(User::getPhone, po.getPhone()), UserStateCode.USER_PHONE_EXIST);
+        ValidationUtils.isTrue(checkUniqueProperty(User::getEmail, po.getEmail()), UserStateCode.USER_MAIL_EXIST);
+        log.info("创建用户: {}", po);
         
-    	User user = BeanUtils.toObject(userPO, User.class);
+    	User user = BeanUtils.toObject(po, User.class);
     	if(user.getStatus() == null) {
     		user.setStatus(EntityState.NORMAL.getCode());
     	}
@@ -149,28 +152,33 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 		}
         return userMapper.selectOne(wrapper);
     }
+	
+	/**
+     * 检测用户唯一属性是否已经存在
+     * @param column 列方法引用
+     * @param val 列值
+     * @return true: 检测通过
+     */
+    public boolean checkUniqueProperty(SFunction<User, ?> column, Object val) {
+    	return checkUniqueProperty(column, val);
+    }
     
     /**
-     * 检测用户的唯一属性是否已经存在
-     * 按照账号、手机、邮箱的顺序进行检测
-     * @param query 用户信息
-     * @return 不存在返回 true
+     * 检测用户唯一属性是否已经存在
+     * @param userId 用户ID
+     * @param column 列方法引用
+     * @param val 列值
+     * @return true: 检测通过
      */
-    public boolean checkUniqueProperty(UserQueryPO query) {
-    	LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-    	if(query != null) {
-    		// 不包含当前用户
-	    	if(query.getId() != null) {
-	        	wrapper.ne(User::getId, query.getId());
-	        }
-	    	if(StringUtils.isNotBlank(query.getAccount())) {
-	        	wrapper.eq(User::getAccount, query.getAccount());
-	        }else if(StringUtils.isNotBlank(query.getPhone())) {
-				wrapper.eq(User::getPhone, query.getPhone());
-			}else if(StringUtils.isNotBlank(query.getEmail())) {
-	        	wrapper.eq(User::getEmail, query.getEmail());
-	        }
+    public boolean checkUniqueProperty(Integer userId, SFunction<User, ?> column, Object val) {
+    	if(ObjectUtils.isEmpty(val)) {
+    		return true;
     	}
+		LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(column, val);
+        // 不包含当前用户
+    	wrapper.ne(userId != null, User::getId, userId);
+        
     	return userMapper.selectCount(wrapper) == 0;
     }
 
@@ -210,12 +218,17 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     	if(po.getId() == null) {
     		throw new WebworkRuntimeException(StateCode.PARAMETER_MISSING, "用户ID不能为空");
     	}
-    	UserQueryPO query = UserQueryPO.builder()
-    			.id(po.getId())
-    			.phone(po.getPhone())
-    			.email(po.getEmail()).build();
-        ValidationUtils.isTrue(checkUniqueProperty(query), UserStateCode.USER_PHONE_EXIST);
-        ValidationUtils.isTrue(checkUniqueProperty(query), UserStateCode.USER_MAIL_EXIST);
+    	// 更新用户时，用户 账号、姓名 不能为空
+    	if(StringUtils.isAnyBlank(po.getAccount(), po.getName())) {
+    		ValidationUtils.isTrue(false, UserStateCode.USER_PROPS_NOT_NULL, "用户账号、姓名不能为空");
+    	}
+    	// 用户账号、手机、邮箱不能重复
+    	ValidationUtils.isTrue(checkUniqueProperty(po.getId(), User::getAccount, po.getAccount()), 
+    			UserStateCode.USER_ACCOUNT_EXIST);
+		ValidationUtils.isTrue(checkUniqueProperty(po.getId(), User::getPhone, po.getPhone()), 
+				UserStateCode.USER_PHONE_EXIST);
+		ValidationUtils.isTrue(checkUniqueProperty(po.getId(), User::getEmail, po.getEmail()), 
+				UserStateCode.USER_MAIL_EXIST);
         
         log.info("更新用户: {}", po);
     	User user = BeanUtils.toObject(po, User.class);

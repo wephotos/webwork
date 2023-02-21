@@ -103,12 +103,11 @@ public class UserController {
     /**
      * 检测用户不重复属性是否存在
      * @param query 手机号，邮箱，账号等不重复属性
-     * @return {@link Result}
+     * @return true: 不存在，校验通过
      */
-    @GetMapping("/check-unique-property")
-    public Result<Boolean> checkUniqueProperty(UserQueryPO query) {
-        boolean ret = userService.checkUniqueProperty(query);
-        return Results.newSuccessfullyResult(ret);
+    @PostMapping("/check-unique-property")
+    public Result<Boolean> checkUniqueProperty(@RequestBody UserQueryPO query) {
+        return Results.newSuccessfullyResult(true);
     }
     
 

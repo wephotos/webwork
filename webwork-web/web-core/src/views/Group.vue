@@ -14,7 +14,7 @@
         <span @contextmenu.prevent>{{ node.title }}</span>
         <template #overlay>
           <a-menu
-            @click="({key: menuKey}) => onContextMenuClick(node, menuKey)"
+            @click="onContextMenuClick(node, $event)"
           >
             <!-- 单位菜单 -->
             <template v-if="node.type == 0 || node.type == 1">
@@ -128,7 +128,8 @@ export default class GroupVue extends Vue {
   }
 
   // 右键菜单
-  onContextMenuClick(node: TreeDataItem, menuKey: ContextMenuKeys) {
+  onContextMenuClick(node: TreeDataItem, e: { key: ContextMenuKeys; [key: string]: any }) {
+    const menuKey = e.key
     let title
     let formData: {
       id?: number; // rawId
@@ -289,6 +290,7 @@ export default class GroupVue extends Vue {
       code: data.code,
       rawId: data.rawId,
       sort: data.sort,
+      parentId: data.parentId,
       isLeaf: data.type === TreeNodeType.DEPT
     } as TreeDataItem
   }
@@ -365,13 +367,11 @@ export default class GroupVue extends Vue {
     this.loopParentNode(dragKey, {}, this.treeData, (pNode: TreeDataItem) => {
       parentId = pNode.rawId
     })
-    // console.log('targetNode', targetNode)
     const dropSort = {
       parent: parentId,
       sort: dragObj.sort,
       targetSort: targetNode.sort
     }
-    // console.log('dropSort', dropSort)
     request.dropSort(dropSort).then(ret => {
       console.log(ret.code, ret.msg, ret.data)
     })

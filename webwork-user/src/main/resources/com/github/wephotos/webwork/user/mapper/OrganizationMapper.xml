@@ -3,7 +3,7 @@
 <mapper namespace="com.github.wephotos.webwork.user.mapper.OrganizationMapper">
 	
 	<!-- 查询最大的排序号 -->
-    <select id="getMaxCode" parameterType="java.lang.Integer">
+    <select id="getMaxSort" resultType="java.lang.Integer">
         SELECT 
           IFNULL(MAX(sort), 0)
         FROM 
@@ -20,7 +20,7 @@
     </select>
     
     <!-- 查询最大的code -->
-    <select id="getMaxCode" resultType="java.lang.String" parameterType="java.lang.Integer">
+    <select id="getMaxCode" resultType="java.lang.String">
         SELECT 
           LPAD(IFNULL(MAX(CAST(SUBSTR(CODE, -3) AS SIGNED) + 1), 1), 3, 0) MAX_CODE
         FROM 
@@ -72,5 +72,4 @@
             </if>
         </where>
     </update>
-
 </mapper>
