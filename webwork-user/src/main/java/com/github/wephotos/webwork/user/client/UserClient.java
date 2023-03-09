@@ -5,6 +5,8 @@ import java.util.List;
 import com.github.wephotos.webwork.schema.entity.Result;
 import com.github.wephotos.webwork.user.client.entity.po.UserResoQueryPO;
 import com.github.wephotos.webwork.user.client.entity.po.UserRoleQueryPO;
+import com.github.wephotos.webwork.user.client.entity.po.ChangePasswordPO;
+import com.github.wephotos.webwork.user.client.entity.po.UpdateUserInfoPO;
 import com.github.wephotos.webwork.user.client.entity.po.UserLoginPO;
 import com.github.wephotos.webwork.user.client.entity.ro.NodeRO;
 import com.github.wephotos.webwork.user.client.entity.ro.ResoRO;
@@ -32,6 +34,21 @@ public interface UserClient {
 	 * @return 用户信息
 	 */
 	Result<UserRO> selectByUsername(String username);
+	
+	/**
+	 * 修改用户密码
+	 * @param po 修改密码参数
+	 * @return 是否修改成功
+	 */
+	Result<Boolean> changePassword(ChangePasswordPO po);
+	
+	/**
+	 * 更新用户信息
+	 * 
+	 * @param po 用户信息参数
+	 * @return 是否更新成功
+	 */
+	Result<Boolean> updateUserInfo(UpdateUserInfoPO po);
 	
 	/**
 	 * 查询用户详情，包含部门单位信息

@@ -12,6 +12,8 @@ import com.github.wephotos.webwork.schema.entity.Result;
 import com.github.wephotos.webwork.schema.exception.StateCode;
 import com.github.wephotos.webwork.schema.utils.Results;
 import com.github.wephotos.webwork.user.client.UserClient;
+import com.github.wephotos.webwork.user.client.entity.po.ChangePasswordPO;
+import com.github.wephotos.webwork.user.client.entity.po.UpdateUserInfoPO;
 import com.github.wephotos.webwork.user.client.entity.po.UserLoginPO;
 import com.github.wephotos.webwork.user.client.entity.po.UserResoQueryPO;
 import com.github.wephotos.webwork.user.client.entity.po.UserRoleQueryPO;
@@ -77,6 +79,16 @@ public class UserClientDefault implements UserClient {
 		UserVO vo = userService.findUserDetailsById(userId);
 		UserRO ro = BeanUtils.toObject(vo, UserRO.class);
 		return Results.newSuccessfullyResult(ro);
+	}
+	
+	@Override
+	public Result<Boolean> changePassword(ChangePasswordPO po) {
+		return userService.changePassword(po);
+	}
+	
+	@Override
+	public Result<Boolean> updateUserInfo(UpdateUserInfoPO po) {
+		return userService.updateSimpleUserInfo(po);
 	}
 
 	@Override

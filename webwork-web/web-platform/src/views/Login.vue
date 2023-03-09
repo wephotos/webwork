@@ -58,18 +58,14 @@ import {
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import axiosUtils from '@/utils/AxiosUtils'
 import { R } from '@/types/R'
+import pubutils from '@/utils/PubUtils'
+import { User } from '@/types/User'
+
 interface UserAuth {
   username: string;
   password: string;
 }
-interface LoginUser {
-  id: number;
-  name: string;
-  deptId: number;
-  deptName: string;
-  groupId: number;
-  groupName: string;
-}
+
 @Options({
   components: {
     UserOutlined,
@@ -87,7 +83,7 @@ export default class Login extends Vue {
   // 认证通过登录
   async handleFinish(values: UserAuth) {
     const params = `username=${this.formData.username}&password=${this.formData.password}`
-    const result = await axiosUtils.post<R<LoginUser>>(
+    const result = await axiosUtils.post<R<User>>(
       '/platform/login',
       params,
       {
@@ -97,8 +93,8 @@ export default class Login extends Vue {
       }
     )
     if (result.code === 0) {
-      this.$toast('登录成功')
       this.$router.push('/')
+      pubutils.setLocalStorageUser(result.data)
     } else {
       this.$toast(result.msg)
     }

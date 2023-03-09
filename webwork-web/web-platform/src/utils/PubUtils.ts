@@ -1,3 +1,4 @@
+import { User } from '@/types/User'
 import moment from 'moment'
 /** 公共工具类 */
 export default class PubUtils {
@@ -34,5 +35,22 @@ export default class PubUtils {
      */
     static formatDate(date: Date = new Date(), format = 'YYYY-MM-DD') {
         return moment(date).format(format)
+    }
+
+    /**
+     * 将用户信息存入本地存储中
+     * @param user 用户信息
+     */
+    static setLocalStorageUser(user: User) {
+        localStorage.setItem("webworks-user", JSON.stringify(user))
+    }
+
+    /**
+     * 从本地存储中获取当前用户信息
+     * @returns 用户信息
+     */
+    static getLocalStorageUser(): User {
+        const ustr = localStorage.getItem("webworks-user")
+        return (ustr ? JSON.parse(ustr) : ustr) as User
     }
 }

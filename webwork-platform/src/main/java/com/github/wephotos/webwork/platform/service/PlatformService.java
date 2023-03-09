@@ -11,6 +11,8 @@ import com.github.wephotos.webwork.schema.exception.StateCode;
 import com.github.wephotos.webwork.schema.utils.Results;
 import com.github.wephotos.webwork.security.entity.SecurityUser;
 import com.github.wephotos.webwork.user.client.UserClient;
+import com.github.wephotos.webwork.user.client.entity.po.ChangePasswordPO;
+import com.github.wephotos.webwork.user.client.entity.po.UpdateUserInfoPO;
 import com.github.wephotos.webwork.user.client.entity.po.UserLoginPO;
 import com.github.wephotos.webwork.user.client.entity.ro.ResoRO;
 import com.github.wephotos.webwork.user.client.entity.ro.UserRO;
@@ -38,6 +40,18 @@ public class PlatformService {
 		}else {
 			return Results.newResult(StateCode.get(result.getCode()));
 		}
+	}
+	
+	public Result<Boolean> changePassword(ChangePasswordPO po) {
+		return userClient.changePassword(po);
+	}
+	
+	public Result<UserRO> getUserInfo(String username) {
+		return userClient.selectByUsername(username);
+	}
+	
+	public Result<Boolean> updateUserInfo(UpdateUserInfoPO po) {
+		return userClient.updateUserInfo(po);
 	}
 	
 	/**

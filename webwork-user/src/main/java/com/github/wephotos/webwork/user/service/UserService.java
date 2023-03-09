@@ -12,6 +12,7 @@ import javax.annotation.Resource;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -25,6 +26,8 @@ import com.github.wephotos.webwork.schema.entity.Result;
 import com.github.wephotos.webwork.schema.exception.StateCode;
 import com.github.wephotos.webwork.schema.exception.WebworkRuntimeException;
 import com.github.wephotos.webwork.schema.utils.Results;
+import com.github.wephotos.webwork.user.client.entity.po.ChangePasswordPO;
+import com.github.wephotos.webwork.user.client.entity.po.UpdateUserInfoPO;
 import com.github.wephotos.webwork.user.client.entity.po.UserLoginPO;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.entity.User;
@@ -43,11 +46,13 @@ import com.github.wephotos.webwork.utils.StringUtils;
 import com.github.wephotos.webwork.utils.WebworkUtils;
 
 /**
- * @author chengzi
- * @date 2021-01-25 16:46
+ * 用户业务层
+ * 
+ * @author TianQi
+ *
  */
 @Service
-@Transactional(rollbackFor = Exception.class)
+@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
 public class UserService extends ServiceImpl<UserMapper, User> {
 	
 	private static final Logger log = LoggerFactory.getLogger(UserService.class);
@@ -138,7 +143,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 	public User selectOne(UserQueryPO query) {
     	LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.select(User::getId, User::getName, User::getAccount, User::getPassword, 
-        		User::getEmail, User::getPhone, User::getStatus);
+        		User::getEmail, User::getPhone, User::getStatus, User::getPost, User::getAvatar);
         if(query.getId() != null) {
         	wrapper.eq(User::getId, query.getId());
         }else if(StringUtils.isNotBlank(query.getAccount())) {
@@ -334,5 +339,50 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         	return Results.newResult(UserStateCode.USER_PASSWORD_ERROR);
         }
 	}
+    
+    /**
+     * 修改用户密码
+     * @param po 入参
+     * @return 是否修改成功
+     */
+    public Result<Boolean> changePassword(ChangePasswordPO po) {
+    	if (po.getUserId() == null) {
+    		return Results.newResult(StateCode.PARAMETER_MISSING, "用户名ID不能为空");
+    	}
+    	if (StringUtils.isAnyBlank(po.getPassword(), po.getNewPassword())) {
+    		return Results.newResult(StateCode.PARAMETER_MISSING, "原密码或新密码都不能为空");
+    	}
+    	if (StringUtils.equals(po.getPassword(), po.getNewPassword())) {
+    		return Results.newResult(StateCode.PARAMETER_ILLEGAL, "新密码和原密码不能相同");
+    	}
+    	if (po.getNewPassword().length() < 6) {
+    		return Results.newResult(StateCode.PARAMETER_ILLEGAL, "新密码不能少于6位字符");
+    	}
+    	final User user = getById(po.getUserId());
+    	if (!StringUtils.equals(user.getPassword(), po.getPassword())) {
+    		return Results.newResult(StateCode.PARAMETER_ILLEGAL, "原密码错误，请重新输入");
+    	}
+    	user.setPassword(po.getNewPassword());
+    	user.setUpdateTime(WebworkUtils.nowTime());
+    	return Results.newSuccessfullyResult(updateById(user));
+    }
+    
+    /**
+     * 更新简单的用户信息，提供给用户更新个人信息使用
+     * 
+     * @param po 更新参数
+     * @return 是否更新成功
+     */
+    public Result<Boolean> updateSimpleUserInfo(UpdateUserInfoPO po) {
+    	if (po.getId() == null) {
+    		return Results.newResult(StateCode.PARAMETER_MISSING, "用户名ID不能为空");
+    	}
+    	if (StringUtils.isAnyBlank(po.getName(), po.getPhone())) {
+    		return Results.newResult(UserStateCode.USER_PROPS_NOT_NULL, "用户姓名、手机号不能为空");
+    	}
+    	final User user = BeanUtils.toObject(po, User.class);
+    	user.setUpdateTime(WebworkUtils.nowTime());
+    	return Results.newSuccessfullyResult(updateById(user));
+    }
 
 }

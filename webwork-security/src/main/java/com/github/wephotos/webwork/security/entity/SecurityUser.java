@@ -26,6 +26,10 @@ public class SecurityUser {
 	 */
 	private String name;
 	/**
+	 * 头像
+	 */
+	private String avatar;
+	/**
 	 * 登录账号
 	 */
 	private String account;

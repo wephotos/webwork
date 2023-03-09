@@ -5,6 +5,8 @@ import java.util.List;
 import com.github.wephotos.webwork.schema.entity.Result;
 import com.github.wephotos.webwork.user.client.entity.po.UserResoQueryPO;
 import com.github.wephotos.webwork.user.client.entity.po.UserRoleQueryPO;
+import com.github.wephotos.webwork.user.client.entity.po.ChangePasswordPO;
+import com.github.wephotos.webwork.user.client.entity.po.UpdateUserInfoPO;
 import com.github.wephotos.webwork.user.client.entity.po.UserLoginPO;
 import com.github.wephotos.webwork.user.client.entity.ro.NodeRO;
 import com.github.wephotos.webwork.user.client.entity.ro.ResoRO;
@@ -38,6 +40,16 @@ public class UserClientHttp implements UserClient {
 
 	@Override
 	public Result<UserRO> selectByUsername(String username) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public Result<Boolean> changePassword(ChangePasswordPO po) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public Result<Boolean> updateUserInfo(UpdateUserInfoPO po) {
 		throw new UnsupportedOperationException();
 	}
 
