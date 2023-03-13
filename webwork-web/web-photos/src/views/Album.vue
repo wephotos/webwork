@@ -37,11 +37,11 @@
         </template>
       </a-card>
       <!-- 暂不支持，可能需要升级版本 -->
-      <!-- <div style="display: none;">
+      <div style="display: none;">
         <a-image-preview-group :preview="preview">
           <a-image v-for="photo in photos" :key="photo.id" :src="photoSrc(photo)" />
         </a-image-preview-group>
-      </div> -->
+      </div>
       <!-- 照片信息弹框 -->
       <a-modal v-model:visible="photoInfoDialog.visible" :title="photoInfoDialog.title"
         :confirm-loading="photoInfoDialog.confirmLoading" @ok="onSavePhoto">
@@ -110,7 +110,7 @@ export default class Album extends Vue {
   // 照片预览
   preview = {
     visible: false,
-    // current: 1,
+    current: 1,
     onVisibleChange: (visible: boolean) => {
       this.preview.visible = visible
     }
@@ -152,7 +152,7 @@ export default class Album extends Vue {
    */
   onView(index: number) {
     this.preview.visible = true
-    // this.preview.current = index
+    this.preview.current = index
   }
 
   /**

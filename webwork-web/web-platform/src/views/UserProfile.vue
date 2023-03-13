@@ -60,7 +60,7 @@ import {
     LoadingOutlined
 } from '@ant-design/icons-vue'
 import { Rule } from 'ant-design-vue/es/form/interface'
-import { ref, toRaw } from 'vue'
+import { ref, unref, toRaw } from 'vue'
 import request from '@/request/PlatformRequest'
 import { message } from 'ant-design-vue'
 import { User } from '@/types/User'
@@ -183,7 +183,7 @@ export default class Password extends Vue {
 
     // 取消
     handleCancel() {
-        this.formRef.value?.clearValidate()
+        unref(this.formRef)?.clearValidate()
         this.$emit('close')
     }
 

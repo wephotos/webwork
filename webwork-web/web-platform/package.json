@@ -8,13 +8,14 @@
     "lint": "set NODE_OPTIONS=\"--openssl-legacy-provider\" & vue-cli-service lint"
   },
   "dependencies": {
-    "ant-design-vue": "^2.0.1",
+    "ant-design-vue": "^3.2.15",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "dayjs": "^1.11.7",
     "qs": "^6.10.0",
     "vue": "^3.0.0",
     "vue-class-component": "^8.0.0-0",
-    "vue-router": "^4.0.0-0"
+    "vue-router": "^4.1.6"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.33.0",
@@ -35,6 +36,6 @@
     "eslint-plugin-vue": "^7.0.0-0",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
-    "typescript": "~3.9.3"
+    "typescript": "^4.9.5"
   }
 }

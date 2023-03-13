@@ -111,7 +111,7 @@ export default class Home extends Vue {
   openApps: OpenApp[] = new Array<OpenApp>(0);
 
   get avatarUrl() {
-    return  '/file/download/' + this.user.avatar + '?random=' + this.random
+    return '/file/download/' + this.user.avatar + '?random=' + this.random
   }
 
   // 初始化

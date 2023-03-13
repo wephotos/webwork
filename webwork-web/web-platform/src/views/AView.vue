@@ -80,13 +80,13 @@ import { Options, Vue } from 'vue-class-component'
 
     close!: Function
 
-    top: number | string = '50%'
-    left: number | string = '50%'
+    top!: number | string
+    left!: number | string
     pxTop = 0
     pxLeft = 0
 
-    width: number | string = 200
-    height: number | string = 150
+    width!: number | string
+    height!: number | string
     pxWidth = 0
     pxHeight = 0
 

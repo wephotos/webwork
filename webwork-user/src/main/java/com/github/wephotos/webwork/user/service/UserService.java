@@ -165,7 +165,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * @return true: 检测通过
      */
     public boolean checkUniqueProperty(SFunction<User, ?> column, Object val) {
-    	return checkUniqueProperty(column, val);
+    	return checkUniqueProperty(null, column, val);
     }
     
     /**

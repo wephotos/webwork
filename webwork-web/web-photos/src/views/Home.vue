@@ -135,11 +135,11 @@ export default class Home extends Vue {
     }
     this.albumConfirm = true
     const res = await request.save(this.formData)
+    this.albumVisible = false
     if (res.code === 0) {
-      this.albumVisible = false
+      this.loadAlbums()
       message.success('相册创建成功')
     } else {
-      this.albumConfirm = false
       message.error('相册创建失败: ' + res.msg)
     }
   }

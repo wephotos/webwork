@@ -32,7 +32,7 @@ import {
     LockOutlined
 } from '@ant-design/icons-vue'
 import { Rule } from 'ant-design-vue/es/form/interface'
-import { ref } from 'vue'
+import { ref, unref } from 'vue'
 import request from '@/request/PlatformRequest'
 import { message } from 'ant-design-vue'
 
@@ -64,7 +64,7 @@ export default class Password extends Vue {
                 return Promise.reject(new Error('新密码不能与原密码相同'))
             }
             if (this.formData.confirmPassword !== '') {
-                this.formRef.value?.validate('confirmPassword')
+                unref(this.formRef)?.validate('confirmPassword')
             }
             return Promise.resolve()
         }
@@ -94,8 +94,7 @@ export default class Password extends Vue {
             newPassword: '',
             confirmPassword: ''
         }
-        this.formRef.value?.resetFields()
-        this.formRef.value?.clearValidate()
+        unref(this.formRef)?.resetFields()
         this.$emit('close')
     }
 

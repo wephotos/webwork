@@ -1,5 +1,6 @@
 import { User } from '@/types/User'
-import moment from 'moment'
+import dayjs from 'dayjs'
+
 /** 公共工具类 */
 export default class PubUtils {
     /**
@@ -34,7 +35,7 @@ export default class PubUtils {
      * @returns 格式化字符串
      */
     static formatDate(date: Date = new Date(), format = 'YYYY-MM-DD') {
-        return moment(date).format(format)
+        return dayjs(date).format(format)
     }
 
     /**
