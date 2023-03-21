@@ -16,7 +16,7 @@
         </a-space>
       </div>
       <a-divider />
-      <div style="width: 100%;" v-html="document.html"></div>
+      <div class="markdown-body" v-html="document.html"></div>
     </div>
 </template>
 <script lang="ts">
@@ -27,6 +27,7 @@
   import { marked } from 'marked'
   import highlight from 'highlight.js'
   import 'highlight.js/styles/default.css' // Code CSS
+  import 'github-markdown-css/github-markdown.css'
 
   @Options({
     components: {
@@ -100,6 +101,19 @@
   </script>
   <style lang="scss" scoped>
   .content {
-    padding: 20px 50px;
+    padding: 20px 10%;
   }
+
+  .markdown-body {
+		box-sizing: border-box;
+		min-width: 200px;
+		max-width: 100%;
+		margin: 0 auto;
+	}
+
+	@media (max-width: 767px) {
+		.markdown-body {
+			padding: 15px;
+		}
+	}
   </style>

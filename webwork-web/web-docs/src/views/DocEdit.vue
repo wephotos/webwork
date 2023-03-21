@@ -36,7 +36,7 @@
       :footer="null"
       wrap-class-name="full-modal"
     >
-    <div v-html="previewMarkdown"></div>
+    <div class="markdown-body" v-html="previewMarkdown"></div>
     </a-modal>
     </div>
 </template>
@@ -48,6 +48,8 @@
   import { marked } from 'marked'
   import highlight from 'highlight.js'
   import 'highlight.js/styles/default.css' // Code CSS
+  import 'github-markdown-css/github-markdown.css'
+
   @Options({
     components: {
     }
@@ -137,4 +139,18 @@
     flex: 1;
     overflow: auto;
   }
+
+  .markdown-body {
+		box-sizing: border-box;
+		min-width: 200px;
+		max-width: 100%;
+		margin: 0 auto;
+		padding: 25px 10%;
+	}
+
+	@media (max-width: 767px) {
+		.markdown-body {
+			padding: 15px;
+		}
+	}
 </style>
