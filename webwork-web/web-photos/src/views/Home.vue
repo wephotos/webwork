@@ -96,7 +96,8 @@ export default class Home extends Vue {
    * @param album 相册数据
    */
   onEdit(album: Album) {
-    this.formData = album
+    // 克隆一份数据，防止保存前更新数据
+    this.formData = { ...album }
     this.albumVisible = true
     this.albumModalTitle = '编辑相册'
   }

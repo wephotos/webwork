@@ -4,11 +4,9 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.user.entity.RoleResource;
 import com.github.wephotos.webwork.user.entity.po.RoleResourcesPO;
 import com.github.wephotos.webwork.user.mapper.RoleResourceMapper;
@@ -20,8 +18,6 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
  */
 @Service
 public class RoleResourceService {
-
-	private static final Logger log = LoggerFactory.getLogger(RoleResourceService.class);
 	
     @Resource
     private RoleResourceMapper roleResourceMapper;
@@ -32,7 +28,6 @@ public class RoleResourceService {
      * @return 新增记录主键
      */
     public Integer add(RoleResource record) {
-    	log.info("添加(单个)角色资源: {}", record);
     	record.setCreateTime(WebworkUtils.nowTime());
     	roleResourceMapper.insert(record);
     	return record.getId();
@@ -44,7 +39,6 @@ public class RoleResourceService {
      * @return 保存成功返回true
      */
     public void save(RoleResourcesPO po) {
-    	log.info("保存(全量)角色资源: {}", po);
     	deleteByRoleId(po.getRoleId());
     	List<Integer> resList = po.getResources();
     	if(resList == null || resList.isEmpty()) {
@@ -66,7 +60,6 @@ public class RoleResourceService {
      * @return 删除成功返回true
      */
     public boolean deleteByRoleId(Integer roleId) {
-    	log.info("删除角色资源, roleId = {}", roleId);
     	LambdaQueryWrapper<RoleResource> query = new LambdaQueryWrapper<>();
     	query.eq(RoleResource::getRoleId, roleId);
     	return roleResourceMapper.delete(query) > 0;
@@ -78,7 +71,6 @@ public class RoleResourceService {
      * @return 成功返回true
      */
     public boolean deleteById(String id) {
-    	log.info("删除角色资源, id = {}", id);
     	return roleResourceMapper.deleteById(id) == 1;
     }
 }

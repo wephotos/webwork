@@ -22,7 +22,7 @@ public class LogConfig {
 	 */
 	@Bean
 	@ConditionalOnMissingFilterBean
-	public FilterRegistrationBean<MDCFilter> webworkMDCFilter() {
+	public FilterRegistrationBean<MDCFilter> LogMDCFilter() {
 		FilterRegistrationBean<MDCFilter> registration = new FilterRegistrationBean<>();
 		registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
 		registration.setFilter(new MDCFilter());

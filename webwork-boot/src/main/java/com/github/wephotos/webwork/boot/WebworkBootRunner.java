@@ -18,9 +18,9 @@ public class WebworkBootRunner implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		// 注入获取日志操作者方法
-		LoggerRequestHandler.setOperator((session) -> {
+		LoggerRequestHandler.setLogUserContext((session) -> {
 			SecurityUser user = SecurityUtils.getSecurityUser(session);
-			return user == null ? "未知" : user.getName();
+			return user == null ? "" : user.getName();
 		});
 	}
 

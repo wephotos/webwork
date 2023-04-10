@@ -5,11 +5,9 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
@@ -27,8 +25,6 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
  */
 @Service
 public class DictionaryService {
-	
-	private static final Logger log = LoggerFactory.getLogger(DictionaryService.class);
 
 	@Resource
 	private DictionaryMapper dictionaryMapper;
@@ -48,7 +44,6 @@ public class DictionaryService {
 	 * @return 成功返回true
 	 */
 	public boolean delete(int id) {
-		log.info("删除数据字典, id = {}", id);
 		Dictionary entity = new Dictionary();
 		entity.setId(id);
 		entity.setStatus(EntityState.DELETED.getCode());
@@ -61,7 +56,6 @@ public class DictionaryService {
 	 * @return 数据主键
 	 */
 	public int add(Dictionary dictionary) {
-		log.info("新增数据字典:{}", dictionary);
 		int sort = dictionaryMapper.getMaxSort(dictionary.getParentId());
 		dictionary.setSort(sort);
 		dictionary.setCreateTime(WebworkUtils.nowTime());
@@ -80,7 +74,6 @@ public class DictionaryService {
 		if(dictionary.getId() == null) {
 			throw new IllegalArgumentException("数据字典ID不能为空");
 		}
-		log.info("更新数据字典:{}", dictionary);
 		dictionary.setUpdateTime(WebworkUtils.nowTime());
 		return dictionaryMapper.updateById(dictionary) == 1;
 	}

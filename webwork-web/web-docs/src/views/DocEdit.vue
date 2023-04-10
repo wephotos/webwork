@@ -120,7 +120,7 @@
     }
   }
   </script>
-  <style lang="scss" >
+  <style lang="scss">
   .content {
     padding: 20px 50px;
   }
@@ -140,12 +140,13 @@
     overflow: auto;
   }
 
+</style>
+<style lang="scss" scoped>
   .markdown-body {
 		box-sizing: border-box;
 		min-width: 200px;
 		max-width: 100%;
-		margin: 0 auto;
-		padding: 25px 10%;
+    margin: 0 auto;
 	}
 
 	@media (max-width: 767px) {

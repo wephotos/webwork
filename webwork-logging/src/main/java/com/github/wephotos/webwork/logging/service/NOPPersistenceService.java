@@ -1,7 +1,5 @@
 package com.github.wephotos.webwork.logging.service;
 
-import java.util.List;
-
 import com.github.wephotos.webwork.logging.entity.WebworkLog;
 
 /**
@@ -9,16 +7,10 @@ import com.github.wephotos.webwork.logging.entity.WebworkLog;
  * @author TQ
  *
  */
-public class WebworkLogServiceNop implements WebworkLogService {
+public class NOPPersistenceService implements IPersistenceService {
 
 	@Override
 	public int save(WebworkLog log) {
 		return 0;
 	}
-
-	@Override
-	public int saveBatch(List<WebworkLog> logs) {
-		return 0;
-	}
-
 }

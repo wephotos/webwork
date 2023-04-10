@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.github.wephotos.webwork.file.entity.FileGroup;
@@ -16,7 +15,6 @@ import com.github.wephotos.webwork.file.entity.WebworkFile;
 import com.github.wephotos.webwork.file.entity.po.FileGroupKeyQueryPO;
 import com.github.wephotos.webwork.file.mapper.FileMapper;
 import com.github.wephotos.webwork.file.stor.FileStor;
-import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.schema.exception.StateCode;
 import com.github.wephotos.webwork.schema.exception.WebworkRuntimeException;
@@ -30,8 +28,6 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
  */
 @Service
 public class FileService {
-	
-	private static final Logger log = LoggerFactory.getLogger(FileService.class);
 
     public FileService() {
     }
@@ -57,7 +53,6 @@ public class FileService {
      * @throws IOException IO异常
      */
     public UploadResult upload(WebworkFile file) throws IOException {
-    	log.info("上传文件: {}", file);
         // 是否覆盖原文件
         boolean isOverwrite = false;
         String objectName = file.getObjectName();
@@ -106,7 +101,6 @@ public class FileService {
      * @return 删除成功返回 true
      */
     public boolean logicalDelete(Integer id) {
-    	log.info("逻辑删除文件, id = {}", id);
         WebworkFile file = new WebworkFile();
         file.setId(id);
         file.setStatus(EntityState.DELETED.getCode());
@@ -121,7 +115,6 @@ public class FileService {
      * @throws IOException IO异常
      */
     public boolean physicalDelete(Integer id) throws IOException {
-    	log.info("物理删除文件, id = {}", id);
         WebworkFile file = fileMapper.selectByPrimaryKey(id);
         fileStor.delete(file.getObjectName());
         return fileMapper.deleteByPrimaryKey(id) == 1;
@@ -135,7 +128,6 @@ public class FileService {
      * @throws IOException IO异常
      */
     public WebworkFile getFile(Integer id) throws IOException {
-    	log.info("获取文件, id = {}", id);
         WebworkFile file = fileMapper.selectByPrimaryKey(id);
         file.setInputStream(fileStor.get(file.getObjectName()));
         return file;
@@ -149,7 +141,6 @@ public class FileService {
      * @throws IOException IO异常
      */
     public WebworkFile getFileByObjectName(String objectName) throws IOException {
-    	log.info("获取文件, objectName = {}", objectName);
         WebworkFile file = fileMapper.selectByObjectName(objectName);
         file.setInputStream(fileStor.get(file.getObjectName()));
         return file;
@@ -162,7 +153,6 @@ public class FileService {
      * @return {@link List<WebworkFile>}
      */
     public List<WebworkFile> listByFileGroupKey(FileGroupKeyQueryPO fileGroupKeyQueryPO) {
-    	log.info("查询文件组下文件: {}", fileGroupKeyQueryPO);
         return fileMapper.listByFileGroupKey(fileGroupKeyQueryPO);
     }
 }

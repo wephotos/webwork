@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
@@ -22,7 +21,6 @@ import com.github.wephotos.webwork.config.entity.Config;
 import com.github.wephotos.webwork.config.mapper.ConfigMapper;
 import com.github.wephotos.webwork.config.spring.HotConfigEnvironmentPostProcessor;
 import com.github.wephotos.webwork.config.spring.scope.HotScope;
-import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
@@ -35,8 +33,6 @@ import com.github.wephotos.webwork.schema.entity.Pageable;
 @Service
 public class ConfigService implements EnvironmentAware {
 	
-	//日志
-	private static final Logger log = LoggerFactory.getLogger(ConfigService.class);
 	/**
 	 * 配置文件缓存
 	 */
@@ -56,7 +52,6 @@ public class ConfigService implements EnvironmentAware {
 	@Override
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
-		log.info("{}", this.environment);
 	}
 	
 	/**
@@ -139,7 +134,6 @@ public class ConfigService implements EnvironmentAware {
 	 * 更新配置
 	 */
 	private void updateEnvironment() {
-		log.info("updateEnvironment:{}", this.environment);
 		if(!(this.environment instanceof ConfigurableEnvironment)) {
 			return;
 		}

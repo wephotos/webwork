@@ -1,8 +1,13 @@
 package com.github.wephotos.webwork.file.stor;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDate;
+
+import javax.annotation.PostConstruct;
+
 import com.github.wephotos.webwork.file.config.FileProperties;
 import com.github.wephotos.webwork.file.entity.WebworkFile;
-import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.qingstor.sdk.config.EnvContext;
 import com.qingstor.sdk.exception.QSException;
 import com.qingstor.sdk.service.Bucket;
@@ -11,13 +16,8 @@ import com.qingstor.sdk.service.Bucket.GetObjectOutput;
 import com.qingstor.sdk.service.Bucket.PutObjectInput;
 import com.qingstor.sdk.service.Bucket.PutObjectOutput;
 import com.qingstor.sdk.service.QingStor;
-import lombok.Getter;
-import org.slf4j.Logger;
 
-import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDate;
+import lombok.Getter;
 
 /**
  * 青云对象存储
@@ -26,9 +26,6 @@ import java.time.LocalDate;
  */
 @Getter
 public class FileStorQing implements FileStor {
-
-    // 日志
-    private static final Logger log = LoggerFactory.getLogger(FileStorQing.class);
 
     public FileStorQing(FileProperties props) {
         this.props = props;
@@ -78,7 +75,6 @@ public class FileStorQing implements FileStor {
         if (output.getStatueCode() != 201) {
             throw new FileStorException(String.format("上传附件到青云失败:%s", output.getMessage()));
         }
-        log.info("附件上传青云成功:{}", file.getObjectName());
     }
 
     @Override
@@ -92,7 +88,6 @@ public class FileStorQing implements FileStor {
         if (output.getStatueCode() != 204) {
             throw new FileStorException(String.format("删除青云附件失败:%s", output.getMessage()));
         }
-        log.info("删除青云附件成功:{}", objectName);
     }
 
     @Override
@@ -103,7 +98,6 @@ public class FileStorQing implements FileStor {
         } catch (QSException e) {
             throw new FileStorException("获取青云附件失败", e);
         }
-        log.info("获取青云附件成功:{}", objectName);
         return output.getBodyInputStream();
     }
 

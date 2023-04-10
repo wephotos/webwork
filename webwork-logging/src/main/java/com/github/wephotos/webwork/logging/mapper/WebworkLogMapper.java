@@ -3,6 +3,7 @@ package com.github.wephotos.webwork.logging.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.github.wephotos.webwork.logging.entity.WebworkLog;
 import com.github.wephotos.webwork.logging.entity.po.LogQueryPO;
@@ -23,6 +24,14 @@ public interface WebworkLogMapper {
     int insert(WebworkLog log);
 
     /**
+     * 批量插入
+     * 
+     * @param logs 日志集合
+     * @return 影响行数
+     */
+	int insertBatch(@Param("list") List<WebworkLog> logs);
+	
+    /**
      * 查询分页总条数
      * @param pageable 分页条件
      * @return 总数
@@ -35,4 +44,5 @@ public interface WebworkLogMapper {
 	 * @return 列表数据
 	 */
 	List<WebworkLog> pageList(Pageable<LogQueryPO> pageable);
+
 }

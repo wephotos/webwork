@@ -3,11 +3,12 @@ package com.github.wephotos.webwork.logging;
 import org.slf4j.helpers.Util;
 
 /**
- * 工具类
+ * WEB工具类
+ * 
  * @author TQ
  *
  */
-public final class LoggerUtils {
+public final class WEBUtils {
 
 	/**
 	 * 标识WEB环境的类名

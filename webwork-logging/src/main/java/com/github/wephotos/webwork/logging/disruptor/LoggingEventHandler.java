@@ -6,10 +6,10 @@ import java.io.Writer;
 import java.sql.Timestamp;
 
 import com.github.wephotos.webwork.logging.WebworkLoggingEvent;
-import com.github.wephotos.webwork.logging.WebworkLoggingEvent.LoggerRequest;
+import com.github.wephotos.webwork.logging.WebworkLoggingEvent.HttpLogRequest;
 import com.github.wephotos.webwork.logging.entity.WebworkLog;
-import com.github.wephotos.webwork.logging.service.WebworkLogService;
-import com.github.wephotos.webwork.logging.service.WebworkLogServiceNop;
+import com.github.wephotos.webwork.logging.service.IPersistenceService;
+import com.github.wephotos.webwork.logging.service.NOPPersistenceService;
 import com.lmax.disruptor.EventHandler;
 
 /**
@@ -22,22 +22,21 @@ public class LoggingEventHandler implements EventHandler<WebworkLoggingEvent> {
 	/***
 	 * 日志服务
 	 */
-	private static WebworkLogService logService = new WebworkLogServiceNop();
+	private static IPersistenceService persistence = new NOPPersistenceService();
 	
 	/**
 	 * 设置日志服务
 	 * @param logService 日志服务
 	 */
-	public static void setLogService(WebworkLogService logService) {
-		if(logService != null) {
-			LoggingEventHandler.logService = logService;
+	public static void setPersistenceService(IPersistenceService persistence) {
+		if(persistence != null) {
+			LoggingEventHandler.persistence = persistence;
 		}
 	}
 
-	//TODO: 后期可优化为批量入库
     @Override
     public void onEvent(WebworkLoggingEvent event, long sequence, boolean endOfBatch) throws Exception {
-        logService.save(toWebworkLog(event));
+    	persistence.save(toWebworkLog(event));
     }
     
     /**
@@ -60,12 +59,15 @@ public class LoggingEventHandler implements EventHandler<WebworkLoggingEvent> {
     		Writer out = new StringWriter(512);
     		PrintWriter writer = new PrintWriter(out);
     		throwable.printStackTrace(writer);
-    		log.setStackTrace(out.toString());
+    		// 将堆栈信息拼接到日志内容后面
+    		String content = new StringBuilder(log.getContent())
+    				.append("\n\r").append(out.toString()).toString();
+    		log.setContent(content);
     	}
-    	LoggerRequest request = event.getRequest();
+    	HttpLogRequest request = event.getRequest();
     	if(request != null) {
     		log.setUrl(request.getRequestURL());
-    		log.setUsername(request.getOperator());
+    		log.setUsername(request.getUsername());
     		log.setClientInfo(request.getUserAgent());
     		log.setClientHost(request.getClientHost());
     	}

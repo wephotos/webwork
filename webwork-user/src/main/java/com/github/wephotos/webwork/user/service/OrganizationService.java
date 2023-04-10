@@ -9,12 +9,10 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
-import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.user.entity.Organization;
 import com.github.wephotos.webwork.user.entity.UserOrg;
@@ -34,8 +32,6 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
  */
 @Service
 public class OrganizationService {
-	
-	private static final Logger log = LoggerFactory.getLogger(OrganizationService.class);
 	
 	@Resource
 	private UserOrgService userOrgService;
@@ -58,7 +54,6 @@ public class OrganizationService {
      * @return 主键
      */
     public synchronized int add(Organization data) {
-    	log.info("新增组织机构:{}", data);
         Integer parentId = data.getParentId();
         // 生成层级代码
         String maxCode = organizationMapper.getMaxCode(parentId);
@@ -81,7 +76,6 @@ public class OrganizationService {
      */
     public boolean update(Organization organ) {
     	Objects.requireNonNull(organ.getId(), "机构ID不能为空");
-    	log.info("更新组织机构:{}", organ);
     	organ.setUpdateTime(WebworkUtils.nowTime());
         return SqlHelper.retBool(organizationMapper.updateById(organ));
     }
@@ -92,7 +86,6 @@ public class OrganizationService {
      * @return 是否成功
      */
     public boolean delete(int id) {
-    	log.info("删除组织机构: id = {}", id);
         Organization org = new Organization();
         org.setId(id);
         org.setStatus(EntityState.DELETED.getCode());
@@ -218,7 +211,6 @@ public class OrganizationService {
      * @return 影响行数
      */
     public boolean dropSort(DropSortPO dropSort) {
-    	log.info("拖动排序组织机构:{}", dropSort);
         return organizationMapper.dropSort(dropSort) > 0;
     }
     

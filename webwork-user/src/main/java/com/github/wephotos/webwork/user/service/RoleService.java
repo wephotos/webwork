@@ -7,11 +7,9 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
@@ -43,8 +41,6 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
 @Service
 public class RoleService {
 	
-	private static final Logger log = LoggerFactory.getLogger(RoleService.class);
-	
     @Resource
     private RoleMapper roleMapper;
     
@@ -71,7 +67,6 @@ public class RoleService {
      * @return 删除是否成功
      */
 	public boolean deleteById(Integer id) {
-		log.info("删除角色, id = {}", id);
 		Role role = new Role();
 		role.setId(id);
 		role.setStatus(EntityState.DELETED.getCode());
@@ -87,7 +82,6 @@ public class RoleService {
     	// 判断角色名称是否存在
     	ValidationUtils.isFalse(isExistsName(role), UserStateCode.ROLE_NAME_EXIST);
     	
-    	log.info("新增角色: {}", role);
         role.setStatus(EntityState.NORMAL.getCode());
         role.setCreateTime(WebworkUtils.nowTime());
         role.setUpdateTime(role.getCreateTime());
@@ -116,7 +110,6 @@ public class RoleService {
     	// 判断角色名称是否存在
     	ValidationUtils.isFalse(isExistsName(role), UserStateCode.ROLE_NAME_EXIST);
     	
-    	log.info("更新角色: {}", role);
     	role.setUpdateTime(WebworkUtils.nowTime());
         return roleMapper.updateById(role) == 1;
     }

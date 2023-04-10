@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -23,7 +22,6 @@ import com.github.wephotos.webwork.docs.entity.vo.SaveDocResult;
 import com.github.wephotos.webwork.docs.mapper.DocumentMapper;
 import com.github.wephotos.webwork.docs.utils.DocStateCode;
 import com.github.wephotos.webwork.docs.utils.DocUtils;
-import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
@@ -41,8 +39,6 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
 @Service
 public class DocumentService {
 	
-	//日志
-	private static final Logger log = LoggerFactory.getLogger(DocumentService.class);
 	/**
 	 * 子标题最大长度
 	 */
@@ -107,7 +103,6 @@ public class DocumentService {
 		if(contentType == null) {
 			throw new WebworkRuntimeException(StateCode.PARAMETER_ILLEGAL, "错误的文档内容类型: " + po.getContentType());
 		}
-		log.info("新建文档:{}", po);
 		
 		Document doc = BeanUtils.toObject(po, Document.class);
 		// 抽取文本
@@ -146,7 +141,6 @@ public class DocumentService {
 			throw new WebworkRuntimeException(StateCode.PARAMETER_MISSING, 
 					"参数[id, versionNo, content]不能为空");
 		}
-		log.info("更新文档:{}", po);
 		// 比对文档版本号
 		Document origin = documentMapper.selectById(po.getId());
 		if(origin == null) {

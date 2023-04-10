@@ -8,7 +8,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.github.wephotos.webwork.logging.WebworkLoggingEvent.LoggerRequest;
+import com.github.wephotos.webwork.logging.WebworkLoggingEvent.HttpLogRequest;
 
 /**
  * 请求参数处理
@@ -20,10 +20,10 @@ public final class LoggerRequestHandler {
 	/**
 	 * 获取日志操作者接口
 	 */
-	private static LoggerOperator operator;
+	private static ILogUserContext context;
 	
-	public static void setOperator(LoggerOperator operator) {
-		LoggerRequestHandler.operator = operator;
+	public static void setLogUserContext(ILogUserContext context) {
+		LoggerRequestHandler.context = context;
 	}
 	
 	/**
@@ -31,21 +31,21 @@ public final class LoggerRequestHandler {
 	 * @param loggerRequest 日志请求对象
 	 */
 	@Nullable
-	public static LoggerRequest getLoggerRequest() {
+	public static HttpLogRequest getHttpLogRequest() {
 		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 		if(!(requestAttributes instanceof ServletRequestAttributes)) {
 			return null;
 		}
 		HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-		LoggerRequest request2 = new LoggerRequest();
+		HttpLogRequest request2 = new HttpLogRequest();
 		request2.setClientHost(request.getRemoteAddr());
 		request2.setUserAgent(getUserAgent(request));
 		request2.setRequestURL(request.getRequestURL().toString());
 		
 		// 设置用户信息
 		HttpSession session = request.getSession();
-		if(operator != null) {
-			request2.setOperator(operator.getName(session));
+		if(context != null) {
+			request2.setUsername(context.getUsername(session));
 		}
 		return request2;
 	}

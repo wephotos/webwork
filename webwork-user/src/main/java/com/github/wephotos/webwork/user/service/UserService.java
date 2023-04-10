@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
@@ -55,8 +53,6 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
 @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
 public class UserService extends ServiceImpl<UserMapper, User> {
 	
-	private static final Logger log = LoggerFactory.getLogger(UserService.class);
-	
     @Resource
     private UserMapper userMapper;
     
@@ -84,7 +80,6 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         ValidationUtils.isTrue(checkUniqueProperty(User::getAccount, po.getAccount()), UserStateCode.USER_ACCOUNT_EXIST);
         ValidationUtils.isTrue(checkUniqueProperty(User::getPhone, po.getPhone()), UserStateCode.USER_PHONE_EXIST);
         ValidationUtils.isTrue(checkUniqueProperty(User::getEmail, po.getEmail()), UserStateCode.USER_MAIL_EXIST);
-        log.info("创建用户: {}", po);
         
     	User user = BeanUtils.toObject(po, User.class);
     	if(user.getStatus() == null) {
@@ -118,7 +113,6 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * @return
      */
 	public boolean deleteById(Integer id) {
-		log.info("删除用户, id = {}", id);
 		User user = new User();
 		user.setId(id);
 		user.setStatus(EntityState.DELETED.getCode());
@@ -204,7 +198,6 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * @return 是否成功
      */
     public boolean top(String userId, String deptId) {
-    	log.info("置顶用户, userId = {}, deptId = {}", userId, deptId);
     	UserOrg entity = new UserOrg();
     	entity.setUserSort(0);
     	entity.setTopTime(WebworkUtils.nowTime());
@@ -235,7 +228,6 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 		ValidationUtils.isTrue(checkUniqueProperty(po.getId(), User::getEmail, po.getEmail()), 
 				UserStateCode.USER_MAIL_EXIST);
         
-        log.info("更新用户: {}", po);
     	User user = BeanUtils.toObject(po, User.class);
     	user.setUpdateUser(user.getCreateUser());
     	user.setUpdateTime(WebworkUtils.nowTime());
@@ -315,7 +307,6 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 		if(StringUtils.isAnyBlank(po.getUsername(), po.getPassword())) {
 			return Results.newResult(StateCode.PARAMETER_MISSING, "用户名或密码不能为空");
 		}
-		log.info("用户登录: {}", po);
 		User user = this.getByAccount(po.getUsername());
         if (user == null) {
             return Results.newResult(UserStateCode.USER_NOT_EXISTS);

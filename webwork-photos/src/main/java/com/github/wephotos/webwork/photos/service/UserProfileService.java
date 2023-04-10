@@ -5,12 +5,10 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.photos.entity.UserProfile;
 import com.github.wephotos.webwork.photos.mapper.UserProfileMapper;
 import com.github.wephotos.webwork.photos.utils.PhotosStateCode;
@@ -27,9 +25,6 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
  */
 @Service
 public class UserProfileService extends ServiceImpl<UserProfileMapper, UserProfile> {
-	
-	//日志
-	static final Logger log = LoggerFactory.getLogger(UserProfileService.class);
 	
 	@Resource
 	private UserClient userClient;

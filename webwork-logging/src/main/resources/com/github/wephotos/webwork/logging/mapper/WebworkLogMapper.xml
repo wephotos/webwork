@@ -29,6 +29,18 @@
         		#{createTime,jdbcType=TIMESTAMP})
     </insert>
     
+    <insert id="insertBatch" parameterType="com.github.wephotos.webwork.logging.entity.WebworkLog">
+        insert into webwork_log(name, level, trace_id, username, url, client_host, client_info, 
+        						content, stack_trace, create_time)
+        values 
+        <foreach collection="list" item="item" separator=",">
+        (#{item.name,jdbcType=VARCHAR}, #{item.level,jdbcType=VARCHAR}, #{item.traceId,jdbcType=VARCHAR}, 
+        		#{item.username,jdbcType=VARCHAR}, #{item.url,jdbcType=VARCHAR}, #{item.clientHost,jdbcType=VARCHAR}, 
+        		#{item.clientInfo,jdbcType=VARCHAR}, #{item.content,jdbcType=VARCHAR}, #{item.stackTrace,jdbcType=VARCHAR}, 
+        		#{item.createTime,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+    
     <select id="pageCount" resultType="int" parameterType="com.github.wephotos.webwork.schema.entity.Pageable">
     	SELECT 
     	  COUNT(1) 

@@ -7,11 +7,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.github.wephotos.webwork.logging.LoggerFactory;
 import com.github.wephotos.webwork.schema.entity.EntityState;
 import com.github.wephotos.webwork.schema.entity.Page;
 import com.github.wephotos.webwork.schema.entity.Pageable;
@@ -43,8 +41,6 @@ import com.github.wephotos.webwork.utils.WebworkUtils;
  */
 @Service
 public class ResourceService {
-	
-	private static final Logger log = LoggerFactory.getLogger(ResourceService.class);
 	
     @javax.annotation.Resource
     private ResourceMapper resourceMapper;
@@ -137,7 +133,6 @@ public class ResourceService {
         }
         // 校验资源自定义编码
         ValidationUtils.isFalse(containsResource(record), UserStateCode.RESOURCE_CODE_EXIST);
-        log.info("新增资源:{}", record);
     	// 添加应用
     	if(NodeTypeEnum.GROUP.is(parentType)) {
     		record.setCode(getAppMaxCode());
@@ -165,7 +160,6 @@ public class ResourceService {
     public boolean update(Resource resource) {
     	// 校验资源自定义编码
         ValidationUtils.isFalse(containsResource(resource), UserStateCode.RESOURCE_CODE_EXIST);
-        log.info("更新资源:{}", resource);
         resource.setUpdateTime(WebworkUtils.nowTime());
         return resourceMapper.updateById(resource) == 1;
     }
@@ -176,7 +170,6 @@ public class ResourceService {
      * @return 删除成功返回true
      */
 	public boolean deleteById(Integer id) {
-		log.info("删除资源: id = {}", id);
 		Resource entity = new Resource()
 				.setId(id)
 				.setStatus(EntityState.DELETED.getCode());

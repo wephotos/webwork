@@ -67,8 +67,8 @@ public class LoggerPublisher {
         loggingEvent.setArgumentArray(args);
         loggingEvent.setThrowable(throwable);
         // 获取当前请求信息
-    	if(LoggerUtils.isWebEnv()) {
-    		loggingEvent.setRequest(LoggerRequestHandler.getLoggerRequest());
+    	if(WEBUtils.isWebEnv()) {
+    		loggingEvent.setRequest(LoggerRequestHandler.getHttpLogRequest());
     	}
     	// MDC traceId
     	loggingEvent.setTraceId(MDCUtils.get());
